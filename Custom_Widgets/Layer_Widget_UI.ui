@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Custom_Layer_Widget_UI</class>
- <widget class="QWidget" name="Custom_Layer_Widget_UI">
+ <class>Layer_Widget_UI</class>
+ <widget class="QWidget" name="Layer_Widget_UI">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>77</height>
+    <height>78</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="Layer_widget_button_layout_1">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QPushButton" name="Layer_widget_visible_button1">
+      <widget class="QPushButton" name="Visible_button">
        <property name="minimumSize">
         <size>
          <width>20</width>
@@ -36,7 +33,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="Layer_widget_lock_button1">
+      <widget class="QPushButton" name="Lock_button">
        <property name="minimumSize">
         <size>
          <width>20</width>
@@ -57,30 +54,42 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="Layer_widget_preview_label_1">
+    <widget class="QLabel" name="Preview_label">
+     <property name="minimumSize">
+      <size>
+       <width>60</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>60</height>
+      </size>
+     </property>
      <property name="text">
       <string>预览</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_24">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QLabel" name="Layer_widget_layer_name_1">
+      <widget class="QLabel" name="Layer_name_label">
        <property name="text">
         <string>名</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="Layer_widget_layer_mod_1">
+      <widget class="QLabel" name="Layer_mod_label">
        <property name="text">
         <string>模式</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="Layer_widget_layer_Opacity_1">
+      <widget class="QLabel" name="Layer_opacity_label">
        <property name="text">
         <string>不透明度</string>
        </property>
@@ -89,7 +98,7 @@
     </layout>
    </item>
    <item>
-    <spacer name="horizontalSpacer_11">
+    <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

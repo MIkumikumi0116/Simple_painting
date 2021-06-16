@@ -7,19 +7,36 @@
     <x>0</x>
     <y>0</y>
     <width>1450</width>
-    <height>749</height>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="Centra_layout">
+  <widget class="QWidget" name="Centra_Layout">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QSplitter" name="Centra_splitter_layout">
+     <widget class="QSplitter" name="Splitting_Layout">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <widget class="QFrame" name="Board_frame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>6</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QFrame" name="Layer_frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -27,13 +44,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QHBoxLayout" name="Mix_mod_Layout">
           <item>
@@ -159,6 +170,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -191,6 +205,12 @@
             </item>
             <item row="1" column="2">
              <widget class="QPushButton" name="Del_layer_button">
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>30</width>
@@ -285,8 +305,8 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
              </spacer>
@@ -303,13 +323,13 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>298</width>
-               <height>549</height>
+               <width>212</width>
+               <height>552</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="Custom_Layer_Widget" name="widget" native="true"/>
+               <widget class="Layer_Widget" name="Layer_1_widget" native="true"/>
               </item>
               <item>
                <spacer name="verticalSpacer">
@@ -332,64 +352,79 @@
         </item>
        </layout>
       </widget>
-      <widget class="QFrame" name="Func_frame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QPushButton" name="pushButton_4">
-          <property name="text">
-           <string>PushButton</string>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="Func_frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QScrollArea" name="Func_scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="Func_scrollArea_widget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>280</width>
+            <height>686</height>
+           </rect>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>PushButton</string>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="Color_Wheel" name="widget" native="true"/>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QFrame" name="Board_frame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>6</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="Menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -399,6 +434,9 @@
     </rect>
    </property>
    <widget class="QMenu" name="File_menu_tab">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>文件</string>
     </property>
@@ -434,6 +472,7 @@
      <addaction name="White_bg_action"/>
      <addaction name="Black_bg_action"/>
      <addaction name="Front_color_bg_action"/>
+     <addaction name="Specified_color_bg_action"/>
      <addaction name="Transparent_white_bg_action"/>
      <addaction name="Transparent_black_bg_action"/>
      <addaction name="separator"/>
@@ -594,33 +633,54 @@
    </property>
   </action>
   <action name="White_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>白</string>
    </property>
   </action>
   <action name="Black_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>黑</string>
    </property>
   </action>
   <action name="Front_color_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>前景色</string>
    </property>
   </action>
   <action name="Transparent_white_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>透明（浅色格子）</string>
    </property>
   </action>
   <action name="Transparent_black_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>透明（深色格子）</string>
    </property>
   </action>
   <action name="Specify_color_bg_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>指定颜色</string>
+    <string>指定背景颜色</string>
    </property>
   </action>
   <action name="New_bit_layer_action">
@@ -675,12 +735,12 @@
   </action>
   <action name="CW_rotate_layer_action">
    <property name="text">
-    <string>顺时针旋转图层90度</string>
+    <string>顺时针90度旋转图层</string>
    </property>
   </action>
   <action name="CCW_rotate_layer_action">
    <property name="text">
-    <string>逆时针旋转图层90度</string>
+    <string>逆时针90度旋转图层</string>
    </property>
   </action>
   <action name="Layer_setting_action">
@@ -773,12 +833,23 @@
     <string>选中图层成组</string>
    </property>
   </action>
+  <action name="Specified_color_bg_action">
+   <property name="text">
+    <string>指定色</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>Custom_Layer_Widget</class>
+   <class>Layer_Widget</class>
    <extends>QWidget</extends>
-   <header>Custom_Layer_Widget.h</header>
+   <header>Custom_Widgets/Layer_Widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Color_Wheel</class>
+   <extends>QWidget</extends>
+   <header>Custom_Widgets/Color_Wheel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
