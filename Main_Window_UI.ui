@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QFrame" name="Board_frame">
+      <widget class="QFrame" name="Board_Frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>6</horstretch>
@@ -37,7 +37,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QFrame" name="Layer_frame">
+      <widget class="QFrame" name="Layer_Frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>1</horstretch>
@@ -46,9 +46,9 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QHBoxLayout" name="Mix_mod_Layout">
+         <layout class="QHBoxLayout" name="Mix_Mod_Layout">
           <item>
-           <widget class="QLabel" name="Mix_mod_label">
+           <widget class="QLabel" name="Mix_Mod_Label">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
@@ -61,7 +61,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="Mix_mod_comboBox">
+           <widget class="QComboBox" name="Mix_Mod_ComboBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>2</horstretch>
@@ -150,7 +150,7 @@
         <item>
          <layout class="QHBoxLayout" name="Opacity_Layout">
           <item>
-           <widget class="QLabel" name="Opacity_label">
+           <widget class="QLabel" name="Opacity_Label">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
@@ -181,11 +181,11 @@
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="Layer_list_Layout">
+         <layout class="QVBoxLayout" name="Layer_List_Layout">
           <item>
-           <layout class="QGridLayout" name="Layer_action_Layout">
+           <layout class="QGridLayout" name="Layer_Action_Layout">
             <item row="1" column="1">
-             <widget class="QPushButton" name="Clear_layer_button">
+             <widget class="QPushButton" name="Clear_Layer_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -204,7 +204,7 @@
              </widget>
             </item>
             <item row="1" column="2">
-             <widget class="QPushButton" name="Del_layer_button">
+             <widget class="QPushButton" name="Del_Layer_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -223,7 +223,7 @@
              </widget>
             </item>
             <item row="0" column="2">
-             <widget class="QPushButton" name="New_layer_group_button">
+             <widget class="QPushButton" name="New_Layer_Group_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -242,7 +242,7 @@
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QPushButton" name="New_bit_layer_button">
+             <widget class="QPushButton" name="New_Bit_Layer_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -261,7 +261,7 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QPushButton" name="Merge_visible_layer_button">
+             <widget class="QPushButton" name="Merge_Visible_Layer_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -280,7 +280,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QPushButton" name="New_vector_layer_button">
+             <widget class="QPushButton" name="New_Vector_Layer_Button">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -314,11 +314,11 @@
            </layout>
           </item>
           <item>
-           <widget class="QScrollArea" name="Layer_list_scrollArea">
+           <widget class="QScrollArea" name="Layer_List_ScrollArea">
             <property name="widgetResizable">
              <bool>true</bool>
             </property>
-            <widget class="QWidget" name="Layer_list_scrollArea_widget">
+            <widget class="QWidget" name="Layer_List_ScrollArea_Widget">
              <property name="geometry">
               <rect>
                <x>0</x>
@@ -329,7 +329,7 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="Layer_Widget" name="Layer_1_widget" native="true"/>
+               <widget class="Layer_Widget" name="Layer_1_Widget" native="true"/>
               </item>
               <item>
                <spacer name="verticalSpacer">
@@ -355,7 +355,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QFrame" name="Func_frame">
+     <widget class="QFrame" name="Func_Frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -376,11 +376,11 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QScrollArea" name="Func_scrollArea">
+        <widget class="QScrollArea" name="Func_ScrollArea">
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="Func_scrollArea_widget">
+         <widget class="QWidget" name="Func_ScrollArea_Widget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -396,9 +396,6 @@
            </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="Color_Wheel" name="widget" native="true"/>
-           </item>
            <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
@@ -433,206 +430,206 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="File_menu_tab">
+   <widget class="QMenu" name="File_Menu_Tab">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="New_action"/>
-    <addaction name="Open_action"/>
+    <addaction name="New_Action"/>
+    <addaction name="Open_Action"/>
     <addaction name="separator"/>
-    <addaction name="Save_action"/>
-    <addaction name="Save_as_action"/>
-    <addaction name="Export_action"/>
+    <addaction name="Save_Action"/>
+    <addaction name="Save_As_Action"/>
+    <addaction name="Export_Action"/>
     <addaction name="separator"/>
-    <addaction name="Close_action"/>
-    <addaction name="Exit_action"/>
+    <addaction name="Close_Action"/>
+    <addaction name="Exit_Action"/>
    </widget>
-   <widget class="QMenu" name="Edit_menu_tab">
+   <widget class="QMenu" name="Edit_Menu_Tab">
     <property name="title">
      <string>编辑</string>
     </property>
-    <addaction name="Revoke_action"/>
-    <addaction name="Redo_action"/>
+    <addaction name="Revoke_Action"/>
+    <addaction name="Redo_Action"/>
     <addaction name="separator"/>
-    <addaction name="Cut_action"/>
-    <addaction name="Copy_action"/>
-    <addaction name="Paste_action"/>
+    <addaction name="Cut_Action"/>
+    <addaction name="Copy_Action"/>
+    <addaction name="Paste_Action"/>
    </widget>
-   <widget class="QMenu" name="Image_menu_tab">
+   <widget class="QMenu" name="Image_Menu_Tab">
     <property name="title">
      <string>图像</string>
     </property>
-    <widget class="QMenu" name="Board_bg_menu">
+    <widget class="QMenu" name="Board_Bg_Menu">
      <property name="title">
       <string>画布背景</string>
      </property>
-     <addaction name="White_bg_action"/>
-     <addaction name="Black_bg_action"/>
-     <addaction name="Front_color_bg_action"/>
-     <addaction name="Specified_color_bg_action"/>
-     <addaction name="Transparent_white_bg_action"/>
-     <addaction name="Transparent_black_bg_action"/>
+     <addaction name="White_Bg_Action"/>
+     <addaction name="Black_Bg_Action"/>
+     <addaction name="Front_Color_Bg_Action"/>
+     <addaction name="Specified_Color_Bg_Action"/>
+     <addaction name="Transparent_White_Bg_Action"/>
+     <addaction name="Transparent_Black_Bg_Action"/>
      <addaction name="separator"/>
-     <addaction name="Specify_color_bg_action"/>
+     <addaction name="Specify_Color_Bg_Action"/>
     </widget>
-    <addaction name="Board_size_action"/>
+    <addaction name="Board_Size_Action"/>
     <addaction name="separator"/>
-    <addaction name="Horizontal_flip_Board_action"/>
-    <addaction name="Vertical_flip_Board_action"/>
-    <addaction name="CW_rotate_Board_action"/>
-    <addaction name="CCW_rotate_Board_action"/>
+    <addaction name="Horizontal_Flip_Board_Action"/>
+    <addaction name="Vertical_Flip_Board_Action"/>
+    <addaction name="CW_Rotate_Board_Action"/>
+    <addaction name="CCW_Rotate_Board_Action"/>
     <addaction name="separator"/>
-    <addaction name="Board_bg_menu"/>
+    <addaction name="Board_Bg_Menu"/>
    </widget>
-   <widget class="QMenu" name="Layer_menu_tab">
+   <widget class="QMenu" name="Layer_Menu_Tab">
     <property name="title">
      <string>图层</string>
     </property>
-    <addaction name="New_bit_layer_action"/>
-    <addaction name="New_vector_layer_action"/>
-    <addaction name="New_layer_group_action"/>
-    <addaction name="Group_layer_action"/>
+    <addaction name="New_Bit_Layer_Action"/>
+    <addaction name="New_Vector_Layer_Action"/>
+    <addaction name="New_Layer_Group_Action"/>
+    <addaction name="Group_Layer_Action"/>
     <addaction name="separator"/>
-    <addaction name="Copy_layer_action"/>
-    <addaction name="Del_layer_action"/>
-    <addaction name="Clear_layer_action"/>
+    <addaction name="Copy_Layer_Action"/>
+    <addaction name="Del_Layer_Action"/>
+    <addaction name="Clear_Layer_Action"/>
     <addaction name="separator"/>
-    <addaction name="Merge_selected_layer_action"/>
-    <addaction name="Merge_visible_layer_action"/>
+    <addaction name="Merge_Selected_Layer_Action"/>
+    <addaction name="Merge_Visible_Layer_Action"/>
     <addaction name="separator"/>
-    <addaction name="Horizontal_flip_layer_action"/>
-    <addaction name="Vertical_flip_layer_action"/>
-    <addaction name="CW_rotate_layer_action"/>
-    <addaction name="CCW_rotate_layer_action"/>
+    <addaction name="Horizontal_Flip_Layer_Action"/>
+    <addaction name="Vertical_Flip_Layer_Action"/>
+    <addaction name="CW_Rotate_Layer_Action"/>
+    <addaction name="CCW_Rotate_Layer_Action"/>
     <addaction name="separator"/>
-    <addaction name="Layer_setting_action"/>
+    <addaction name="Layer_Setting_Action"/>
    </widget>
-   <widget class="QMenu" name="View_menu_tab">
+   <widget class="QMenu" name="View_Menu_Tab">
     <property name="title">
      <string>视图</string>
     </property>
-    <addaction name="Enlarge_view_action"/>
-    <addaction name="Narrow_view_action"/>
-    <addaction name="CW_rotate_view_action"/>
-    <addaction name="CCW_rotate_view_action"/>
+    <addaction name="Enlarge_View_Action"/>
+    <addaction name="Narrow_View_Action"/>
+    <addaction name="CW_Rotate_View_Action"/>
+    <addaction name="CCW_Rotate_View_Action"/>
     <addaction name="separator"/>
-    <addaction name="Zoom_100_action"/>
-    <addaction name="Zoom_window_size_action"/>
-    <addaction name="Clear_view_offset_action"/>
-    <addaction name="Clear_view_rotate_action"/>
+    <addaction name="Zoom_100_Action"/>
+    <addaction name="Zoom_Window_Size_Action"/>
+    <addaction name="Clear_View_Offset_Action"/>
+    <addaction name="Clear_View_Rotate_Action"/>
    </widget>
-   <widget class="QMenu" name="Anime_menu_tab">
+   <widget class="QMenu" name="Anime_Menu_Tab">
     <property name="title">
      <string>动画</string>
     </property>
-    <addaction name="New_frame_action"/>
-    <addaction name="Copy_frame_action"/>
-    <addaction name="Del_frame_action"/>
-    <addaction name="Clear_frame_action"/>
+    <addaction name="New_Frame_Action"/>
+    <addaction name="Copy_Frame_Action"/>
+    <addaction name="Del_Frame_Action"/>
+    <addaction name="Clear_Frame_Action"/>
     <addaction name="separator"/>
-    <addaction name="Next_frame_action"/>
-    <addaction name="Previous_frame_action"/>
+    <addaction name="Next_Frame_Action"/>
+    <addaction name="Previous_Frame_Action"/>
     <addaction name="separator"/>
-    <addaction name="Play_anime_action"/>
+    <addaction name="Play_Anime_Action"/>
     <addaction name="separator"/>
-    <addaction name="Anime_setting_action"/>
+    <addaction name="Anime_Setting_Action"/>
    </widget>
-   <addaction name="File_menu_tab"/>
-   <addaction name="Edit_menu_tab"/>
-   <addaction name="Image_menu_tab"/>
-   <addaction name="Layer_menu_tab"/>
-   <addaction name="View_menu_tab"/>
-   <addaction name="Anime_menu_tab"/>
+   <addaction name="File_Menu_Tab"/>
+   <addaction name="Edit_Menu_Tab"/>
+   <addaction name="Image_Menu_Tab"/>
+   <addaction name="Layer_Menu_Tab"/>
+   <addaction name="View_Menu_Tab"/>
+   <addaction name="Anime_Menu_Tab"/>
   </widget>
-  <action name="New_action">
+  <action name="New_Action">
    <property name="text">
     <string>新建</string>
    </property>
   </action>
-  <action name="Open_action">
+  <action name="Open_Action">
    <property name="text">
     <string>打开</string>
    </property>
   </action>
-  <action name="Export_action">
+  <action name="Export_Action">
    <property name="text">
     <string>导出</string>
    </property>
   </action>
-  <action name="Close_action">
+  <action name="Close_Action">
    <property name="text">
     <string>关闭</string>
    </property>
   </action>
-  <action name="Exit_action">
+  <action name="Exit_Action">
    <property name="text">
     <string>退出</string>
    </property>
   </action>
-  <action name="Save_action">
+  <action name="Save_Action">
    <property name="text">
     <string>保存</string>
    </property>
   </action>
-  <action name="Save_as_action">
+  <action name="Save_As_Action">
    <property name="text">
     <string>另存为</string>
    </property>
   </action>
-  <action name="Revoke_action">
+  <action name="Revoke_Action">
    <property name="text">
     <string>撤销</string>
    </property>
   </action>
-  <action name="Redo_action">
+  <action name="Redo_Action">
    <property name="text">
     <string>还原</string>
    </property>
   </action>
-  <action name="Cut_action">
+  <action name="Cut_Action">
    <property name="text">
     <string>剪切</string>
    </property>
   </action>
-  <action name="Copy_action">
+  <action name="Copy_Action">
    <property name="text">
     <string>复制</string>
    </property>
   </action>
-  <action name="Paste_action">
+  <action name="Paste_Action">
    <property name="text">
     <string>粘贴</string>
    </property>
   </action>
-  <action name="Board_size_action">
+  <action name="Board_Size_Action">
    <property name="text">
     <string>画布大小</string>
    </property>
   </action>
-  <action name="Horizontal_flip_Board_action">
+  <action name="Horizontal_Flip_Board_Action">
    <property name="text">
     <string>水平翻转画布</string>
    </property>
   </action>
-  <action name="Vertical_flip_Board_action">
+  <action name="Vertical_Flip_Board_Action">
    <property name="text">
     <string>垂直翻转画布</string>
    </property>
   </action>
-  <action name="CW_rotate_Board_action">
+  <action name="CW_Rotate_Board_Action">
    <property name="text">
     <string>顺时针旋转画布90度</string>
    </property>
   </action>
-  <action name="CCW_rotate_Board_action">
+  <action name="CCW_Rotate_Board_Action">
    <property name="text">
     <string>逆时针旋转画布90度</string>
    </property>
   </action>
-  <action name="White_bg_action">
+  <action name="White_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -643,7 +640,7 @@
     <string>白</string>
    </property>
   </action>
-  <action name="Black_bg_action">
+  <action name="Black_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -651,7 +648,7 @@
     <string>黑</string>
    </property>
   </action>
-  <action name="Front_color_bg_action">
+  <action name="Front_Color_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -659,7 +656,7 @@
     <string>前景色</string>
    </property>
   </action>
-  <action name="Transparent_white_bg_action">
+  <action name="Transparent_White_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -667,7 +664,7 @@
     <string>透明（浅色格子）</string>
    </property>
   </action>
-  <action name="Transparent_black_bg_action">
+  <action name="Transparent_Black_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -675,7 +672,7 @@
     <string>透明（深色格子）</string>
    </property>
   </action>
-  <action name="Specify_color_bg_action">
+  <action name="Specify_Color_Bg_Action">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -683,157 +680,157 @@
     <string>指定背景颜色</string>
    </property>
   </action>
-  <action name="New_bit_layer_action">
+  <action name="New_Bit_Layer_Action">
    <property name="text">
     <string>新建彩色图层</string>
    </property>
   </action>
-  <action name="New_vector_layer_action">
+  <action name="New_Vector_Layer_Action">
    <property name="text">
     <string>新建钢笔图层</string>
    </property>
   </action>
-  <action name="New_layer_group_action">
+  <action name="New_Layer_Group_Action">
    <property name="text">
     <string>新建图层组</string>
    </property>
   </action>
-  <action name="Copy_layer_action">
+  <action name="Copy_Layer_Action">
    <property name="text">
     <string>复制图层</string>
    </property>
   </action>
-  <action name="Del_layer_action">
+  <action name="Del_Layer_Action">
    <property name="text">
     <string>删除图层</string>
    </property>
   </action>
-  <action name="Clear_layer_action">
+  <action name="Clear_Layer_Action">
    <property name="text">
     <string>清空图层</string>
    </property>
   </action>
-  <action name="Merge_selected_layer_action">
+  <action name="Merge_Selected_Layer_Action">
    <property name="text">
     <string>合并选中图层</string>
    </property>
   </action>
-  <action name="Merge_visible_layer_action">
+  <action name="Merge_Visible_Layer_Action">
    <property name="text">
     <string>合并可见图层</string>
    </property>
   </action>
-  <action name="Horizontal_flip_layer_action">
+  <action name="Horizontal_Flip_Layer_Action">
    <property name="text">
     <string>水平翻转图层</string>
    </property>
   </action>
-  <action name="Vertical_flip_layer_action">
+  <action name="Vertical_Flip_Layer_Action">
    <property name="text">
     <string>垂直翻转图层</string>
    </property>
   </action>
-  <action name="CW_rotate_layer_action">
+  <action name="CW_Rotate_Layer_Action">
    <property name="text">
     <string>顺时针90度旋转图层</string>
    </property>
   </action>
-  <action name="CCW_rotate_layer_action">
+  <action name="CCW_Rotate_Layer_Action">
    <property name="text">
     <string>逆时针90度旋转图层</string>
    </property>
   </action>
-  <action name="Layer_setting_action">
+  <action name="Layer_Setting_Action">
    <property name="text">
     <string>图层属性</string>
    </property>
   </action>
-  <action name="CW_rotate_view_action">
+  <action name="CW_Rotate_View_Action">
    <property name="text">
     <string>顺时针旋转视图</string>
    </property>
   </action>
-  <action name="CCW_rotate_view_action">
+  <action name="CCW_Rotate_View_Action">
    <property name="text">
     <string>逆时针旋转视图</string>
    </property>
   </action>
-  <action name="Enlarge_view_action">
+  <action name="Enlarge_View_Action">
    <property name="text">
     <string>放大</string>
    </property>
   </action>
-  <action name="Narrow_view_action">
+  <action name="Narrow_View_Action">
    <property name="text">
     <string>缩小</string>
    </property>
   </action>
-  <action name="Zoom_100_action">
+  <action name="Zoom_100_Action">
    <property name="text">
     <string>100%大小</string>
    </property>
   </action>
-  <action name="Clear_view_offset_action">
+  <action name="Clear_View_Offset_Action">
    <property name="text">
     <string>重置视图位置</string>
    </property>
   </action>
-  <action name="Clear_view_rotate_action">
+  <action name="Clear_View_Rotate_Action">
    <property name="text">
     <string>重置视图旋转</string>
    </property>
   </action>
-  <action name="Zoom_window_size_action">
+  <action name="Zoom_Window_Size_Action">
    <property name="text">
     <string>缩放到窗口大小</string>
    </property>
   </action>
-  <action name="New_frame_action">
+  <action name="New_Frame_Action">
    <property name="text">
     <string>新建空白帧</string>
    </property>
   </action>
-  <action name="Copy_frame_action">
+  <action name="Copy_Frame_Action">
    <property name="text">
     <string>复制到新帧</string>
    </property>
   </action>
-  <action name="Del_frame_action">
+  <action name="Del_Frame_Action">
    <property name="text">
     <string>删除帧</string>
    </property>
   </action>
-  <action name="Clear_frame_action">
+  <action name="Clear_Frame_Action">
    <property name="text">
     <string>清空帧</string>
    </property>
   </action>
-  <action name="Anime_setting_action">
+  <action name="Anime_Setting_Action">
    <property name="text">
     <string>动画属性</string>
    </property>
   </action>
-  <action name="Previous_frame_action">
+  <action name="Previous_Frame_Action">
    <property name="text">
     <string>上一帧</string>
    </property>
   </action>
-  <action name="Next_frame_action">
+  <action name="Next_Frame_Action">
    <property name="text">
     <string>下一帧</string>
    </property>
   </action>
-  <action name="Play_anime_action">
+  <action name="Play_Anime_Action">
    <property name="text">
     <string>播放</string>
    </property>
   </action>
-  <action name="Group_layer_action">
+  <action name="Group_Layer_Action">
    <property name="text">
     <string>选中图层成组</string>
    </property>
   </action>
-  <action name="Specified_color_bg_action">
+  <action name="Specified_Color_Bg_Action">
    <property name="text">
     <string>指定色</string>
    </property>
@@ -844,12 +841,6 @@
    <class>Layer_Widget</class>
    <extends>QWidget</extends>
    <header>Custom_Widgets/Layer_Widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Color_Wheel</class>
-   <extends>QWidget</extends>
-   <header>Custom_Widgets/Color_Wheel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
