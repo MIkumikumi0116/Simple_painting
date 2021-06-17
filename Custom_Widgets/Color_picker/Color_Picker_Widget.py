@@ -8,9 +8,6 @@ from .Color_Picker_Widget_UI import Ui_Color_Picker_Widget_UI
 
 
 class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
-    color_wheel_change_single = pyqtSignal(QColor)
-    color_slider_change_singal = pyqtSignal(str, int)
-
     def __init__(self,parent_widget):
         # TODO parent
         super().__init__(parent_widget)
@@ -60,8 +57,14 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.HSV_Button.clicked.connect(self.On_hsv_button_clicked)
         self.Swatches_Button.clicked.connect(self.On_swatches_button_clicked)
 
-        self.color_wheel_change_single.connect(self.On_color_wheel_change_single_emit)
-        self.color_slider_change_singal.connect(self.On_color_slider_change_singal)
+        self.R_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+        self.G_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+        self.B_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+        self.H_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+        self.S_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+        self.V_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
+
+        self.Color_Wheel_Widget.color_wheel_change_single.connect(self.On_color_wheel_change_single_emit)
 
     def Get_current_color(self):
         return self.current_color
@@ -229,7 +232,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
 
         self.Update_color()
 
-    def On_color_slider_change_singal(self, slider_type_enum, value):
+    def On_color_slider_change_singal_emit(self, slider_type_enum, value):
         if slider_type_enum == 'r_slider':
             r, g, b, _ = self.current_color.getRgb()
             self.current_color.setRgb(value, g, b)

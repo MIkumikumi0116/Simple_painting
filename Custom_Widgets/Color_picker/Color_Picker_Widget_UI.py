@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Code\软件实训\Custom_Widgets\Color_picker\Color_Picker_Widget_UI.ui'
+# Form implementation generated from reading ui file 'f:\Code\软件实训\Custom_Widgets\Color_Picker\Color_Picker_Widget_UI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -14,10 +14,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Color_Picker_Widget_UI(object):
     def setupUi(self, Color_Picker_Widget_UI):
         Color_Picker_Widget_UI.setObjectName("Color_Picker_Widget_UI")
-        Color_Picker_Widget_UI.resize(400, 530)
+        Color_Picker_Widget_UI.resize(400, 562)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Color_Picker_Widget_UI.sizePolicy().hasHeightForWidth())
+        Color_Picker_Widget_UI.setSizePolicy(sizePolicy)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Color_Picker_Widget_UI)
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.Main_Layout = QtWidgets.QVBoxLayout()
+        self.Main_Layout.setSpacing(6)
         self.Main_Layout.setObjectName("Main_Layout")
         self.Display_Button_Layout = QtWidgets.QHBoxLayout()
         self.Display_Button_Layout.setObjectName("Display_Button_Layout")
@@ -51,6 +59,8 @@ class Ui_Color_Picker_Widget_UI(object):
         self.RGB_Layout = QtWidgets.QWidget(Color_Picker_Widget_UI)
         self.RGB_Layout.setObjectName("RGB_Layout")
         self.RGB_Layout_2 = QtWidgets.QVBoxLayout(self.RGB_Layout)
+        self.RGB_Layout_2.setContentsMargins(0, 0, 0, 0)
+        self.RGB_Layout_2.setSpacing(4)
         self.RGB_Layout_2.setObjectName("RGB_Layout_2")
         self.line = QtWidgets.QFrame(self.RGB_Layout)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -113,6 +123,8 @@ class Ui_Color_Picker_Widget_UI(object):
         self.HSV_Layout = QtWidgets.QWidget(Color_Picker_Widget_UI)
         self.HSV_Layout.setObjectName("HSV_Layout")
         self.HSV_Layout_2 = QtWidgets.QVBoxLayout(self.HSV_Layout)
+        self.HSV_Layout_2.setContentsMargins(0, 0, 0, 0)
+        self.HSV_Layout_2.setSpacing(4)
         self.HSV_Layout_2.setObjectName("HSV_Layout_2")
         self.line_3 = QtWidgets.QFrame(self.HSV_Layout)
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
@@ -201,5 +213,5 @@ class Ui_Color_Picker_Widget_UI(object):
         self.V_Label.setText(_translate("Color_Picker_Widget_UI", "V"))
         self.V_LineEdit.setInputMask(_translate("Color_Picker_Widget_UI", "D00"))
         self.V_LineEdit.setText(_translate("Color_Picker_Widget_UI", "0"))
-from Color_Slider import Color_Slider
-from Color_Wheel import Color_Wheel
+from .Color_Slider import Color_Slider
+from .Color_Wheel import Color_Wheel

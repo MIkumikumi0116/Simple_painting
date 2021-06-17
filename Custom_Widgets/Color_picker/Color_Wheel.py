@@ -2,15 +2,17 @@ import math
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPen, QColor, QConicalGradient, QLinearGradient, QVector2D
-from PyQt5.QtCore import Qt, QPoint, QRect
+from PyQt5.QtCore import Qt, QPoint, QRect, pyqtSignal
 
 
 
 class Color_Wheel(QWidget):
+    color_wheel_change_single = pyqtSignal(QColor)
+
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
         self.parent_widget = parent_widget
-        #self.style_manage_controller = style_manage_controller  # TODO
+        #self.style_manage_controller = style_manage_controller  # TODO style_manage_controller
 
         self.current_color = QColor(0, 0, 0)
         self.select_mode_enum = 'not_select'
@@ -192,11 +194,11 @@ class Color_Wheel(QWidget):
 
         if self.select_mode_enum == 'circle':
             self.Update_h(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
         elif self.select_mode_enum == 'rect':
             self.Update_s_and_v(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
 
         return super().mousePressEvent(event)
@@ -205,11 +207,11 @@ class Color_Wheel(QWidget):
         click_pos = event.pos()
         if self.select_mode_enum == 'circle':
             self.Update_h(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
         elif self.select_mode_enum == 'rect':
             self.Update_s_and_v(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
 
         return super().mouseMoveEvent(event)
@@ -218,11 +220,11 @@ class Color_Wheel(QWidget):
         click_pos = event.pos()
         if self.select_mode_enum == 'circle':
             self.Update_h(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
         elif self.select_mode_enum == 'rect':
             self.Update_s_and_v(click_pos)
-            self.parent_widget.color_wheel_change_single.emit(self.current_color)
+            self.color_wheel_change_single.emit(self.current_color)
             self.update()
 
         self.select_mode_enum = 'not_select'

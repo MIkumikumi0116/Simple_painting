@@ -7,15 +7,39 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>530</height>
+    <height>562</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="Main_Layout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
      <item>
       <layout class="QHBoxLayout" name="Display_Button_Layout">
        <item>
@@ -122,6 +146,21 @@
      <item>
       <widget class="QWidget" name="RGB_Layout" native="true">
        <layout class="QVBoxLayout" name="RGB_Layout_2">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="Line" name="line">
           <property name="orientation">
@@ -285,6 +324,21 @@
      <item>
       <widget class="QWidget" name="HSV_Layout" native="true">
        <layout class="QVBoxLayout" name="HSV_Layout_2">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="Line" name="line_3">
           <property name="orientation">

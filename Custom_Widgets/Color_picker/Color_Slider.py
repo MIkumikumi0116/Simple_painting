@@ -1,13 +1,15 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPen, QColor, QLinearGradient, QPolygon
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 
 
 class Color_Slider(QWidget):
+    color_slider_change_singal = pyqtSignal(str, int)
+
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
         self.parent_widget = parent_widget.parentWidget()
-        # self.style_manage_controller = style_manage_controller    # TODO
+        # self.style_manage_controller = style_manage_controller    # TODO style_manage_controller
 
         self.current_value = 0
         self.min_value = 0
@@ -67,21 +69,21 @@ class Color_Slider(QWidget):
         click_pos = event.pos()
 
         self.Pick_value(click_pos)
-        self.parent_widget.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
         self.update()
 
     def mouseMoveEvent(self, event):
         click_pos = event.pos()
 
         self.Pick_value(click_pos)
-        self.parent_widget.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
         self.update()
 
     def mouseReleaseEvent(self, event):
         click_pos = event.pos()
 
         self.Pick_value(click_pos)
-        self.parent_widget.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
         self.update()
 
     def paintEvent(self, event):
@@ -94,7 +96,7 @@ class Color_Slider(QWidget):
                                           -self.style_margin - self.style_handel_height,)
 
         # 绘制边框
-        painter.setPen(QPen(QColor(200, 200, 200)))
+        painter.setPen(QPen(QColor(160, 160, 160)))
         painter.drawRoundedRect(slider_rect, 4, 4)
 
         # 绘制渐变
@@ -114,7 +116,7 @@ class Color_Slider(QWidget):
         painter.drawRoundedRect(slider_rect, 4, 4)
 
         # 绘制滑动手柄
-        painter.setBrush(QColor(220, 220, 220))
+        painter.setBrush(QColor(160, 160, 160))
         handle_pos = self.current_value / (self.max_value - self.min_value) * slider_rect.width() + slider_rect.x()
         handle_pos = QPoint(handle_pos, slider_rect.bottom() + self.style_padding + 1)
         polygon = QPolygon()
