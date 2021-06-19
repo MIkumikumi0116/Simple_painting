@@ -61,6 +61,7 @@ class Board_Layer_View:
         image_size = image.size
         zoom_time = self.board_layer_controller.Get_zoom_time()
 
+
         if image_size[0] < board_size[0] and image_size[1] < board_size[1]:
             narrow_type = 'no_narrow'
         elif image_size[0] > board_size[0] and image_size[1] < board_size[1]:
@@ -313,6 +314,7 @@ class Style_Manage_Controller:
 
         self.base_color = QColor(240, 240, 240)
         self.board_color = QColor(160 ,160, 160)
+        self.text_color = QColor(0, 0, 0)
 
     def init(self):
         pass
@@ -322,6 +324,9 @@ class Style_Manage_Controller:
 
     def Get_board_color(self):
         return self.board_color
+
+    def Get_text_color(self):
+        return self.text_color
 
 
 class Event_And_Singal_Distributor:
@@ -354,6 +359,7 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.event_and_singal_distributor = Event_And_Singal_Distributor(self.main_window)
 
         self.setupUi(self)
+        self.main_window.show()
         self.Init_ui_and_module()
 
         self.image_edited_flag = False
@@ -401,5 +407,4 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_window = Main_Window()
-    main_window.show()
     sys.exit(app.exec_())

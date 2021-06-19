@@ -8,9 +8,9 @@ class Color_Slider(QWidget):
 
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
-        self.style_manage_controller = QApplication.topLevelWidgets()[0].Get_style_manage_controller() \
-                                       if 'Main_Window' in str(type(QApplication.topLevelWidgets()[0])) \
-                                       else QApplication.topLevelWidgets()[1].Get_style_manage_controller()
+        self.style_manage_controller = [widget.Get_style_manage_controller()
+                                        for widget in QApplication.topLevelWidgets()
+                                        if 'Main_Window' in str(type(widget))][0]
 
         self.current_value = 0
         self.min_value = 0
@@ -73,27 +73,6 @@ class Color_Slider(QWidget):
         else:
             self.max_value = 255
 
-    def mousePressEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()
-
-    def mouseMoveEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()
-
-    def mouseReleaseEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()
-
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -132,3 +111,26 @@ class Color_Slider(QWidget):
         polygon.append(QPoint(handle_pos.x() - self.style_handel_width / 2, handle_pos.y() + self.style_handel_height))
         polygon.append(QPoint(handle_pos.x() + self.style_handel_width / 2, handle_pos.y() + self.style_handel_height))
         painter.drawPolygon(polygon)
+
+        super().paintEvent(event)
+
+    def mousePressEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()
+
+    def mouseMoveEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()
+
+    def mouseReleaseEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()

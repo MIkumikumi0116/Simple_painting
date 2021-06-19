@@ -1,7 +1,7 @@
 import math
 
 from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtGui import QPainter, QPen, QColor, QConicalGradient, QLinearGradient, QVector2D
+from PyQt5.QtGui import QPainter, QPen, QColor, QConicalGradient, QLinearGradient, QVector2D, QBrush
 from PyQt5.QtCore import Qt, QPoint, QRect, pyqtSignal
 
 
@@ -11,9 +11,9 @@ class Color_Wheel(QWidget):
 
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
-        self.style_manage_controller = QApplication.topLevelWidgets()[0].Get_style_manage_controller() \
-                                       if 'Main_Window' in str(type(QApplication.topLevelWidgets()[0])) \
-                                       else QApplication.topLevelWidgets()[1].Get_style_manage_controller()
+        self.style_manage_controller = [widget.Get_style_manage_controller()
+                                        for widget in QApplication.topLevelWidgets()
+                                        if 'Main_Window' in str(type(widget))][0]
 
         self.current_color = QColor(0, 0, 0)
         self.select_mode_enum = 'not_selected'
@@ -39,11 +39,14 @@ class Color_Wheel(QWidget):
         circle_rect = QRect(self.rect().center().x() - circle_diameter / 2,
                             self.rect().center().y() - circle_diameter / 2,
                             circle_diameter, circle_diameter)
+        circle_rect.adjust(2, 2, -2, -2)
+        circle_rect.adjust(2, 2, -2, -2)
         circle_rect.adjust(self.circle_width, self.circle_width, -self.circle_width, -self.circle_width)
+        circle_rect.adjust(2, 2, -2, -2)
 
         square_width = math.sqrt(2) / 2 * circle_rect.width()
-        square_rect = QRect(circle_rect.center().x() - square_width / 2,
-                            circle_rect.center().y() - square_width / 2,
+        square_rect = QRect(self.rect().center().x() - square_width / 2,
+                            self.rect().center().y() - square_width / 2,
                             square_width, square_width)
         square_rect.adjust(2, 2, -2, -2)
 
@@ -71,10 +74,11 @@ class Color_Wheel(QWidget):
         circle_rect = QRect(self.rect().center().x() - circle_diameter / 2,
                             self.rect().center().y() - circle_diameter / 2,
                             circle_diameter, circle_diameter)
+        circle_rect.adjust(2, 2, -2, -2)
 
         # 绘制外边框
-        painter.setPen(QPen(QPen(self.style_manage_controller.Get_board_color())))
-        painter.drawRect(circle_rect)
+        painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
+        painter.drawEllipse(circle_rect)
         circle_rect.adjust(2, 2, -2, -2)
 
         # 绘制圆环渐变颜色
@@ -87,11 +91,17 @@ class Color_Wheel(QWidget):
         painter.setBrush(circle_gradient)
         painter.drawEllipse(circle_rect)
         circle_rect.adjust(self.circle_width, self.circle_width, -self.circle_width, -self.circle_width)
+
+        # 绘制圆环内空白
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QBrush(self.style_manage_controller.Get_base_color()))
+        painter.drawEllipse(circle_rect)
         circle_rect.adjust(2, 2, -2, -2)
 
         # 绘制内边框
-        painter.setPen(QPen(QPen(self.style_manage_controller.Get_board_color())))
-        painter.drawRect(circle_rect)
+        painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
+        painter.setBrush(Qt.NoBrush)
+        painter.drawEllipse(circle_rect)
 
         # 绘制H选择圆圈
         h, s, v, _ = self.current_color.getHsv()
@@ -107,9 +117,9 @@ class Color_Wheel(QWidget):
         ring_pos.normalize()
         circle_rect.adjust(-2, -2, 2, 2)
         ring_pos *= circle_rect.width() / 2 + self.circle_width / 2
-        ring_pos = QVector2D(self.rect().center().x() + ring_pos.x(),
-                             self.rect().center().y() - ring_pos.y())
-        painter.drawEllipse(QRect(QPoint(ring_pos), self.circle_width / 5, self.circle_width / 5))
+        painter.drawEllipse(QPoint(self.rect().center().x() + ring_pos.x(),
+                                   self.rect().center().y() - ring_pos.y()),
+                            self.circle_width / 5, self.circle_width / 5)
 
     def Draw_center_rect(self):
         painter = QPainter(self)
@@ -120,21 +130,22 @@ class Color_Wheel(QWidget):
                             self.rect().center().y() - circle_diameter / 2,
                             circle_diameter, circle_diameter)
         circle_rect.adjust(2, 2, -2, -2)
+        circle_rect.adjust(2, 2, -2, -2)
         circle_rect.adjust(self.circle_width, self.circle_width, -self.circle_width, -self.circle_width)
         circle_rect.adjust(2, 2, -2, -2)
 
         square_width = math.sqrt(2) / 2 * circle_rect.width()
-        square_rect = QRect(circle_rect.center().x() - square_width / 2,
-                            circle_rect.center().y() - square_width / 2,
+        square_rect = QRect(self.rect().center().x() - square_width / 2,
+                            self.rect().center().y() - square_width / 2,
                             square_width, square_width)
         square_rect.adjust(2, 2, -2, -2)
 
         # 绘制边框
-        painter.setPen(QPen(QPen(self.style_manage_controller.Get_board_color())))
+        painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
         painter.drawRect(square_rect)
+        square_rect.adjust(2, 2, -2, -2)
 
         # 绘制渐变
-        square_rect.adjust(2, 2, -2, -2)
         painter.setCompositionMode(QPainter.CompositionMode_Multiply)
         h, s, v, _ = self.current_color.getHsv()
         color = QColor()
@@ -152,13 +163,11 @@ class Color_Wheel(QWidget):
         # 绘制选中的圈
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         r, g, b, _ = self.current_color.getRgb()
-        choose_ring_color = QColor(255 - r, 255 - g, 255 - b)
-        choose_ring_pen = QPen()
-        choose_ring_pen.setColor(choose_ring_color)
+        choose_ring_pen = QPen(QColor(255 - r, 255 - g, 255 - b))
         choose_ring_pen.setWidth(2)
 
-        choose_ring_x = square_rect.width() * (s / 255)
-        choose_ring_y = square_rect.height() * (v / 255)
+        choose_ring_x = (s / 255) * square_rect.width()
+        choose_ring_y = (v / 255) * square_rect.height()
         choose_ring_pos = QPoint(square_rect.bottomLeft().x() + choose_ring_x,
                                  square_rect.bottomLeft().y() - choose_ring_y)
         painter.setPen(choose_ring_pen)
@@ -169,11 +178,13 @@ class Color_Wheel(QWidget):
         self.Draw_wheel()
         self.Draw_center_rect()
 
-    def resizeEvent(self, event):
-        width = min(self.size().width(), self.size().height())
-        self.circle_width = width / 8
+        super().paintEvent(event)
 
-        return super().resizeEvent(event)
+    def resizeEvent(self, event):
+        circle_diameter = min(self.width(), self.height())
+        self.circle_width = circle_diameter / 8
+
+        super().resizeEvent(event)
 
     def mousePressEvent(self, event):
         self.select_mode_enum = 'not_selected'
@@ -183,21 +194,26 @@ class Color_Wheel(QWidget):
         circle_rect = QRect(self.rect().center().x() - circle_diameter / 2,
                             self.rect().center().y() - circle_diameter / 2,
                             circle_diameter, circle_diameter)
+        circle_rect.adjust(2, 2, -2, -2)
+        circle_rect.adjust(2, 2, -2, -2)
 
         # 判断是否选中圆环
-        Distance = lambda point_1, point_2:math.sqrt((point_1.x() - point_2.x()) ** 2 + (point_1.y() - point_2.y()) ** 2)
+        Distance = lambda point_1, point_2 : math.sqrt((point_1.x() - point_2.x()) ** 2 + (point_1.y() - point_2.y()) ** 2)
         pos_to_center_len = Distance(self.rect().center(), click_pos)
-        circle_outer_radius = abs(circle_rect.topLeft().x() - self.rect().center().x())
+
+        circle_outer_radius = self.rect().center().x() - circle_rect.topLeft().x()
         circle_rect.adjust(self.circle_width, self.circle_width, -self.circle_width, -self.circle_width)
-        circle_inner_radius = abs(circle_rect.topLeft().x() - self.rect().center().x())
+        circle_inner_radius = self.rect().center().x() - circle_rect.topLeft().x()
         if circle_inner_radius < pos_to_center_len and pos_to_center_len < circle_outer_radius:
             self.select_mode_enum = 'circle'
 
         # 判断是否选中中间矩形
+        circle_rect.adjust(2, 2, -2, -2)
         square_width = math.sqrt(2) * circle_rect.width() / 2
         square_rect = QRect(circle_rect.center().x() - square_width / 2,
                             circle_rect.center().y() - square_width / 2,
                             square_width, square_width)
+        square_rect.adjust(2, 2, -2, -2)
         square_rect.adjust(2, 2, -2, -2)
         if square_rect.contains(click_pos):
             self.select_mode_enum = 'rect'
@@ -211,8 +227,6 @@ class Color_Wheel(QWidget):
             self.color_wheel_change_single.emit(self.current_color)
             self.update()
 
-        return super().mousePressEvent(event)
-
     def mouseMoveEvent(self, event):
         click_pos = event.pos()
         if self.select_mode_enum == 'circle':
@@ -223,8 +237,6 @@ class Color_Wheel(QWidget):
             self.Update_s_and_v(click_pos)
             self.color_wheel_change_single.emit(self.current_color)
             self.update()
-
-        return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         click_pos = event.pos()
@@ -238,4 +250,3 @@ class Color_Wheel(QWidget):
             self.update()
 
         self.select_mode_enum = 'not_selected'
-        return super().mouseReleaseEvent(event)

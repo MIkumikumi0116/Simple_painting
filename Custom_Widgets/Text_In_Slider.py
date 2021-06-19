@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt, pyqtSignal
 
@@ -9,6 +9,9 @@ class Text_In_Slider(QWidget):
 
     def __init__(self,parent_widget):
         super().__init__(parent_widget)
+        self.style_manage_controller = [widget.Get_style_manage_controller()
+                                        for widget in QApplication.topLevelWidgets()
+                                        if 'Main_Window' in str(type(widget))][0]
 
         self.current_value = 10
         self.min_value = 0
@@ -82,10 +85,10 @@ class Text_In_Slider(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
 
         slider_rect = self.rect()
-        painter.setPen(QPen(QColor(200, 200, 200)))
+        painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
         painter.drawRoundedRect(slider_rect, 2, 2)
 
-        slider_rect = slider_rect.adjusted(2, 2, -2, -2)
+        slider_rect.adjust(2, 2, -2, -2)
         gray_rect = slider_rect.adjusted(0, 0, self.current_value / (self.max_value - self.min_value) * slider_rect.width(), 0)
         white_rect = slider_rect.adjusted(self.current_value / (self.max_value - self.min_value) * slider_rect.width(), 0, 0, 0)
 
@@ -95,7 +98,10 @@ class Text_In_Slider(QWidget):
         painter.setBrush(QColor(255, 255, 255))
         painter.drawRect(white_rect)
 
-        painter.setPen(QPen(QColor(0, 0, 0)))
+        slider_rect.adjust(2, 0, -2, 0)
+        painter.setPen(QPen(self.style_manage_controller.Get_text_color()))
         painter.setBrush(Qt.NoBrush)
         painter.drawText(slider_rect, Qt.AlignLeft, self.left_text)
         painter.drawText(slider_rect, Qt.AlignRight, self.right_text)
+
+        super().paintEvent(event)

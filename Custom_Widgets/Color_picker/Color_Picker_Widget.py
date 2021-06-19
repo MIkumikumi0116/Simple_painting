@@ -8,18 +8,20 @@ from .Color_Picker_Widget_UI import Ui_Color_Picker_Widget_UI
 
 
 class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
+    color_change_singal = pyqtSignal(QColor)
+
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
         self.setupUi(self)
-        self.style_manage_controller = QApplication.topLevelWidgets()[0].Get_style_manage_controller() \
-                                       if 'Main_Window' in str(type(QApplication.topLevelWidgets()[0])) \
-                                       else QApplication.topLevelWidgets()[1].Get_style_manage_controller()
+        self.style_manage_controller = [widget.Get_style_manage_controller()
+                                        for widget in QApplication.topLevelWidgets()
+                                        if 'Main_Window' in str(type(widget))][0]
 
         self.current_color = QColor(0,0,0)
 
         self.show_color_wheel_flag = True
         self.show_rgb_flag = True
-        self.show_hsv_wheel_flag = True
+        self.show_hsv_flag = True
         self.show_swatches_flag = False
 
         self.Color_Wheel_Widget.Set_current_color(self.current_color)
@@ -46,6 +48,13 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.V_Slider.Set_start_color(QColor(0, 0, 0))
         self.V_Slider.Set_end_color(QColor(255, 255, 255))
 
+        self.Color_Wheel_Button.clicked.connect(self.On_color_wheel_button_clicked)
+        self.RGB_Button.clicked.connect(self.On_rgb_button_clicked)
+        self.HSV_Button.clicked.connect(self.On_hsv_button_clicked)
+        self.Swatches_Button.clicked.connect(self.On_swatches_button_clicked)
+
+        self.Color_Wheel_Widget.color_wheel_change_single.connect(self.On_color_wheel_change_single_emit)
+
         self.R_LineEdit.textEdited.connect(self.On_r_lineedit_textedited)
         self.G_LineEdit.textEdited.connect(self.On_g_lineedit_textedited)
         self.B_LineEdit.textEdited.connect(self.On_b_lineedit_textedited)
@@ -53,40 +62,12 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.S_LineEdit.textEdited.connect(self.On_s_lineedit_textedited)
         self.V_LineEdit.textEdited.connect(self.On_v_lineedit_textedited)
 
-        self.Color_Wheel_Button.clicked.connect(self.On_color_wheel_button_clicked)
-        self.RGB_Button.clicked.connect(self.On_rgb_button_clicked)
-        self.HSV_Button.clicked.connect(self.On_hsv_button_clicked)
-        self.Swatches_Button.clicked.connect(self.On_swatches_button_clicked)
-
         self.R_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.G_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.B_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.H_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.S_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.V_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
-
-        self.Color_Wheel_Widget.color_wheel_change_single.connect(self.On_color_wheel_change_single_emit)
-
-    def Get_current_color(self):
-        return self.current_color
-
-    def Set_current_color(self, color):
-        r, g, b, _ = color.getRgb()
-        self.current_color = QColor(r, g, b)
-
-        self.Update_color_wheel()
-        self.Update_lineedit()
-        self.Update_slider()
-
-    def Get_style_manage_controller(self):
-        return self.style_manage_controller
-
-    def Update_color(self):
-        # self.parent_widget.color_change_single.emit(self.current_color)
-
-        self.Update_color_wheel()
-        self.Update_lineedit()
-        self.Update_slider()
 
     def Update_color_wheel(self):
         self.Color_Wheel_Widget.Set_current_color(self.current_color)
@@ -120,19 +101,37 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
 
         self.H_Slider.Set_current_value(h)
 
-        S_color = QColor()
-        S_color.setHsv(h, 0, v)
-        self.S_Slider.Set_start_color(S_color)
-        S_color.setHsv(h, 255, v)
-        self.S_Slider.Set_end_color(S_color)
+        s_color = QColor()
+        s_color.setHsv(h, 0, v)
+        self.S_Slider.Set_start_color(s_color)
+        s_color.setHsv(h, 255, v)
+        self.S_Slider.Set_end_color(s_color)
         self.S_Slider.Set_current_value(s)
 
-        V_color = QColor()
-        V_color.setHsv(h, s, 0)
-        self.V_Slider.Set_start_color(V_color)
-        V_color.setHsv(h, s, 255)
-        self.V_Slider.Set_end_color(V_color)
+        v_color = QColor()
+        v_color.setHsv(h, s, 0)
+        self.V_Slider.Set_start_color(v_color)
+        v_color.setHsv(h, s, 255)
+        self.V_Slider.Set_end_color(v_color)
         self.V_Slider.Set_current_value(v)
+
+    def Update_color(self):
+        self.color_change_singal.emit(self.current_color)
+
+        self.Update_color_wheel()
+        self.Update_lineedit()
+        self.Update_slider()
+
+    def Get_current_color(self):
+        return self.current_color
+
+    def Set_current_color(self, color):
+        r, g, b, _ = color.getRgb()
+        self.current_color = QColor(r, g, b)
+
+        self.Update_color_wheel()
+        self.Update_lineedit()
+        self.Update_slider()
 
     def On_color_wheel_button_clicked(self):
         if self.show_color_wheel_flag:
@@ -151,12 +150,12 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
             self.show_rgb_flag = True
 
     def On_hsv_button_clicked(self):
-        if self.show_hsv_wheel_flag:
+        if self.show_hsv_flag:
             self.HSV_Layout.setVisible(False)
-            self.show_hsv_wheel_flag = False
+            self.show_hsv_flag = False
         else:
             self.HSV_Layout.setVisible(True)
-            self.show_hsv_wheel_flag = True
+            self.show_hsv_flag = True
 
     def On_swatches_button_clicked(self):
         if self.show_swatches_flag:

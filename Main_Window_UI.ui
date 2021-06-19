@@ -31,31 +31,25 @@
         <property name="spacing">
          <number>0</number>
         </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <layout class="QVBoxLayout" name="Board_H_Layout" stretch="1,0">
+         <layout class="QVBoxLayout" name="Board_H_Layout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QLabel" name="Board_Label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777214</width>
-              <height>16777214</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">#Board_Label{
-background-color:black;
-}</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
+           <widget class="QLabel" name="Board_Label"/>
           </item>
           <item>
            <widget class="QScrollBar" name="Board_H_ScrollBar">
@@ -69,11 +63,7 @@ background-color:black;
         <item>
          <layout class="QVBoxLayout" name="Board_V_Layout" stretch="1,0">
           <item>
-           <widget class="QScrollBar" name="Board_V_ScrollBar">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
+           <widget class="QScrollBar" name="Board_V_ScrollBar"/>
           </item>
           <item>
            <widget class="QWidget" name="widget" native="true">
@@ -117,15 +107,12 @@ background-color:black;
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="Mix_Mod_Layout">
+         <layout class="QHBoxLayout" name="Mix_Mod_Layout" stretch="0,1">
+          <property name="spacing">
+           <number>20</number>
+          </property>
           <item>
            <widget class="QLabel" name="Mix_Mod_Label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="text">
              <string>混合模式</string>
             </property>
@@ -133,12 +120,6 @@ background-color:black;
           </item>
           <item>
            <widget class="QComboBox" name="Mix_Mod_ComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <item>
              <property name="text">
               <string>正常</string>
@@ -219,15 +200,12 @@ background-color:black;
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="Opacity_Layout">
+         <layout class="QHBoxLayout" name="Opacity_Layout" stretch="0,1">
+          <property name="spacing">
+           <number>20</number>
+          </property>
           <item>
            <widget class="QLabel" name="Opacity_Label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="text">
              <string>不透明度</string>
             </property>
@@ -235,12 +213,6 @@ background-color:black;
           </item>
           <item>
            <widget class="Text_In_Slider" name="Opacity_Slider" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -390,14 +362,6 @@ background-color:black;
              <bool>true</bool>
             </property>
             <widget class="QWidget" name="Layer_List_ScrollArea_Widget">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>154</width>
-               <height>446</height>
-              </rect>
-             </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
                <widget class="Layer_Widget" name="Layer_1_Widget" native="true"/>
@@ -436,29 +400,18 @@ background-color:black;
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOn</enum>
           </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
-          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="Func_ScrollArea_Widget">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>428</width>
-             <height>686</height>
-            </rect>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1">
             <item>
              <widget class="Color_Picker_Widget" name="Color_Picker_Widget" native="true"/>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="Quick_Func_Layout_3">
+             <layout class="QHBoxLayout" name="Quick_Func_Container_Layout">
               <item>
-               <layout class="QGridLayout" name="Quick_Func_Layout_2">
+               <layout class="QGridLayout" name="Quick_Func_Layout">
                 <item row="0" column="2">
                  <widget class="QPushButton" name="Rotate_Button">
                   <property name="minimumSize">
@@ -856,19 +809,6 @@ background-color:black;
                    <widget class="Text_In_Slider" name="Pencil_Size_Slider" native="true"/>
                   </item>
                  </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -1320,7 +1260,7 @@ background-color:black;
   <customwidget>
    <class>Layer_Widget</class>
    <extends>QWidget</extends>
-   <header>Custom_Widgets/Layer_Widget.h</header>
+   <header>Custom_Widgets/Layer_Widget/Layer_Widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
