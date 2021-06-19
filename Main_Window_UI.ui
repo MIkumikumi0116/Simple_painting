@@ -362,6 +362,14 @@
              <bool>true</bool>
             </property>
             <widget class="QWidget" name="Layer_List_ScrollArea_Widget">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>215</width>
+               <height>446</height>
+              </rect>
+             </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
                <widget class="Layer_Widget" name="Layer_1_Widget" native="true"/>
@@ -404,6 +412,14 @@
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="Func_ScrollArea_Widget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>428</width>
+             <height>686</height>
+            </rect>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1">
             <item>
              <widget class="Color_Picker_Widget" name="Color_Picker_Widget" native="true"/>

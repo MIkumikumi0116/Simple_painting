@@ -58,14 +58,6 @@ class Color_Wheel(QWidget):
         h, s, v, _ = self.current_color.getHsv()
         self.current_color.setHsv(h, s_value, v_value)
 
-    def Get_current_color(self):
-        return self.current_color
-
-    def Set_current_color(self, color):
-        h, s, v, _ = color.getHsv()
-        self.current_color.setHsv(h, s, v)
-        self.update()
-
     def Draw_wheel(self):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -174,6 +166,11 @@ class Color_Wheel(QWidget):
         painter.setBrush(Qt.NoBrush)
         painter.drawEllipse(choose_ring_pos, self.circle_width / 5, self.circle_width / 5)
 
+    def Set_current_color(self, color):
+        h, s, v, _ = color.getHsv()
+        self.current_color.setHsv(h, s, v)
+        self.update()
+
     def paintEvent(self, event):
         self.Draw_wheel()
         self.Draw_center_rect()
@@ -204,7 +201,7 @@ class Color_Wheel(QWidget):
         circle_outer_radius = self.rect().center().x() - circle_rect.topLeft().x()
         circle_rect.adjust(self.circle_width, self.circle_width, -self.circle_width, -self.circle_width)
         circle_inner_radius = self.rect().center().x() - circle_rect.topLeft().x()
-        if circle_inner_radius < pos_to_center_len and pos_to_center_len < circle_outer_radius:
+        if circle_inner_radius < pos_to_center_len < circle_outer_radius:
             self.select_mode_enum = 'circle'
 
         # 判断是否选中中间矩形

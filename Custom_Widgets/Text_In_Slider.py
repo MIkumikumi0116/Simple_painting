@@ -20,11 +20,11 @@ class Text_In_Slider(QWidget):
         self.left_text = '10'
         self.right_text = '90'
 
-    def Set_current_value(self, value):
-        self.current_value = value
-
     def Get_current_value(self):
         return self.current_value
+
+    def Set_current_value(self, value):
+        self.current_value = value
 
     def Set_min_value(self, value):
         self.min_value = value
