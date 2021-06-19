@@ -27,16 +27,71 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QLabel" name="Board_Label">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::PlainText</enum>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="Board_H_Layout" stretch="1,0">
+          <item>
+           <widget class="QLabel" name="Board_Label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777214</width>
+              <height>16777214</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#Board_Label{
+background-color:black;
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QScrollBar" name="Board_H_ScrollBar">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="Board_V_Layout" stretch="1,0">
+          <item>
+           <widget class="QScrollBar" name="Board_V_ScrollBar">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>21</width>
+              <height>21</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>21</width>
+              <height>21</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -48,6 +103,19 @@
         </sizepolicy>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="Notify_Label">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="Mix_Mod_Layout">
           <item>
@@ -326,8 +394,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>167</width>
-               <height>552</height>
+               <width>154</width>
+               <height>446</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">

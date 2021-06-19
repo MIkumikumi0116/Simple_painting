@@ -1,5 +1,5 @@
 # TODO:常用颜色
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
 
@@ -8,11 +8,12 @@ from .Color_Picker_Widget_UI import Ui_Color_Picker_Widget_UI
 
 
 class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
-    def __init__(self,parent_widget):
-        # TODO parent
+    def __init__(self, parent_widget):
         super().__init__(parent_widget)
-        self.parent_widget = parent_widget
         self.setupUi(self)
+        self.style_manage_controller = QApplication.topLevelWidgets()[0].Get_style_manage_controller() \
+                                       if 'Main_Window' in str(type(QApplication.topLevelWidgets()[0])) \
+                                       else QApplication.topLevelWidgets()[1].Get_style_manage_controller()
 
         self.current_color = QColor(0,0,0)
 
@@ -76,6 +77,9 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color_wheel()
         self.Update_lineedit()
         self.Update_slider()
+
+    def Get_style_manage_controller(self):
+        return self.style_manage_controller
 
     def Update_color(self):
         # self.parent_widget.color_change_single.emit(self.current_color)

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QColor, QLinearGradient, QPolygon
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 
@@ -8,8 +8,9 @@ class Color_Slider(QWidget):
 
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
-        self.parent_widget = parent_widget.parentWidget()
-        # self.style_manage_controller = style_manage_controller    # TODO style_manage_controller
+        self.style_manage_controller = QApplication.topLevelWidgets()[0].Get_style_manage_controller() \
+                                       if 'Main_Window' in str(type(QApplication.topLevelWidgets()[0])) \
+                                       else QApplication.topLevelWidgets()[1].Get_style_manage_controller()
 
         self.current_value = 0
         self.min_value = 0
@@ -21,37 +22,10 @@ class Color_Slider(QWidget):
         self.slider_type_enum = 'r_slider'
         self.color_list = [QColor(255, 0, 0), QColor(255, 255, 0), QColor(0, 255, 0), QColor(0, 255, 255), QColor(0, 0, 255), QColor(255, 0, 255)]
 
+        self.style_padding = 4
         self.style_margin = 1
         self.style_handel_width = 12
         self.style_handel_height = 10
-        self.style_padding = 4
-
-    def Set_start_color(self, start_color):
-        if self.slider_type_enum in ['s_slider', 'v_slider']:
-            h, s, v, _ = start_color.getHsv()
-            self.start_color.setHsv(h, s, v)
-        else:
-            self.start_color = start_color
-
-        self.update()
-
-    def Set_end_color(self, end_color):
-        if self.slider_type_enum in ['s_slider', 'v_slider']:
-            h, s, v, _ = end_color.getHsv()
-            self.end_color.setHsv(h, s, v)
-        else:
-            self.end_color = end_color
-
-        self.update()
-
-    def Set_current_value(self, value):
-        self.current_value = value
-        self.update()
-
-    def Set_slider_type_enum(self, slider_type_enum):
-        self.slider_type_enum = slider_type_enum
-        if self.slider_type_enum == 'h_slider':
-            self.max_value = 360
 
     def Pick_value(self, click_pos):
         slider_rect = self.rect().adjusted(self.style_margin + self.style_handel_width / 2 - self.style_padding,
@@ -64,6 +38,40 @@ class Color_Slider(QWidget):
         value = max(value, self.min_value)
         value = min(value, self.max_value)
         self.current_value = value
+
+    def Set_start_color(self, start_color):
+        if self.slider_type_enum in ['s_slider', 'v_slider']:
+            h, s, v, _ = start_color.getHsv()
+            self.start_color.setHsv(h, s, v)
+        elif self.slider_type_enum == 'h_slider':
+            pass
+        else:
+            self.start_color = start_color
+
+        self.update()
+
+    def Set_end_color(self, end_color):
+        if self.slider_type_enum in ['s_slider', 'v_slider']:
+            h, s, v, _ = end_color.getHsv()
+            self.end_color.setHsv(h, s, v)
+        elif self.slider_type_enum == 'h_slider':
+            pass
+        else:
+            self.end_color = end_color
+
+        self.update()
+
+    def Set_current_value(self, value):
+        self.current_value = value
+        self.update()
+
+    def Set_slider_type_enum(self, slider_type_enum):
+        self.slider_type_enum = slider_type_enum
+
+        if self.slider_type_enum == 'h_slider':
+            self.max_value = 360
+        else:
+            self.max_value = 255
 
     def mousePressEvent(self, event):
         click_pos = event.pos()
@@ -96,7 +104,7 @@ class Color_Slider(QWidget):
                                           -self.style_margin - self.style_handel_height,)
 
         # 绘制边框
-        painter.setPen(QPen(QColor(160, 160, 160)))
+        painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
         painter.drawRoundedRect(slider_rect, 4, 4)
 
         # 绘制渐变
@@ -116,9 +124,9 @@ class Color_Slider(QWidget):
         painter.drawRoundedRect(slider_rect, 4, 4)
 
         # 绘制滑动手柄
-        painter.setBrush(QColor(160, 160, 160))
-        handle_pos = self.current_value / (self.max_value - self.min_value) * slider_rect.width() + slider_rect.x()
-        handle_pos = QPoint(handle_pos, slider_rect.bottom() + self.style_padding + 1)
+        painter.setBrush(self.style_manage_controller.Get_board_color())
+        handle_pos_x = self.current_value / (self.max_value - self.min_value) * slider_rect.width() + slider_rect.x()
+        handle_pos = QPoint(handle_pos_x, slider_rect.bottom() + self.style_padding + 1)
         polygon = QPolygon()
         polygon.append(handle_pos)
         polygon.append(QPoint(handle_pos.x() - self.style_handel_width / 2, handle_pos.y() + self.style_handel_height))
