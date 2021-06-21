@@ -2,19 +2,11 @@
 <ui version="4.0">
  <class>Layer_Widget_UI</class>
  <widget class="QWidget" name="Layer_Widget_UI">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>78</height>
-   </rect>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="Button_Layout">
      <item>
-      <widget class="QPushButton" name="Visible_Button">
+      <widget class="QPushButton" name="Hide_Button">
        <property name="minimumSize">
         <size>
          <width>20</width>
@@ -28,7 +20,13 @@
         </size>
        </property>
        <property name="text">
-        <string>见</string>
+        <string>藏</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -49,6 +47,9 @@
        <property name="text">
         <string>锁</string>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -57,14 +58,14 @@
     <widget class="QLabel" name="Preview_Label">
      <property name="minimumSize">
       <size>
-       <width>60</width>
-       <height>60</height>
+       <width>80</width>
+       <height>80</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>60</width>
-       <height>60</height>
+       <width>80</width>
+       <height>80</height>
       </size>
      </property>
      <property name="text">
@@ -73,23 +74,23 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="Attributes_Layout">
      <item>
-      <widget class="QLabel" name="Layer_Name_Label">
+      <widget class="QLabel" name="Name_Label">
        <property name="text">
         <string>名</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="Layer_Mod_Label">
+      <widget class="QLabel" name="Mod_Label">
        <property name="text">
         <string>模式</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="Layer_Opacity_Label">
+      <widget class="QLabel" name="Opacity_Label">
        <property name="text">
         <string>不透明度</string>
        </property>

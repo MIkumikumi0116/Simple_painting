@@ -27,7 +27,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -44,44 +44,75 @@
          <number>0</number>
         </property>
         <item>
-         <layout class="QVBoxLayout" name="Board_H_Layout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="Board_Label"/>
-          </item>
-          <item>
-           <widget class="QScrollBar" name="Board_H_ScrollBar">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="Board_V_Layout" stretch="1,0">
-          <item>
-           <widget class="QScrollBar" name="Board_V_ScrollBar"/>
-          </item>
-          <item>
-           <widget class="QWidget" name="widget" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>21</width>
-              <height>21</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>21</width>
-              <height>21</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="Board_Label_Widget" native="true">
+          <layout class="QHBoxLayout" name="Board_Label_Layout" stretch="0,0">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>1</number>
+           </property>
+           <property name="topMargin">
+            <number>1</number>
+           </property>
+           <property name="rightMargin">
+            <number>1</number>
+           </property>
+           <property name="bottomMargin">
+            <number>1</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="Board_H_Layout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="Board_Label">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QScrollBar" name="Board_H_ScrollBar">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="Board_V_Layout" stretch="1,0">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QScrollBar" name="Board_V_ScrollBar"/>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>21</width>
+                 <height>21</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>21</width>
+                 <height>21</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -103,6 +134,9 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -366,11 +400,11 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>215</width>
+               <width>211</width>
                <height>446</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_5">
+             <layout class="QVBoxLayout" name="Layer_List_ScrollArea_Layout">
               <item>
                <widget class="Layer_Widget" name="Layer_1_Widget" native="true"/>
               </item>
@@ -973,12 +1007,23 @@
     <addaction name="separator"/>
     <addaction name="Anime_Setting_Action"/>
    </widget>
+   <widget class="QMenu" name="Other_Menu_Tab">
+    <property name="title">
+     <string>其他</string>
+    </property>
+    <addaction name="Skin_Action"/>
+    <addaction name="separator"/>
+    <addaction name="Manual_Action"/>
+    <addaction name="separator"/>
+    <addaction name="Setting_Action"/>
+   </widget>
    <addaction name="File_Menu_Tab"/>
    <addaction name="Edit_Menu_Tab"/>
    <addaction name="Image_Menu_Tab"/>
    <addaction name="Layer_Menu_Tab"/>
    <addaction name="View_Menu_Tab"/>
    <addaction name="Anime_Menu_Tab"/>
+   <addaction name="Other_Menu_Tab"/>
   </widget>
   <action name="New_Action">
    <property name="text">
@@ -1269,6 +1314,21 @@
   <action name="Specified_Color_Bg_Action">
    <property name="text">
     <string>指定色</string>
+   </property>
+  </action>
+  <action name="Skin_Action">
+   <property name="text">
+    <string>皮肤</string>
+   </property>
+  </action>
+  <action name="Manual_Action">
+   <property name="text">
+    <string>手册</string>
+   </property>
+  </action>
+  <action name="Setting_Action">
+   <property name="text">
+    <string>设置</string>
    </property>
   </action>
  </widget>
