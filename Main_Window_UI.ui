@@ -45,7 +45,7 @@
         </property>
         <item>
          <widget class="QWidget" name="Board_Label_Widget" native="true">
-          <layout class="QHBoxLayout" name="Board_Label_Layout" stretch="0,0">
+          <layout class="QHBoxLayout" name="Board_Label_Layout" stretch="1,0">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -462,25 +462,6 @@
              <layout class="QHBoxLayout" name="Quick_Func_Container_Layout">
               <item>
                <layout class="QGridLayout" name="Quick_Func_Layout">
-                <item row="0" column="2">
-                 <widget class="QPushButton" name="Rotate_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>旋转</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="1" column="4">
                  <widget class="QPushButton" name="Move_Layer_Button">
                   <property name="minimumSize">
@@ -500,8 +481,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3">
-                 <widget class="QPushButton" name="Dragger_Button">
+                <item row="0" column="2">
+                 <widget class="QPushButton" name="Rotate_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -515,7 +496,26 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>抓手</string>
+                   <string>旋转</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="Zoom_Button">
+                  <property name="minimumSize">
+                   <size>
+                    <width>30</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>30</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>缩放</string>
                   </property>
                  </widget>
                 </item>
@@ -538,8 +538,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QPushButton" name="Zoom_Button">
+                <item row="0" column="3">
+                 <widget class="QPushButton" name="Dragger_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -553,7 +553,7 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>缩放</string>
+                   <string>抓手</string>
                   </property>
                  </widget>
                 </item>
@@ -614,23 +614,20 @@
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="5">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QWidget" name="Color_View_Widget" native="true"/>
               </item>
              </layout>
             </item>
