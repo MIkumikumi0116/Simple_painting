@@ -675,6 +675,10 @@ class Color_Controller:
         self.main_window.Color_Picker_Widget.color_change_singal.connect(self.On_color_change_singal_emit)
         self.main_window.Color_Indicator_Widget.switch_color_singal.connect(self.On_switch_color_singal_emit)
 
+        self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
+        self.main_window.Color_Indicator_Widget.Set_back_color(self.back_color)
+        self.main_window.Color_Picker_Widget.Set_current_color(self.front_color)
+
     def On_color_change_singal_emit(self, color):
         r, g, b, _ = color.getRgb()
         self.front_color.setRgb(r, g, b)
