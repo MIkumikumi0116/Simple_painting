@@ -675,17 +675,17 @@ class Color_Controller:
         self.main_window.Color_Picker_Widget.color_change_singal.connect(self.On_color_change_singal_emit)
         self.main_window.Color_Indicator_Widget.switch_color_singal.connect(self.On_switch_color_singal_emit)
 
+    def On_color_change_singal_emit(self, color):
+        r, g, b, _ = color.getRgb()
+        self.front_color.setRgb(r, g, b)
+        self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
+
     def On_switch_color_singal_emit(self):
         self.front_color, self.back_color = self.back_color, self.front_color
 
         self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
         self.main_window.Color_Indicator_Widget.Set_back_color(self.back_color)
         self.main_window.Color_Picker_Widget.Set_current_color(self.front_color)
-
-    def On_color_change_singal_emit(self, color):
-        r, g, b, _ = color.getRgb()
-        self.front_color.setRgb(r, g, b)
-        self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
 
     def Get_front_color(self):
         return self.front_color
@@ -694,12 +694,17 @@ class Color_Controller:
         r, g, b, _ = color.getRgb()
         self.front_color.setRgb(r, g, b)
 
+        self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
+        self.main_window.Color_Picker_Widget.Set_current_color(self.front_color)
+
     def Get_back_color(self):
         return self.back_color
 
     def Set_back_color(self, color):
         r, g, b, _ = color.getRgb()
         self.back_color.setRgb(r, g, b)
+
+        self.main_window.Color_Indicator_Widget.Set_back_color(self.back_color)
 
 
 class Notify_Controller(QObject):
