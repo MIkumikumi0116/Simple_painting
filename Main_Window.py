@@ -58,11 +58,11 @@ class Board_Layer_View:
         self.camera_image = None
 
         self.camera_zoom = None
-        self.camera_rotate = 30
+        self.camera_rotate = 120
         self.camera_offset = (0, 0)
         self.camera_board_size = (None ,None)
 
-        self.CAMERMA_ZOOM_MAX = 10
+        self.CAMERMA_ZOOM_MAX = 30
         self.CAMERMA_ZOOM_MIN = -10
 
     def init(self):
@@ -125,49 +125,13 @@ class Board_Layer_View:
     def _Inti_get_first_layer_widget(self):
         return self.main_window.Layer_1_Widget
 
-    def Print_image_archive(self, image):
-        # self.camera_zoom = 30
+    def Print_image(self, image):
         self.camera_image = image.copy()
 
-
-        original_image_size = image.size
-
-        camera_zoom   = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-        camera_rotate = self.camera_rotate
-        camera_offset = self.camera_offset
+        camera_zoom   =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+        camera_rotate =  self.camera_rotate
+        camera_offset =  self.camera_offset
         label_size    = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-
-        angle    = np.radians(camera_rotate)
-        cos, sin = np.cos(angle), np.sin(angle)
-        inverse_rotate_matrix = np.array([[ cos, sin],
-                                          [-sin, cos]])
-        inverse_scale_matrix  = np.array([[1 / camera_zoom, 0],
-                                          [0, 1 / camera_zoom]])
-
-        viewport_pos_list = [np.array([-label_size[0] / 2, -label_size[1] / 2]),
-                             np.array([ label_size[0] / 2, -label_size[1] / 2]),
-                             np.array([-label_size[0] / 2,  label_size[1] / 2]),
-                             np.array([ label_size[0] / 2,  label_size[1] / 2])]
-        viewport_pos_inverse_transform = lambda viewport_pos: inverse_scale_matrix @ inverse_rotate_matrix @ viewport_pos - np.array([camera_offset[0], camera_offset[1]])
-        viewport_pos_list = list(map(viewport_pos_inverse_transform, viewport_pos_list))
-
-        extend = math.ceil((label_size[0] ** 2 + label_size[1] ** 2) ** 0.5 / camera_zoom)
-        r, g, b, _ = self.style_manage_controller.Get_base_color().getRgb()
-        image = ImageOps.expand(image, border = extend, fill=(r, g, b))
-
-        image_array = np.array(image)
-        polygon = [(math.ceil(viewport_pos_list[0][0] + image.size[0] / 2), math.ceil(viewport_pos_list[0][1] + image.size[0] / 2)),
-                   (math.ceil(viewport_pos_list[1][0] + image.size[0] / 2), math.ceil(viewport_pos_list[1][1] + image.size[0] / 2)),
-                   (math.ceil(viewport_pos_list[3][0] + image.size[0] / 2), math.ceil(viewport_pos_list[3][1] + image.size[0] / 2)),
-                   (math.ceil(viewport_pos_list[2][0] + image.size[0] / 2), math.ceil(viewport_pos_list[2][1] + image.size[0] / 2))]
-        image_mask = Image.new('1', (image.size[1], image.size[0]), 0)
-        ImageDraw.Draw(image_mask).polygon(polygon, outline = 1, fill = 1)
-        mask_array = np.array(image_mask)
-
-        image_array[:, :, 3]  = mask_array * 255
-        image = Image.fromarray(image_array, "RGBA")
-        image = image.crop(image.getbbox())
-        image = image.resize((image.size[0] * camera_zoom, image.size[1] * camera_zoom), Image.NEAREST)
 
         angle    = np.radians(camera_rotate)
         cos, sin = np.cos(angle), np.sin(angle)
@@ -175,23 +139,82 @@ class Board_Layer_View:
                                   [ sin, cos]])
         scale_matrix  = np.array([[1 * camera_zoom, 0],
                                   [0, 1 * camera_zoom]])
-        viewport_pos_inverse_transform = lambda viewport_pos: scale_matrix @ rotate_matrix @ (viewport_pos + np.array([camera_offset[0], camera_offset[1]])) - np.array([camera_offset[0], camera_offset[1]])
-        viewport_pos_list = list(map(viewport_pos_inverse_transform, viewport_pos_list))
-        image = image.rotate(-camera_rotate, resample = Image.NEAREST, expand = True, fillcolor = (0, 0, 0, 0))
-        image = image.crop((math.ceil(viewport_pos_list[0][0] + image.size[0] / 2),
-                            math.ceil(viewport_pos_list[0][1] + image.size[1] / 2),
-                            math.ceil(viewport_pos_list[3][0] + image.size[0] / 2),
-                            math.ceil(viewport_pos_list[3][1] + image.size[1] / 2)))
 
-        original_image_size_array = np.array([original_image_size[0], original_image_size[1]])
-        transferred_image_size = scale_matrix @ rotate_matrix @original_image_size_array
+        diagonal_1_array = np.array([image.size[0], image.size[1]])
+        diagonal_2_array = np.array([image.size[0],-image.size[1]])
 
-        self.camera_board_size = ((math.ceil(transferred_image_size[0]), math.ceil(transferred_image_size[1])))
+        transferred_diagonal_1 = scale_matrix @ rotate_matrix @ diagonal_1_array
+        transferred_diagonal_2 = scale_matrix @ rotate_matrix @ diagonal_2_array
+
+        self.camera_board_size = ((math.ceil(max(abs(transferred_diagonal_1[0]), abs(transferred_diagonal_2[0]))) + label_size[0],
+                                   math.ceil(max(abs(transferred_diagonal_1[1]), abs(transferred_diagonal_2[1]))) + label_size[1]))
+
+        if image.size[0] * camera_zoom > label_size[0] or image.size[1] * camera_zoom > label_size[1]:
+            angle    = np.radians(camera_rotate)
+            cos, sin = np.cos(angle), np.sin(angle)
+            inverse_rotate_matrix = np.array([[ cos, sin],
+                                            [-sin, cos]])
+            inverse_scale_matrix  = np.array([[1 / camera_zoom, 0],
+                                            [0, 1 / camera_zoom]])
+            camera_offset_array   = np.array([float(-camera_offset[0]), float(-camera_offset[1])])
+            camera_offset_array   = inverse_scale_matrix @ inverse_rotate_matrix @ camera_offset_array
+
+            viewport_pos_list = [np.array([-label_size[0] / 1.8, -label_size[1] / 1.8]),
+                                np.array([ label_size[0] / 1.8, -label_size[1] / 1.8]),
+                                np.array([-label_size[0] / 1.8,  label_size[1] / 1.8]),
+                                np.array([ label_size[0] / 1.8,  label_size[1] / 1.8])]
+            viewport_pos_inverse_transform = lambda viewport_pos: inverse_scale_matrix @ inverse_rotate_matrix @ viewport_pos - camera_offset_array
+            viewport_pos_list = list(map(viewport_pos_inverse_transform, viewport_pos_list))
+
+            board_extend = (label_size[0] ** 2 + label_size[1] ** 2) ** 0.5 / camera_zoom * 1.2
+            r, g, b, _   = self.style_manage_controller.Get_base_color().getRgb()
+            image        = ImageOps.expand(image, border = math.ceil(board_extend), fill=(r, g, b))
+
+            image_array  = np.array(image)
+            image_mask   = Image.new('1', (image.size[1], image.size[0]), 0)
+            polygon = [(math.ceil(viewport_pos_list[0][0] + image.size[0] / 2), math.ceil(viewport_pos_list[0][1] + image.size[0] / 2)),
+                    (math.ceil(viewport_pos_list[1][0] + image.size[0] / 2), math.ceil(viewport_pos_list[1][1] + image.size[0] / 2)),
+                    (math.ceil(viewport_pos_list[3][0] + image.size[0] / 2), math.ceil(viewport_pos_list[3][1] + image.size[0] / 2)),
+                    (math.ceil(viewport_pos_list[2][0] + image.size[0] / 2), math.ceil(viewport_pos_list[2][1] + image.size[0] / 2))]
+            ImageDraw.Draw(image_mask).polygon(polygon, outline = 1, fill = 1)
+            mask_array = np.array(image_mask)
+
+            image_array[:, :, 0] *= mask_array
+            image_array[:, :, 1] *= mask_array
+            image_array[:, :, 2] *= mask_array
+            image_array[:, :, 3] *= mask_array
+            image = Image.fromarray(image_array, "RGBA")
+            image = image.crop(image.getbbox())
+            image = image.resize((math.ceil(image.size[0] * camera_zoom), math.ceil(image.size[1] * camera_zoom)), Image.NEAREST)
+            image = image.rotate(-camera_rotate, resample = Image.NEAREST, expand = True, fillcolor = (0, 0, 0, 0))
+
+            viewport_pos_list = [np.array([-label_size[0] / 2, -label_size[1] / 2]),
+                                 np.array([ label_size[0] / 2, -label_size[1] / 2]),
+                                 np.array([-label_size[0] / 2,  label_size[1] / 2]),
+                                 np.array([ label_size[0] / 2,  label_size[1] / 2])]
+            image = image.crop((math.ceil(viewport_pos_list[0][0] + image.size[0] / 2),
+                                math.ceil(viewport_pos_list[0][1] + image.size[1] / 2),
+                                math.ceil(viewport_pos_list[3][0] + image.size[0] / 2),
+                                math.ceil(viewport_pos_list[3][1] + image.size[1] / 2)))
+
+        else:
+            image = image.resize((math.ceil(image.size[0] * camera_zoom), math.ceil(image.size[1] * camera_zoom)))
+            image = image.rotate(-camera_rotate, expand = True, fillcolor = (0, 0, 0, 0))
+
+            viewport_pos_list = [np.array([-label_size[0] / 2, -label_size[1] / 2]),
+                                 np.array([ label_size[0] / 2, -label_size[1] / 2]),
+                                 np.array([-label_size[0] / 2,  label_size[1] / 2]),
+                                 np.array([ label_size[0] / 2,  label_size[1] / 2])]
+            image = image.crop((math.ceil(viewport_pos_list[0][0] + image.size[0] / 2 + camera_offset[0]),
+                                math.ceil(viewport_pos_list[0][1] + image.size[1] / 2 + camera_offset[1]),
+                                math.ceil(viewport_pos_list[3][0] + image.size[0] / 2 + camera_offset[0]),
+                                math.ceil(viewport_pos_list[3][1] + image.size[1] / 2 + camera_offset[1])))
+
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
         self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(image))
 
-    def Print_image(self, image):
+    def Print_image_(self, image):
         self.camera_image = image.copy()
 
         camera_zoom   = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
@@ -572,7 +595,7 @@ class Tool_Controller:
         def __init__(self, controller):
             self.controller = controller
 
-            self.brush_size = 10
+            self.brush_size = 20
 
         def Pencil_draw(self, x, y):
             layer = self.controller._Get_selected_layer()
@@ -592,18 +615,30 @@ class Tool_Controller:
                 radius = self.brush_size // 2
                 board_size = self.controller._Get_board_size()
                 pixel_matrix_np = np.array(layer.image, dtype = 'uint8')
-                r, g, b, _ = self.controller._Get_front_color().getRgb()
-                color = np.array((r, g, b, 255))
+
+                color = self.controller._Get_front_color()
+                r, g, b, _ = color.getRgb()
+                defult_color = np.array((r, g, b, 255))
 
                 # TODO 插值
-                paint_area = [(i, j) for i in range(layer_x - radius, layer_x + radius + 1)
-                                     for j in range(layer_y - radius, layer_y + radius + 1)
-                                     if abs(i - layer_x) ** 2 + abs(j - layer_y) ** 2 <= radius ** 2
-                                     and 0 <= i < board_size[0]
-                                     and 0 <= j < board_size[1]]
+                paint_area = [(i, j,
+                              defult_color
+                              if ((i - layer_x) ** 2 + (j - layer_y) ** 2 <= (radius) ** 2)
+                              else (((radius + 1) ** 2 - (radius) ** 2) - ((i - layer_x) ** 2 + (j - layer_y) ** 2 - (radius) ** 2)) / ((radius + 1) ** 2 - (radius) ** 2))
+
+                              for i in range(layer_x - radius, layer_x + radius + 1)
+                              for j in range(layer_y - radius, layer_y + radius + 1)
+                              if (i - layer_x) ** 2 + (j - layer_y) ** 2 <= (radius + 1) ** 2
+                              and 0 <= i < board_size[0] and 0 <= j < board_size[1]]
 
                 for point in paint_area:
-                    pixel_matrix_np[point[1], point[0]] = color
+                    if str(type(point[2])) == "<class 'numpy.ndarray'>":
+                        pixel_matrix_np[point[1], point[0]] = defult_color
+                    # else:
+                    #     pixel_matrix_np[point[1], point[0]] = np.array([r + (255 - r) * point[2],
+                    #                                                     g + (255 - g) * point[2],
+                    #                                                     b + (255 - b) * point[2],
+                    #                                                     255])
 
                 layer.image = Image.fromarray(pixel_matrix_np)
 

@@ -168,7 +168,7 @@ class Color_Wheel(QWidget):
 
     def Set_current_color(self, color):
         h, s, v, _ = color.getHsv()
-        self.current_color.setHsv(h, s, v)
+        self.current_color.setHsv(max(h, 0), s, v)
         self.update()
 
     def paintEvent(self, event):
