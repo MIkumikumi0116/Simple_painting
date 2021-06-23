@@ -1,11 +1,8 @@
 import sys
 import time
-import math
 import numpy as np
 from threading import Thread
 from PIL import Image, ImageQt, ImageDraw, ImageOps
-
-from skimage.transform import resize
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QImage, QColor
@@ -58,12 +55,15 @@ class Board_Layer_View:
         self.camera_image = None
 
         self.camera_zoom = None
-        self.camera_rotate = 120
+        self.camera_rotate = 0
         self.camera_offset = (0, 0)
         self.camera_board_size = (None ,None)
 
-        self.CAMERMA_ZOOM_MAX = 30
-        self.CAMERMA_ZOOM_MIN = -10
+        self.first_click_pos = None
+        self.second_click_pos = None
+
+        self.CAMERMA_ZOOM_MAX = 50
+        self.CAMERMA_ZOOM_MIN = -20
 
     def init(self):
         pass
@@ -71,9 +71,17 @@ class Board_Layer_View:
     def _Init_print_image(self, image):
         # init camera_image, camera_zoom, camera_board_size
         self.camera_image = image.copy()
+
+        self.camera_zoom = None
+        self.camera_rotate = 0
+        self.camera_offset = (0, 0)
+        self.camera_board_size = (None ,None)
+
+        self.first_click_pos = None
+        self.second_click_pos = None
+
         image_size = image.size
         label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-        camera_offset = self.camera_offset
 
         if image_size[0] <= label_size[0] and image_size[1] <= label_size[1]:
             narrow_type = 'no_narrow'
@@ -108,22 +116,22 @@ class Board_Layer_View:
                                            (r, g, b))
         label_background_image.paste(image_transferred, (label_size[0] // 2 ,label_size[1] // 2))
 
-        drawn_rect = [0, 0, 0, 0]
-        drawn_rect[0] = label_background_image.size[0] // 2 + camera_offset[0] - label_size[0] // 2
-        drawn_rect[1] = label_background_image.size[1] // 2 + camera_offset[1] - label_size[1] // 2
+        drawn_rect    = [0, 0, 0, 0]
+        drawn_rect[0] = label_background_image.size[0] // 2 - label_size[0] // 2
+        drawn_rect[1] = label_background_image.size[1] // 2 - label_size[1] // 2
         drawn_rect[2] = drawn_rect[0] + label_size[1]
         drawn_rect[3] = drawn_rect[1] + label_size[1]
 
         drawn_image = label_background_image.crop(tuple(drawn_rect))
 
         self.camera_zoom = camera_zoom
-        self.camera_board_size = label_background_image.size
+        self.camera_board_size = image_transferred.size
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
         self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(drawn_image))
 
     def _Inti_get_first_layer_widget(self):
-        return self.main_window.Layer_1_Widget
+        return self.main_window.Layer_List_ScrollArea.findChildren(Layer_Widget)[0]
 
     def Print_image(self, image):
         self.camera_image = image.copy()
@@ -133,23 +141,7 @@ class Board_Layer_View:
         camera_offset =  self.camera_offset
         label_size    = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
 
-        angle    = np.radians(camera_rotate)
-        cos, sin = np.cos(angle), np.sin(angle)
-        rotate_matrix = np.array([[ cos,-sin],
-                                  [ sin, cos]])
-        scale_matrix  = np.array([[1 * camera_zoom, 0],
-                                  [0, 1 * camera_zoom]])
-
-        diagonal_1_array = np.array([image.size[0], image.size[1]])
-        diagonal_2_array = np.array([image.size[0],-image.size[1]])
-
-        transferred_diagonal_1 = scale_matrix @ rotate_matrix @ diagonal_1_array
-        transferred_diagonal_2 = scale_matrix @ rotate_matrix @ diagonal_2_array
-
-        self.camera_board_size = ((math.ceil(max(abs(transferred_diagonal_1[0]), abs(transferred_diagonal_2[0]))) + label_size[0],
-                                   math.ceil(max(abs(transferred_diagonal_1[1]), abs(transferred_diagonal_2[1]))) + label_size[1]))
-
-        if image.size[0] * camera_zoom > label_size[0] or image.size[1] * camera_zoom > label_size[1]:
+        if self.camera_board_size[0] > label_size[0] or self.camera_board_size[1] > label_size[1]:
             angle    = np.radians(camera_rotate)
             cos, sin = np.cos(angle), np.sin(angle)
             inverse_rotate_matrix = np.array([[ cos, sin],
@@ -160,24 +152,24 @@ class Board_Layer_View:
             camera_offset_array   = inverse_scale_matrix @ inverse_rotate_matrix @ camera_offset_array
 
             viewport_pos_list = [np.array([-label_size[0] / 1.8, -label_size[1] / 1.8]),
-                                np.array([ label_size[0] / 1.8, -label_size[1] / 1.8]),
-                                np.array([-label_size[0] / 1.8,  label_size[1] / 1.8]),
-                                np.array([ label_size[0] / 1.8,  label_size[1] / 1.8])]
+                                 np.array([ label_size[0] / 1.8, -label_size[1] / 1.8]),
+                                 np.array([-label_size[0] / 1.8,  label_size[1] / 1.8]),
+                                 np.array([ label_size[0] / 1.8,  label_size[1] / 1.8])]
             viewport_pos_inverse_transform = lambda viewport_pos: inverse_scale_matrix @ inverse_rotate_matrix @ viewport_pos - camera_offset_array
             viewport_pos_list = list(map(viewport_pos_inverse_transform, viewport_pos_list))
 
             board_extend = (label_size[0] ** 2 + label_size[1] ** 2) ** 0.5 / camera_zoom * 1.2
             r, g, b, _   = self.style_manage_controller.Get_base_color().getRgb()
-            image        = ImageOps.expand(image, border = math.ceil(board_extend), fill=(r, g, b))
+            image        = ImageOps.expand(image, border = round(board_extend), fill=(r, g, b))
 
             image_array  = np.array(image)
             image_mask   = Image.new('1', (image.size[1], image.size[0]), 0)
-            polygon = [(math.ceil(viewport_pos_list[0][0] + image.size[0] / 2), math.ceil(viewport_pos_list[0][1] + image.size[0] / 2)),
-                    (math.ceil(viewport_pos_list[1][0] + image.size[0] / 2), math.ceil(viewport_pos_list[1][1] + image.size[0] / 2)),
-                    (math.ceil(viewport_pos_list[3][0] + image.size[0] / 2), math.ceil(viewport_pos_list[3][1] + image.size[0] / 2)),
-                    (math.ceil(viewport_pos_list[2][0] + image.size[0] / 2), math.ceil(viewport_pos_list[2][1] + image.size[0] / 2))]
+            polygon      = [(round(viewport_pos_list[0][0] + image.size[0] / 2), round(viewport_pos_list[0][1] + image.size[0] / 2)),
+                            (round(viewport_pos_list[1][0] + image.size[0] / 2), round(viewport_pos_list[1][1] + image.size[0] / 2)),
+                            (round(viewport_pos_list[3][0] + image.size[0] / 2), round(viewport_pos_list[3][1] + image.size[0] / 2)),
+                            (round(viewport_pos_list[2][0] + image.size[0] / 2), round(viewport_pos_list[2][1] + image.size[0] / 2))]
             ImageDraw.Draw(image_mask).polygon(polygon, outline = 1, fill = 1)
-            mask_array = np.array(image_mask)
+            mask_array   = np.array(image_mask)
 
             image_array[:, :, 0] *= mask_array
             image_array[:, :, 1] *= mask_array
@@ -185,75 +177,66 @@ class Board_Layer_View:
             image_array[:, :, 3] *= mask_array
             image = Image.fromarray(image_array, "RGBA")
             image = image.crop(image.getbbox())
-            image = image.resize((math.ceil(image.size[0] * camera_zoom), math.ceil(image.size[1] * camera_zoom)), Image.NEAREST)
+            image = image.resize((round(image.size[0] * camera_zoom), round(image.size[1] * camera_zoom)), Image.NEAREST)
             image = image.rotate(-camera_rotate, resample = Image.NEAREST, expand = True, fillcolor = (0, 0, 0, 0))
 
             viewport_pos_list = [np.array([-label_size[0] / 2, -label_size[1] / 2]),
                                  np.array([ label_size[0] / 2, -label_size[1] / 2]),
                                  np.array([-label_size[0] / 2,  label_size[1] / 2]),
                                  np.array([ label_size[0] / 2,  label_size[1] / 2])]
-            image = image.crop((math.ceil(viewport_pos_list[0][0] + image.size[0] / 2),
-                                math.ceil(viewport_pos_list[0][1] + image.size[1] / 2),
-                                math.ceil(viewport_pos_list[3][0] + image.size[0] / 2),
-                                math.ceil(viewport_pos_list[3][1] + image.size[1] / 2)))
+            image = image.crop((round(viewport_pos_list[0][0] + image.size[0] / 2),
+                                round(viewport_pos_list[0][1] + image.size[1] / 2),
+                                round(viewport_pos_list[3][0] + image.size[0] / 2),
+                                round(viewport_pos_list[3][1] + image.size[1] / 2)))
 
         else:
-            image = image.resize((math.ceil(image.size[0] * camera_zoom), math.ceil(image.size[1] * camera_zoom)))
-            image = image.rotate(-camera_rotate, expand = True, fillcolor = (0, 0, 0, 0))
+            image = image.resize((round(image.size[0] * camera_zoom), round(image.size[1] * camera_zoom)), Image.NEAREST)
+            image = image.rotate(-camera_rotate, resample = Image.NEAREST, expand = True, fillcolor = (0, 0, 0, 0))
 
             viewport_pos_list = [np.array([-label_size[0] / 2, -label_size[1] / 2]),
                                  np.array([ label_size[0] / 2, -label_size[1] / 2]),
                                  np.array([-label_size[0] / 2,  label_size[1] / 2]),
                                  np.array([ label_size[0] / 2,  label_size[1] / 2])]
-            image = image.crop((math.ceil(viewport_pos_list[0][0] + image.size[0] / 2 + camera_offset[0]),
-                                math.ceil(viewport_pos_list[0][1] + image.size[1] / 2 + camera_offset[1]),
-                                math.ceil(viewport_pos_list[3][0] + image.size[0] / 2 + camera_offset[0]),
-                                math.ceil(viewport_pos_list[3][1] + image.size[1] / 2 + camera_offset[1])))
+            image = image.crop((round(viewport_pos_list[0][0] + image.size[0] / 2 + camera_offset[0]),
+                                round(viewport_pos_list[0][1] + image.size[1] / 2 + camera_offset[1]),
+                                round(viewport_pos_list[3][0] + image.size[0] / 2 + camera_offset[0]),
+                                round(viewport_pos_list[3][1] + image.size[1] / 2 + camera_offset[1])))
 
+            r, g, b, _ = self.style_manage_controller.Get_base_color().getRgb()
+            label_background_image = Image.new('RGBA',
+                                              (label_size[0], label_size[1]),
+                                              (r, g, b))
+            label_background_image.paste(image, (0, 0), mask = image)
+            image = label_background_image
+
+        self.Update_camera_board_size()
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
         self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(image))
 
-    def Print_image_(self, image):
-        self.camera_image = image.copy()
+    def Update_camera_board_size(self):
+        camera_zoom   =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+        camera_rotate =  self.camera_rotate
+        image_size    =  self.camera_image.size
 
-        camera_zoom   = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-        camera_rotate = self.camera_rotate
-        camera_offset = self.camera_offset
-        label_size    = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+        angle         = np.radians(camera_rotate)
+        cos, sin      = np.cos(angle), np.sin(angle)
+        rotate_matrix = np.array([[cos,-sin],
+                                  [sin, cos]])
+        scale_matrix  = np.array([[1 * camera_zoom, 0],
+                                  [0, 1 * camera_zoom]])
 
-        r, g, b, _ = self.style_manage_controller.Get_base_color().getRgb()
-        image = image.resize((image.size[0] * camera_zoom, image.size[1] * camera_zoom), Image.NEAREST)
-        image = image.rotate(-camera_rotate, resample = Image.NEAREST, expand = True, fillcolor = (r, g, b))
-        self.camera_board_size = ((image.size[0] + label_size[0], image.size[1] + label_size[1]))
+        diagonal_1_array = np.array([image_size[0],  image_size[1]])
+        diagonal_2_array = np.array([image_size[0], -image_size[1]])
 
-        drawn_rect    = [0, 0, 0, 0]
-        drawn_rect[0] = image.size[0] / 2 + camera_offset[0]  - label_size[0] / 2
-        drawn_rect[1] = image.size[1] / 2 + camera_offset[1]  - label_size[1] / 2
-        drawn_rect[2] = drawn_rect[0] + label_size[0]
-        drawn_rect[3] = drawn_rect[1] + label_size[1]
+        transferred_diagonal_1 = scale_matrix @ rotate_matrix @ diagonal_1_array
+        transferred_diagonal_2 = scale_matrix @ rotate_matrix @ diagonal_2_array
 
-        paste_pos     = [0, 0]
-        paste_pos[0]  = 0 if drawn_rect[0] > 0 else math.ceil(-drawn_rect[0])
-        paste_pos[1]  = 0 if drawn_rect[1] > 0 else math.ceil(-drawn_rect[1])
-
-        drawn_rect[0] = math.ceil(max(drawn_rect[0], 0))
-        drawn_rect[1] = math.ceil(max(drawn_rect[1], 0))
-        drawn_rect[2] = math.ceil(min(drawn_rect[2], image.size[0]))
-        drawn_rect[3] = math.ceil(min(drawn_rect[3], image.size[1]))
-
-        image = image.crop(tuple(drawn_rect))
-        label_background_image = Image.new('RGBA',
-                                           (label_size[0], label_size[1]),
-                                           (r, g, b))
-        label_background_image.paste(image, (paste_pos[0], paste_pos[1]))
-
-        self.Set_h_scrollbar()
-        self.Set_v_scrollbar()
-        self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(label_background_image))
+        self.camera_board_size = ((round(max(abs(transferred_diagonal_1[0]), abs(transferred_diagonal_2[0]))),
+                                   round(max(abs(transferred_diagonal_1[1]), abs(transferred_diagonal_2[1])))))
 
     def Label_pos_to_board_pos(self, label_x, label_y):
-        camera_zoom       = self.camera_zoom
+        camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
         camera_rotate     = self.camera_rotate
         camera_offset     = self.camera_offset
         camera_board_size = self.camera_board_size
@@ -261,59 +244,49 @@ class Board_Layer_View:
         board_size =  self.board_layer_controller.Get_board_size()
         label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
 
-        camera_board_x = camera_board_size[0] / 2 + camera_offset[0] - label_size[0] / 2 + label_x
-        camera_board_y = camera_board_size[1] / 2 + camera_offset[1] - label_size[1] / 2 + label_y
+        camera_board_x = camera_offset[0] - label_size[0] / 2 + label_x
+        camera_board_y = camera_offset[1] - label_size[0] / 2 + label_y
 
         angle         = np.radians(camera_rotate)
         cos, sin      = np.cos(angle), np.sin(angle)
-        rotate_matrix = np.array([[ cos, sin],
-                                  [-sin, cos]])
-        scale_matrix  = np.array([[(1 / camera_zoom) if camera_zoom > 0 else -camera_zoom, 0],
-                                  [0, (1 / camera_zoom) if camera_zoom > 0 else -camera_zoom]])
+        inverse_rotate_matrix = np.array([[ cos, sin],
+                                          [-sin, cos]])
+        inverse_scale_matrix  = np.array([[1 / camera_zoom , 0],
+                                          [0, 1 / camera_zoom]])
 
-        board_vector  = np.array([float(camera_board_x), float(camera_board_y)])
-        board_vector -= np.array([camera_board_size[0] / 2, camera_board_size[1] / 2])
-        board_vector  = np.dot(rotate_matrix, board_vector)
-        board_vector  = np.dot(scale_matrix, board_vector)
-        board_vector += np.array([board_size[0] / 2, board_size[1] / 2])
+        board_vector = np.array([float(camera_board_x), float(camera_board_y)])
+        board_vector = inverse_rotate_matrix @ inverse_scale_matrix @ board_vector + np.array([board_size[0] / 2, board_size[1] / 2])
 
         return round(board_vector[0]), round(board_vector[1])
 
-    def Get_new_layer_widget(self):
+    def Yield_new_layer_widget(self):
         layer_widget = Layer_Widget(self.main_window.Layer_List_ScrollArea_Widget)
         self.main_window.Layer_List_ScrollArea_Layout.addWidget(layer_widget)
         return layer_widget
 
     def Zoom_in(self, label_x, label_y):
         if self.camera_zoom + 1 <= self.CAMERMA_ZOOM_MAX:
-            original_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-            self.camera_zoom        = self.camera_zoom + 1 if self.camera_zoom + 1 not in (0, -1) else 1
-            transferred_camera_zoom = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            self.camera_zoom           = self.camera_zoom + 1 if self.camera_zoom + 1 not in (0, -1) else 1
+            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
 
-            label_size        = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-            camera_board_size =  self.camera_board_size
-            original_offset   =  self.camera_offset
+            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+            original_offset =  self.camera_offset
 
-            original_camera_board_x = original_offset[0] - label_size[0] / 2 + label_x
-            original_camera_board_y = original_offset[1] - label_size[1] / 2 + label_y
+            original_camera_board_x    = original_offset[0] - label_size[0] / 2 + label_x
+            original_camera_board_y    = original_offset[1] - label_size[1] / 2 + label_y
 
             transferred_camera_board_x = original_camera_board_x / original_camera_zoom * transferred_camera_zoom
             transferred_camera_board_y = original_camera_board_y / original_camera_zoom * transferred_camera_zoom
 
-            transferred_offset_x = transferred_camera_board_x + label_size[0] / 2 - label_x
-            transferred_offset_y = transferred_camera_board_y + label_size[0] / 2 - label_y
+            transferred_offset_x       = transferred_camera_board_x + label_size[0] / 2 - label_x
+            transferred_offset_y       = transferred_camera_board_y + label_size[0] / 2 - label_y
 
-            self.camera_offset = (round(transferred_offset_x), round(transferred_offset_y))
+            self.Update_camera_board_size()
 
-            angle            = np.radians(self.camera_rotate)
-            cos, sin         = np.cos(angle), np.sin(angle)
-            rotate_matrix    = np.array([[ cos, sin],
-                                         [-sin, cos]])
-            image_size_array = np.array([self.camera_image.size[0], self.camera_image.size[1]])
-            image_size_array = np.dot(rotate_matrix, image_size_array)
-            image_size       = (image_size_array[0], image_size_array[1])
-            self.camera_board_size = ((math.ceil(image_size[0] * transferred_camera_zoom) if transferred_camera_zoom > 0 else math.ceil(image_size[0] // -transferred_camera_zoom)) + label_size[0],
-                                      (math.ceil(image_size[1] * transferred_camera_zoom) if transferred_camera_zoom > 0 else math.ceil(image_size[1] // -transferred_camera_zoom)) + label_size[1])
+            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
+            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
+            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
 
             self.Set_h_scrollbar()
             self.Set_v_scrollbar()
@@ -321,34 +294,27 @@ class Board_Layer_View:
 
     def Zoom_out(self, label_x, label_y):
         if self.camera_zoom - 1 >= self.CAMERMA_ZOOM_MIN:
-            original_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-            self.camera_zoom        = self.camera_zoom - 1 if self.camera_zoom - 1 not in (1, 0) else -1
-            transferred_camera_zoom = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            self.camera_zoom           = self.camera_zoom - 1 if self.camera_zoom - 1 not in (1, 0) else -1
+            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
 
-            label_size        = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-            camera_board_size =  self.camera_board_size
-            original_offset   =  self.camera_offset
+            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+            original_offset =  self.camera_offset
 
-            original_camera_board_x = original_offset[0] - label_size[0] / 2 + label_x
-            original_camera_board_y = original_offset[1] - label_size[1] / 2 + label_y
+            original_camera_board_x    = original_offset[0] - label_size[0] / 2 + label_x
+            original_camera_board_y    = original_offset[1] - label_size[1] / 2 + label_y
 
             transferred_camera_board_x = original_camera_board_x / original_camera_zoom * transferred_camera_zoom
             transferred_camera_board_y = original_camera_board_y / original_camera_zoom * transferred_camera_zoom
 
-            transferred_offset_x = transferred_camera_board_x + label_size[0] / 2 - label_x
-            transferred_offset_y = transferred_camera_board_y + label_size[0] / 2 - label_y
+            transferred_offset_x       = transferred_camera_board_x + label_size[0] / 2 - label_x
+            transferred_offset_y       = transferred_camera_board_y + label_size[0] / 2 - label_y
 
-            self.camera_offset = (round(transferred_offset_x), round(transferred_offset_y))
+            self.Update_camera_board_size()
 
-            angle            = np.radians(self.camera_rotate)
-            cos, sin         = np.cos(angle), np.sin(angle)
-            rotate_matrix    = np.array([[ cos, sin],
-                                         [-sin, cos]])
-            image_size_array = np.array([self.camera_image.size[0], self.camera_image.size[1]])
-            image_size_array = np.dot(rotate_matrix, image_size_array)
-            image_size       = (image_size_array[0], image_size_array[1])
-            self.camera_board_size = ((math.ceil(image_size[0] * transferred_camera_zoom) if transferred_camera_zoom > 0 else math.ceil(image_size[0] // -transferred_camera_zoom)) + label_size[0],
-                                      (math.ceil(image_size[1] * transferred_camera_zoom) if transferred_camera_zoom > 0 else math.ceil(image_size[1] // -transferred_camera_zoom)) + label_size[1])
+            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
+            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
+            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
 
             self.Set_h_scrollbar()
             self.Set_v_scrollbar()
@@ -356,17 +322,17 @@ class Board_Layer_View:
 
     def Set_h_scrollbar(self):
         self.main_window.Board_H_ScrollBar.blockSignals(True)
-        self.main_window.Board_H_ScrollBar.setRange(  -(self.camera_board_size[0] - self.main_window.Board_Label.width()) // 2,
-                                                       (self.camera_board_size[0] - self.main_window.Board_Label.width()) // 2)
-        self.main_window.Board_H_ScrollBar.setPageStep((self.camera_board_size[0] - self.main_window.Board_Label.width()) // 15)
+        self.main_window.Board_H_ScrollBar.setRange(  -(self.camera_board_size[0]) // 2,
+                                                       (self.camera_board_size[0]) // 2)
+        self.main_window.Board_H_ScrollBar.setPageStep((self.camera_board_size[0]) // 15)
         self.main_window.Board_H_ScrollBar.setValue(self.camera_offset[0])
         self.main_window.Board_H_ScrollBar.blockSignals(False)
 
     def Set_v_scrollbar(self):
         self.main_window.Board_V_ScrollBar.blockSignals(True)
-        self.main_window.Board_V_ScrollBar.setRange(  -(self.camera_board_size[1] - self.main_window.Board_Label.height()) // 2,
-                                                       (self.camera_board_size[1] - self.main_window.Board_Label.height()) // 2)
-        self.main_window.Board_V_ScrollBar.setPageStep((self.camera_board_size[1] - self.main_window.Board_Label.height()) // 15)
+        self.main_window.Board_V_ScrollBar.setRange(  -(self.camera_board_size[1]) // 2,
+                                                       (self.camera_board_size[1]) // 2)
+        self.main_window.Board_V_ScrollBar.setPageStep((self.camera_board_size[1]) // 15)
         self.main_window.Board_V_ScrollBar.setValue(self.camera_offset[1])
         self.main_window.Board_V_ScrollBar.blockSignals(False)
 
@@ -401,36 +367,6 @@ class Board_Layer_View:
 
         if 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
             self.tool_controller.Mouse_release_event(label_x, label_y, board_x, board_y, event)
-
-    def Get_camera_zoom(self):
-        return self.camera_zoom
-
-    def Set_camera_zoom(self, value):
-        self.camera_zoom = value
-
-    def Get_camera_rotate(self):
-        return self.camera_rotate
-
-    def Set_camera_rotate(self, value):
-        self.camera_rotate = value
-
-    def Get_camera_offset(self):
-        return self.camera_offset
-
-    def Set_camera_offset(self, value):
-        self.camera_offset = value
-
-    def Get_camera_board_size(self):
-        return self.camera_board_size
-
-    def Set_camera_board_size(self, camera_board_size):
-        self.camera_board_size = camera_board_size
-
-    def Get_camera_zoom_max(self):
-        return self.CAMERMA_ZOOM_MAX
-
-    def Get_camera_zoom_min(self):
-        return self.CAMERMA_ZOOM_MIN
 
 
 class Board_Layer_Controller:
@@ -556,8 +492,8 @@ class Board_Layer_Controller:
 
         self.board_layer_view.Print_image(painting)
 
-    def Get_new_layer(self):
-        return Board_Layer_Controller.Layer(self, self.board_layer_view.Get_new_layer_widget())
+    def Yield_new_layer(self):
+        return Board_Layer_Controller.Layer(self, self.board_layer_view.Yield_new_layer_widget())
 
     def _Get_next_layer_index_self_add(self):
         self.next_layer_index += 1
