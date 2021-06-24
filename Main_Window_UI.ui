@@ -404,24 +404,7 @@
                <height>446</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="Layer_List_ScrollArea_Layout">
-              <item>
-               <widget class="Layer_Widget" name="Layer_1_Widget" native="true"/>
-              </item>
-              <item>
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
+             <layout class="QVBoxLayout" name="Layer_List_ScrollArea_Layout"/>
             </widget>
            </widget>
           </item>
@@ -1330,12 +1313,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>Layer_Widget</class>
-   <extends>QWidget</extends>
-   <header>Custom_Widgets/Layer_Widget/Layer_Widget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>Color_Picker_Widget</class>
    <extends>QWidget</extends>

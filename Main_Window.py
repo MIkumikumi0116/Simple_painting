@@ -4,7 +4,7 @@ import numpy as np
 from threading import Thread
 from PIL import Image, ImageQt, ImageDraw, ImageOps
 
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QImage, QColor
 from PyQt5.QtCore import Qt, QTimer, QPoint, pyqtSignal, QObject
 
@@ -35,14 +35,25 @@ class Frame_Controller:
             else:
                 self.layer_list.inset(index, layer)
 
+        def Get_layer_list(self):
+            return self.layer_list
+
     def __init__(self, main_window):
         self.main_window = main_window
 
+        self.frame_list = [None]
+        self.current_frame = None
+
+    def init(self):
+        self.frame_list = [None]
+        self.current_frame = None
+
+    def New_project(self):
         self.frame_list = [Frame_Controller.Frame(self)]
         self.current_frame = self.frame_list[0]
 
-    def init(self):
-        self.current_frame.Insert_layer(self.board_layer_controller.Inti_get_first_layer())
+        self.current_frame.Insert_layer(self.board_layer_controller.Yield_layer())
+        self.board_layer_controller.New_project_follow_up_draw()
 
     def Get_current_frame(self):
         return self.current_frame
@@ -54,31 +65,33 @@ class Board_Layer_View:
 
         self.camera_image = None
 
-        self.camera_zoom = None
-        self.camera_rotate = 0
-        self.camera_offset = (0, 0)
+        self.camera_zoom       = None
+        self.camera_rotate     = 0
+        self.camera_offset     = (0, 0)
         self.camera_board_size = (None ,None)
 
-        self.first_click_pos = None
-        self.second_click_pos = None
+        self.first_click_board_pos  = None
+        self.second_click_board_pos = None
 
         self.CAMERMA_ZOOM_MAX = 50
         self.CAMERMA_ZOOM_MIN = -20
 
     def init(self):
-        pass
+        self.camera_image      = None
+        self.camera_zoom       = None
+        self.camera_board_size = None
 
-    def _Init_print_image(self, image):
+    def New_project_follow_up_paint(self, image):
         # init camera_image, camera_zoom, camera_board_size
         self.camera_image = image.copy()
 
-        self.camera_zoom = None
-        self.camera_rotate = 0
-        self.camera_offset = (0, 0)
+        self.camera_zoom       = None
+        self.camera_rotate     = 0
+        self.camera_offset     = (0, 0)
         self.camera_board_size = (None ,None)
 
-        self.first_click_pos = None
-        self.second_click_pos = None
+        self.first_click_pos   = None
+        self.second_click_pos  = None
 
         image_size = image.size
         label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
@@ -129,9 +142,8 @@ class Board_Layer_View:
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
         self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(drawn_image))
+        self.Update_layer_list()
 
-    def _Inti_get_first_layer_widget(self):
-        return self.main_window.Layer_List_ScrollArea.findChildren(Layer_Widget)[0]
 
     def Print_image(self, image):
         self.camera_image = image.copy()
@@ -209,10 +221,124 @@ class Board_Layer_View:
             label_background_image.paste(image, (0, 0), mask = image)
             image = label_background_image
 
+        self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(image))
+
+    def Update_offset(self, offset):
+        self.camera_offset = offset
+        self.Print_image(self.camera_image)
+
+    def Zoom_in(self, label_x, label_y):
+        if self.camera_zoom + 1 <= self.CAMERMA_ZOOM_MAX:
+            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            self.camera_zoom           = self.camera_zoom + 1 if self.camera_zoom + 1 not in (0, -1) else 1
+            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+
+            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+            original_offset =  self.camera_offset
+
+            original_board_offset_x    = original_offset[0] - label_size[0] / 2 + label_x
+            original_board_offset_y    = original_offset[1] - label_size[1] / 2 + label_y
+
+            transferred_board_offset_x = original_board_offset_x / original_camera_zoom * transferred_camera_zoom
+            transferred_board_offset_y = original_board_offset_y / original_camera_zoom * transferred_camera_zoom
+
+            transferred_offset_x       = transferred_board_offset_x + label_size[0] / 2 - label_x
+            transferred_offset_y       = transferred_board_offset_y + label_size[0] / 2 - label_y
+
+            self.Update_camera_board_size()
+
+            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
+            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
+            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
+
+            self.Set_h_scrollbar()
+            self.Set_v_scrollbar()
+            self.Print_image(self.camera_image)
+
+    def Zoom_out(self, label_x, label_y):
+        if self.camera_zoom - 1 >= self.CAMERMA_ZOOM_MIN:
+            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+            self.camera_zoom           = self.camera_zoom - 1 if self.camera_zoom - 1 not in (1, 0) else -1
+            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+
+            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+            original_offset =  self.camera_offset
+
+            original_board_offset_x    = original_offset[0] - label_size[0] / 2 + label_x
+            original_board_offset_y    = original_offset[1] - label_size[1] / 2 + label_y
+
+            transferred_board_offset_x = original_board_offset_x / original_camera_zoom * transferred_camera_zoom
+            transferred_board_offset_y = original_board_offset_y / original_camera_zoom * transferred_camera_zoom
+
+            transferred_offset_x       = transferred_board_offset_x + label_size[0] / 2 - label_x
+            transferred_offset_y       = transferred_board_offset_y + label_size[0] / 2 - label_y
+
+            self.Update_camera_board_size()
+
+            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
+            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
+            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
+
+            self.Set_h_scrollbar()
+            self.Set_v_scrollbar()
+            self.Print_image(self.camera_image)
+
+    def Rotate_board(self, delta_angle):
+        camera_zoom     =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+        camera_rotate   =  self.camera_rotate
+        original_offset =  self.camera_offset
+
+        angle    = np.radians(camera_rotate)
+        cos, sin = np.cos(angle), np.sin(angle)
+        inverse_rotate_matrix = np.array([[ cos, sin],
+                                          [-sin, cos]])
+        inverse_scale_matrix  = np.array([[1 / camera_zoom, 0],
+                                          [0, 1 / camera_zoom]])
+        camera_offset = np.array([float(original_offset[0]), float(original_offset[1])])
+        board_offset  = inverse_scale_matrix @ inverse_rotate_matrix @ camera_offset
+
+        camera_rotate = camera_rotate + delta_angle
+
+        angle    = np.radians(camera_rotate)
+        cos, sin = np.cos(angle), np.sin(angle)
+        rotate_matrix = np.array([[cos, -sin],
+                                  [sin,  cos]])
+        scale_matrix  = np.array([[camera_zoom, 0],
+                                  [0, camera_zoom]])
+        camera_offset_array = scale_matrix @ rotate_matrix @ board_offset
+
+
+        self.camera_rotate = camera_rotate
+        self.camera_offset = (round(camera_offset_array[0]), round(camera_offset_array[1]))
+
         self.Update_camera_board_size()
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
-        self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(image))
+        self.Print_image(self.camera_image)
+
+
+    def Label_pos_to_board_pos(self, label_x, label_y):
+        camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
+        camera_rotate     = self.camera_rotate
+        camera_offset     = self.camera_offset
+        camera_board_size = self.camera_board_size
+
+        board_size =  self.board_layer_controller.Get_board_size()
+        label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+
+        camera_board_x = camera_offset[0] - label_size[0] / 2 + label_x
+        camera_board_y = camera_offset[1] - label_size[1] / 2 + label_y
+
+        angle         = np.radians(camera_rotate)
+        cos, sin      = np.cos(angle), np.sin(angle)
+        inverse_rotate_matrix = np.array([[ cos, sin],
+                                          [-sin, cos]])
+        inverse_scale_matrix  = np.array([[1 / camera_zoom , 0],
+                                          [0, 1 / camera_zoom]])
+        board_vector = np.array([float(camera_board_x), float(camera_board_y)])
+        board_vector = inverse_rotate_matrix @ inverse_scale_matrix @ board_vector + np.array([board_size[0] / 2, board_size[1] / 2])
+
+        return round(board_vector[0]), round(board_vector[1])
 
     def Update_camera_board_size(self):
         camera_zoom   =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
@@ -235,91 +361,6 @@ class Board_Layer_View:
         self.camera_board_size = ((round(max(abs(transferred_diagonal_1[0]), abs(transferred_diagonal_2[0]))),
                                    round(max(abs(transferred_diagonal_1[1]), abs(transferred_diagonal_2[1])))))
 
-    def Label_pos_to_board_pos(self, label_x, label_y):
-        camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-        camera_rotate     = self.camera_rotate
-        camera_offset     = self.camera_offset
-        camera_board_size = self.camera_board_size
-
-        board_size =  self.board_layer_controller.Get_board_size()
-        label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-
-        camera_board_x = camera_offset[0] - label_size[0] / 2 + label_x
-        camera_board_y = camera_offset[1] - label_size[0] / 2 + label_y
-
-        angle         = np.radians(camera_rotate)
-        cos, sin      = np.cos(angle), np.sin(angle)
-        inverse_rotate_matrix = np.array([[ cos, sin],
-                                          [-sin, cos]])
-        inverse_scale_matrix  = np.array([[1 / camera_zoom , 0],
-                                          [0, 1 / camera_zoom]])
-
-        board_vector = np.array([float(camera_board_x), float(camera_board_y)])
-        board_vector = inverse_rotate_matrix @ inverse_scale_matrix @ board_vector + np.array([board_size[0] / 2, board_size[1] / 2])
-
-        return round(board_vector[0]), round(board_vector[1])
-
-    def Yield_new_layer_widget(self):
-        layer_widget = Layer_Widget(self.main_window.Layer_List_ScrollArea_Widget)
-        self.main_window.Layer_List_ScrollArea_Layout.addWidget(layer_widget)
-        return layer_widget
-
-    def Zoom_in(self, label_x, label_y):
-        if self.camera_zoom + 1 <= self.CAMERMA_ZOOM_MAX:
-            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-            self.camera_zoom           = self.camera_zoom + 1 if self.camera_zoom + 1 not in (0, -1) else 1
-            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-
-            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-            original_offset =  self.camera_offset
-
-            original_camera_board_x    = original_offset[0] - label_size[0] / 2 + label_x
-            original_camera_board_y    = original_offset[1] - label_size[1] / 2 + label_y
-
-            transferred_camera_board_x = original_camera_board_x / original_camera_zoom * transferred_camera_zoom
-            transferred_camera_board_y = original_camera_board_y / original_camera_zoom * transferred_camera_zoom
-
-            transferred_offset_x       = transferred_camera_board_x + label_size[0] / 2 - label_x
-            transferred_offset_y       = transferred_camera_board_y + label_size[0] / 2 - label_y
-
-            self.Update_camera_board_size()
-
-            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
-            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
-            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
-
-            self.Set_h_scrollbar()
-            self.Set_v_scrollbar()
-            self.Print_image(self.camera_image)
-
-    def Zoom_out(self, label_x, label_y):
-        if self.camera_zoom - 1 >= self.CAMERMA_ZOOM_MIN:
-            original_camera_zoom       = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-            self.camera_zoom           = self.camera_zoom - 1 if self.camera_zoom - 1 not in (1, 0) else -1
-            transferred_camera_zoom    = self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
-
-            label_size      = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-            original_offset =  self.camera_offset
-
-            original_camera_board_x    = original_offset[0] - label_size[0] / 2 + label_x
-            original_camera_board_y    = original_offset[1] - label_size[1] / 2 + label_y
-
-            transferred_camera_board_x = original_camera_board_x / original_camera_zoom * transferred_camera_zoom
-            transferred_camera_board_y = original_camera_board_y / original_camera_zoom * transferred_camera_zoom
-
-            transferred_offset_x       = transferred_camera_board_x + label_size[0] / 2 - label_x
-            transferred_offset_y       = transferred_camera_board_y + label_size[0] / 2 - label_y
-
-            self.Update_camera_board_size()
-
-            transferred_offset_x       = max(0, min(transferred_offset_x, self.camera_board_size[0]))
-            transferred_offset_y       = max(0, min(transferred_offset_y, self.camera_board_size[1]))
-            self.camera_offset         = (round(transferred_offset_x), round(transferred_offset_y))
-
-            self.Set_h_scrollbar()
-            self.Set_v_scrollbar()
-            self.Print_image(self.camera_image)
-
     def Set_h_scrollbar(self):
         self.main_window.Board_H_ScrollBar.blockSignals(True)
         self.main_window.Board_H_ScrollBar.setRange(  -(self.camera_board_size[0]) // 2,
@@ -336,20 +377,69 @@ class Board_Layer_View:
         self.main_window.Board_V_ScrollBar.setValue(self.camera_offset[1])
         self.main_window.Board_V_ScrollBar.blockSignals(False)
 
+
+    def Update_layer_list(self):
+        for layer_widget in self.main_window.Layer_List_ScrollArea.findChildren(Layer_Widget):
+            layer_widget.setParent(None)
+
+        spacer = self.main_window.Layer_List_ScrollArea_Layout.itemAt(0)
+        if spacer:
+            self.main_window.Layer_List_ScrollArea_Layout.removeItem(spacer)
+
+        for layer in self.board_layer_controller.Get_layer_list():
+            self.main_window.Layer_List_ScrollArea_Layout.addWidget(layer.widget)
+
+        spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.main_window.Layer_List_ScrollArea_Layout.addItem(spacer)
+
+    def Yield_layer_widget(self):
+        return Layer_Widget(self.main_window.Layer_List_ScrollArea_Widget)
+
+
+    def Rotate_board_by_mouse(self, label_x, label_y, first_press_flag):
+        if first_press_flag:
+            self.first_click_board_pos = (label_x, label_y)
+            return
+        else:
+            self.second_click_board_pos = (label_x, label_y)
+
+        if (self.first_click_board_pos[0] - self.second_click_board_pos[0]) ** 2 + \
+           (self.first_click_board_pos[1] - self.second_click_board_pos[1]) ** 2 > 100:
+            first_pos  = self.first_click_board_pos
+            second_pos = self.second_click_board_pos
+            center_pos = (self.main_window.Board_Label.width() / 2, self.main_window.Board_Label.height() / 2)
+
+            first_pos_vector  = np.array([first_pos[0]  - center_pos[0], first_pos[1]  - center_pos[1]])
+            second_pos_vector = np.array([second_pos[0] - center_pos[0], second_pos[1] - center_pos[1]])
+
+            first_len   = np.sqrt(first_pos_vector  @ first_pos_vector )
+            second_len  = np.sqrt(second_pos_vector @ second_pos_vector)
+
+            angle_cos   = first_pos_vector @ second_pos_vector / (first_len * second_len)
+            delta_angle = np.arccos(angle_cos)
+            delta_angle = delta_angle * 360 / 2 / np.pi
+
+            if np.cross(first_pos_vector, second_pos_vector) > 0:
+                self.Rotate_board(delta_angle)
+            else:
+                self.Rotate_board(-delta_angle)
+
+            self.first_click_board_pos = self.second_click_board_pos
+
     def On_Board_h_scrollbar_value_changed(self, value):
-        self.camera_offset = (value, self.camera_offset[1])
-        self.Print_image(self.camera_image)
+        self.Update_offset((value, self.camera_offset[1]))
 
     def On_Board_v_scrollbar_value_changed(self, value):
-        self.camera_offset = (self.camera_offset[0], value)
-        self.Print_image(self.camera_image)
+        self.Update_offset((self.camera_offset[0], value))
 
     def Mouse_press_event(self, event):
         label_x, label_y = event.pos().x(), event.pos().y()
         board_x, board_y = self.Label_pos_to_board_pos(label_x, label_y)
         board_size = self.board_layer_controller.Get_board_size()
 
-        if 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
+        if event.buttons() == Qt.MiddleButton:
+            self.Rotate_board_by_mouse(label_x, label_y, first_press_flag = True)
+        elif 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
             self.tool_controller.Mouse_press_event(label_x, label_y, board_x, board_y, event)
 
     def Mouse_move_event(self, event):
@@ -357,7 +447,9 @@ class Board_Layer_View:
         board_x, board_y = self.Label_pos_to_board_pos(label_x, label_y)
         board_size = self.board_layer_controller.Get_board_size()
 
-        if 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
+        if event.buttons() == Qt.MiddleButton:
+            self.Rotate_board_by_mouse(label_x, label_y, first_press_flag = False)
+        elif 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
             self.tool_controller.Mouse_move_event(label_x, label_y, board_x, board_y, event)
 
     def Mouse_release_event(self, event):
@@ -365,12 +457,16 @@ class Board_Layer_View:
         board_x, board_y = self.Label_pos_to_board_pos(label_x, label_y)
         board_size = self.board_layer_controller.Get_board_size()
 
-        if 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
+        if event.buttons() == Qt.MiddleButton:
+            self.Rotate_board_by_mouse(label_x, label_y, first_press_flag = False)
+        elif 0 <= board_x < board_size[0] and 0 <= board_y < board_size[1]:
             self.tool_controller.Mouse_release_event(label_x, label_y, board_x, board_y, event)
 
 
 class Board_Layer_Controller:
     class Layer:
+        next_layer_index = 1
+
         def __init__(self, controller, widget, image = None, offset = (0, 0), name = '', mod_enum = '正常', opacity = 100):
             self.controller = controller
             self.widget = widget
@@ -385,7 +481,11 @@ class Board_Layer_Controller:
 
             self.hide_flag = False
             self.lock_flag = False
-            self.name = name if name != '' else f'图层{controller._Get_next_layer_index_self_add()}'
+            if name != '':
+                self.name = name
+            else:
+                self.name = f'图层{controller.Layer.next_layer_index}'
+                controller.Layer.next_layer_index += 1
             self.mod_enum = mod_enum
             self.opacity = opacity
 
@@ -437,11 +537,14 @@ class Board_Layer_Controller:
         self.selected_layer_list = None
         self.background_layer = Image.new('RGBA', self.board_size, (255, 255, 255))
 
-        self.next_layer_index = 1
-
     def init(self):
+        self.current_frame       = None
+        self.layer_list          = None
+        self.selected_layer_list = None
+
+    def New_project_follow_up_draw(self):
         self.current_frame = self.frame_controller.Get_current_frame()
-        self.layer_list = self.current_frame.layer_list
+        self.layer_list = self.current_frame.Get_layer_list()
         self.selected_layer_list = [self.layer_list[0]]
 
         painting = self.background_layer.copy()
@@ -464,10 +567,8 @@ class Board_Layer_Controller:
                                    layer.offset[1] if layer.offset[1] >= 0 else 0),
                                    mask = layer.image)
 
-        self.board_layer_view._Init_print_image(painting)
+        self.board_layer_view.New_project_follow_up_paint(painting)
 
-    def Inti_get_first_layer(self):
-        return Board_Layer_Controller.Layer(self, self.board_layer_view._Inti_get_first_layer_widget(), name = '图层1')
 
     def Draw_painting(self):
         painting = self.background_layer.copy()
@@ -492,12 +593,15 @@ class Board_Layer_Controller:
 
         self.board_layer_view.Print_image(painting)
 
-    def Yield_new_layer(self):
-        return Board_Layer_Controller.Layer(self, self.board_layer_view.Yield_new_layer_widget())
 
-    def _Get_next_layer_index_self_add(self):
-        self.next_layer_index += 1
-        return self.next_layer_index - 1
+    def Yield_layer(self):
+        return Board_Layer_Controller.Layer(self, self.board_layer_view.Yield_layer_widget())
+
+    def Add_layer(self):
+        new_layer = Board_Layer_Controller.Layer(self, self.board_layer_view.Yield_layer_widget())
+        self.layer_list.append(new_layer)
+        self.board_layer_view.Update_layer_list()
+
 
     def _Get_base_color(self):
         return self.style_manage_controller.Get_base_color()
@@ -505,17 +609,14 @@ class Board_Layer_Controller:
     def Get_board_size(self):
         return self.board_size
 
-    def Set_board_size(self, board_size):
-        self.board_size = board_size
-
     def Get_selected_layer(self):
         if len(self.selected_layer_list) == 1:
             return self.selected_layer_list[0]
         else:
             return False
 
-    def Get_selected_layer_list(self):
-        return self.selected_layer_list
+    def Get_layer_list(self):
+        return self.layer_list
 
 
 class Tool_View:
@@ -577,6 +678,7 @@ class Tool_Controller:
                     #                                                     255])
 
                 layer.image = Image.fromarray(pixel_matrix_np)
+                layer.Set_preview_label()
 
                 self.controller._Draw_painting()
 
@@ -683,24 +785,27 @@ class Color_Controller:
 
 
 class Notify_Controller(QObject):
-    label_notify_singal = pyqtSignal(str)
+    release_label_notify_singal = pyqtSignal(str)
 
     def __init__(self, main_window):
         self.main_window = main_window
         super().__init__()
 
         self.label_notify_list = []
-        self.label_notify_thread = Thread(target = self.Label_notify_thread_action, args = ())
+        self.label_notify_thread = Thread(target = self._Label_notify_thread_action, args = ())
         self.label_notify_thread.start()
-        self.label_notify_singal.connect(self.Release_label_notify)
+        self.release_label_notify_singal.connect(self._Release_label_notify)
         self.label_notify_busy_flag = False
         self.label_notify_timer = QTimer()
-        self.label_notify_timer.timeout.connect(self.On_label_notify_timer_timeout)
+        self.label_notify_timer.timeout.connect(self._On_label_notify_timer_timeout)
 
     def init(self):
         pass
 
-    def Label_notify_thread_action(self):
+    def New_label_notify(self, text):
+        self.label_notify_list.append({'text' : text, 'time' : time.time()})
+
+    def _Label_notify_thread_action(self):
         while True:
             time.sleep(0.05)
 
@@ -709,17 +814,14 @@ class Notify_Controller(QObject):
                 if label_notify['time'] - time.time() > 8:
                     pass
                 else:
-                    self.label_notify_singal.emit(label_notify['text'])
+                    self.release_label_notify_singal.emit(label_notify['text'])
 
-    def New_label_notify(self, text):
-        self.label_notify_list.append({'text' : text, 'time' : time.time()})
-
-    def Release_label_notify(self, text):
+    def _Release_label_notify(self, text):
         self.main_window.Notify_Label.setText(text)
         self.label_notify_busy_flag = True
         self.label_notify_timer.start(2500)
 
-    def On_label_notify_timer_timeout(self):
+    def _On_label_notify_timer_timeout(self):
         self.main_window.Notify_Label.setText('')
         self.label_notify_busy_flag = False
 
@@ -773,12 +875,15 @@ class Event_And_Singal_Distributor:
         self.main_window.keyPressEvent                 = self.Main_window_key_press_event
         self.main_window.keyReleaseEvent               = self.Main_window_key_release_event
         self.main_window.wheelEvent                    = self.Main_window_wheel_event
+
         self.main_window.Board_Label.mousePressEvent   = self.board_layer_view.Mouse_press_event
         self.main_window.Board_Label.mouseMoveEvent    = self.board_layer_view.Mouse_move_event
         self.main_window.Board_Label.mouseReleaseEvent = self.board_layer_view.Mouse_release_event
 
         self.main_window.Board_H_ScrollBar.valueChanged.connect(self.board_layer_view.On_Board_h_scrollbar_value_changed)
         self.main_window.Board_V_ScrollBar.valueChanged.connect(self.board_layer_view.On_Board_v_scrollbar_value_changed)
+
+        self.main_window.New_Bit_Layer_Action.triggered.connect(self.board_layer_controller.Add_layer)
 
     def Main_window_wheel_event(self, event):
         if self.main_window.Board_Label.rect().contains(event.pos()):
@@ -850,6 +955,8 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
 
         for module in self.module_list:
             module.init()
+
+        self.frame_controller.New_project()
 
     def init(self):
         self.main_window.Pencil_Size_ComboBox.setStyleSheet('''#Pencil_Size_ComboBox QAbstractItemView{min-width: 60px;}''')
