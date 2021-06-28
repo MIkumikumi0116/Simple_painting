@@ -30,15 +30,41 @@ class Frame_Controller:
             self.controller = controller
 
             self.layer_list = []
+            self.selected_layer_list = []
 
         def Insert_layer(self, layer, index = None):
             if index == None:
                 self.layer_list.append(layer)
             else:
-                self.layer_list.inset(index, layer)
+                self.layer_list.insert(index, layer)
 
         def Get_layer_list(self):
             return self.layer_list
+
+        def Get_selected_layer_index(self):
+            if len(self.selected_layer_list) == 1:
+                return self.layer_list.index(self.selected_layer_list[0])
+            else:
+                return False
+
+        def Get_selected_layer(self):
+            if len(self.selected_layer_list) == 1:
+                return self.selected_layer_list[0]
+            else:
+                return False
+
+        def Get_selected_layer_list(self):
+            return self.selected_layer_list
+
+        def Set_selected_layer(self, index_list):
+            self.selected_layer_list = []
+            for index in index_list:
+                self.selected_layer_list.append(self.layer_list[index])
+
+        def Append_selected_layer(self, layer):
+            if layer not in self.selected_layer:
+                self.selected_layer.append(layer)
+
 
     def __init__(self, main_window):
         self.main_window = main_window
@@ -56,7 +82,8 @@ class Frame_Controller:
         self.current_frame = self.frame_list[0]
 
         self.current_frame.Insert_layer(self.board_layer_controller.Yield_bit_layer())
-        self.board_layer_controller.On_new_project_draw()
+        self.board_layer_controller.Draw_painting_new_project()
+
 
     def Get_frame_list(self):
         return self.frame_list
@@ -75,7 +102,7 @@ class Board_Layer_View:
     def __init__(self, main_window):
         self.main_window = main_window
 
-        self.camera_image = None
+        self.board_image = None
 
         self.camera_zoom       = None
         self.camera_rotate     = 0
@@ -89,72 +116,16 @@ class Board_Layer_View:
         self.CAMERMA_ZOOM_MIN = -20
 
     def init(self):
-        self.camera_image      = None
+        self.board_image      = None
         self.camera_zoom       = None
         self.camera_board_size = None
 
         self.first_click_board_pos  = None
         self.second_click_board_pos = None
 
-    def On_new_project_print(self, image):
-        # init camera_image, camera_zoom, camera_board_size
-        self.camera_image = image.copy()
-
-        self.camera_zoom       = None
-        self.camera_rotate     = 0
-        self.camera_offset     = (0, 0)
-        self.camera_board_size = (None ,None)
-
-        self.first_click_pos   = None
-        self.second_click_pos  = None
-
-        image_size = image.size
-        label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
-
-        if image_size[0] <= label_size[0] and image_size[1] <= label_size[1]:
-            narrow_type = 'no_narrow'
-        elif image_size[0] > label_size[0] and image_size[1] < label_size[1]:
-            narrow_type = 'h_narrow'
-        elif image_size[0] < label_size[0] and image_size[1] > label_size[1]:
-            narrow_type = 'v_narrow'
-        else:
-            if image_size[0] / label_size[0] > image_size[1] / label_size[1]:
-                narrow_type = 'h_narrow'
-            else:
-                narrow_type = 'v_narrow'
-
-        if narrow_type == 'no_narrow':
-            if image_size[0] / label_size[0] > image_size[1] / label_size[1]:
-                camera_zoom = label_size[0] // image_size[0]
-            else:
-                camera_zoom = label_size[1] // image_size[1]
-            image_transferred = image.resize((image_size[0] * camera_zoom, image_size[1] * camera_zoom), Image.NEAREST)
-
-        elif narrow_type == 'h_narrow':
-            camera_zoom = -(image_size[0] // label_size[0] + 1)
-            image_transferred = image.resize((image_size[0] // -camera_zoom, image_size[1] // -camera_zoom), Image.NEAREST)
-
-        elif narrow_type == 'v_narrow':
-            camera_zoom = -(image_size[1] // label_size[1] + 1)
-            image_transferred = image.resize((image_size[0] // -camera_zoom, image_size[1] // -camera_zoom), Image.NEAREST)
-
-        r, g, b, _ = self.style_manage_controller.Get_stress_back_color().getRgb()
-        label_background_image = Image.new('RGBA',
-                                           (label_size[0], label_size[1]),
-                                           (r, g, b))
-        label_background_image.paste(image_transferred, ((label_size[0] - image_transferred.size[0]) // 2,
-                                                         (label_size[1] - image_transferred.size[1]) // 2))
-
-        self.camera_zoom = camera_zoom
-        self.camera_board_size = image_transferred.size
-        self.Set_h_scrollbar()
-        self.Set_v_scrollbar()
-        self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(label_background_image))
-        self.Update_layer_widget_list()
-
 
     def Print_image(self, image):
-        self.camera_image = image.copy()
+        self.board_image = image.copy()
 
         camera_zoom   =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
         camera_rotate =  self.camera_rotate
@@ -232,6 +203,62 @@ class Board_Layer_View:
         image = self.Print_promet_layer(image)
         self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(image))
 
+    def Print_image_new_project(self, image):
+        # init board_image, camera_zoom, camera_board_size
+        self.board_image = image.copy()
+
+        self.camera_zoom       = None
+        self.camera_rotate     = 0
+        self.camera_offset     = (0, 0)
+        self.camera_board_size = (None ,None)
+
+        self.first_click_pos   = None
+        self.second_click_pos  = None
+
+        image_size = image.size
+        label_size = (self.main_window.Board_Label.width(), self.main_window.Board_Label.height())
+
+        if image_size[0] <= label_size[0] and image_size[1] <= label_size[1]:
+            narrow_type = 'no_narrow'
+        elif image_size[0] > label_size[0] and image_size[1] < label_size[1]:
+            narrow_type = 'h_narrow'
+        elif image_size[0] < label_size[0] and image_size[1] > label_size[1]:
+            narrow_type = 'v_narrow'
+        else:
+            if image_size[0] / label_size[0] > image_size[1] / label_size[1]:
+                narrow_type = 'h_narrow'
+            else:
+                narrow_type = 'v_narrow'
+
+        if narrow_type == 'no_narrow':
+            if image_size[0] / label_size[0] > image_size[1] / label_size[1]:
+                camera_zoom = label_size[0] // image_size[0]
+            else:
+                camera_zoom = label_size[1] // image_size[1]
+            image_transferred = image.resize((image_size[0] * camera_zoom, image_size[1] * camera_zoom), Image.NEAREST)
+
+        elif narrow_type == 'h_narrow':
+            camera_zoom = -(image_size[0] // label_size[0] + 1)
+            image_transferred = image.resize((image_size[0] // -camera_zoom, image_size[1] // -camera_zoom), Image.NEAREST)
+
+        elif narrow_type == 'v_narrow':
+            camera_zoom = -(image_size[1] // label_size[1] + 1)
+            image_transferred = image.resize((image_size[0] // -camera_zoom, image_size[1] // -camera_zoom), Image.NEAREST)
+
+        r, g, b, _ = self.style_manage_controller.Get_stress_back_color().getRgb()
+        label_background_image = Image.new('RGBA',
+                                           (label_size[0], label_size[1]),
+                                           (r, g, b))
+        label_background_image.paste(image_transferred, ((label_size[0] - image_transferred.size[0]) // 2,
+                                                         (label_size[1] - image_transferred.size[1]) // 2))
+
+        self.camera_zoom = camera_zoom
+        self.camera_board_size = image_transferred.size
+        self.Set_h_scrollbar()
+        self.Set_v_scrollbar()
+        self.main_window.Board_Label.setPixmap(ImageQt.toqpixmap(label_background_image))
+        self.Update_layer_widget_list()
+
     def Print_promet_layer(self, image):
         command = self.board_layer_controller.Get_promet_layer_command()
         if command == None:
@@ -298,7 +325,7 @@ class Board_Layer_View:
 
     def Update_offset(self, offset):
         self.camera_offset = offset
-        self.Print_image(self.camera_image)
+        self.Print_image(self.board_image)
 
     def Zoom_in(self, label_x, label_y):
         if self.camera_zoom + 1 <= self.CAMERMA_ZOOM_MAX:
@@ -326,7 +353,7 @@ class Board_Layer_View:
 
             self.Set_h_scrollbar()
             self.Set_v_scrollbar()
-            self.Print_image(self.camera_image)
+            self.Print_image(self.board_image)
 
     def Zoom_out(self, label_x, label_y):
         if self.camera_zoom - 1 >= self.CAMERMA_ZOOM_MIN:
@@ -354,7 +381,7 @@ class Board_Layer_View:
 
             self.Set_h_scrollbar()
             self.Set_v_scrollbar()
-            self.Print_image(self.camera_image)
+            self.Print_image(self.board_image)
 
     def Rotate_board(self, delta_angle):
         camera_zoom     =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
@@ -387,7 +414,7 @@ class Board_Layer_View:
         self.Update_camera_board_size()
         self.Set_h_scrollbar()
         self.Set_v_scrollbar()
-        self.Print_image(self.camera_image)
+        self.Print_image(self.board_image)
 
 
     def Label_pos_to_board_pos(self, label_x, label_y):
@@ -437,7 +464,7 @@ class Board_Layer_View:
     def Update_camera_board_size(self):
         camera_zoom   =  self.camera_zoom if self.camera_zoom > 0 else -1 / self.camera_zoom
         camera_rotate =  self.camera_rotate
-        image_size    =  self.camera_image.size
+        image_size    =  self.board_image.size
 
         angle         = np.radians(camera_rotate)
         cos, sin      = np.cos(angle), np.sin(angle)
@@ -503,13 +530,18 @@ class Board_Layer_View:
 
     def Update_layer_widget_list(self):
         for layer_widget in self.main_window.Layer_List_ScrollArea.findChildren(Layer_Widget):
-            layer_widget.setParent(None)
+            self.main_window.Layer_List_ScrollArea_Layout.removeWidget(layer_widget)
+            layer_widget.deleteLater()
 
         spacer = self.main_window.Layer_List_ScrollArea_Layout.itemAt(0)
         if spacer:
             self.main_window.Layer_List_ScrollArea_Layout.removeItem(spacer)
+            del spacer
+
+        self.main_window.update()
 
         for layer in self.board_layer_controller.Get_layer_list():
+            layer.Set_widget(self.Yield_layer_widget())
             self.main_window.Layer_List_ScrollArea_Layout.addWidget(layer.widget)
 
         spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -577,6 +609,7 @@ class Board_Layer_View:
 
 
 class Board_Layer_Controller:
+
     class Promet_Layer_Command_Struct:
         def __init__(self):
             self.order_enum  = None
@@ -666,37 +699,55 @@ class Board_Layer_Controller:
             self.lock_flag = not self.lock_flag
             self.widget.Set_widget_info()
 
+        def Set_widget(self, widget):
+            self.widget = widget
+            self.widget.init(self, self.controller.style_manage_controller)
+            self.widget.Hide_Button.clicked.connect(self.On_hide_button_clicked)
+            self.widget.Lock_Button.clicked.connect(self.On_lock_button_clicked)
+            self.Set_preview_label()
+            self.widget.Set_widget_info()
+
+        def Get_image(self):
+            return self.image
+
+        def Set_image(self, image):
+            self.image = image.copy()
+            self.Set_preview_label()
+
+        def Get_offset(self):
+            return self.offset
+
+        def Set_offset(self, offset):
+            self.offset = offset
+
+        def Get_hide_flag(self):
+            return self.hide_flag
+
+        def Get_lock_flag(self):
+            return self.lock_flag
+
 
     def __init__(self, main_window):
         self.main_window = main_window
 
         self.board_size           = (256, 256)
         self.current_frame        = None
-        self.layer_list           = None
-        self.selected_layer_list  = None
         self.selection_mask       = None
+        self.promet_layer_command = None
 
         self.painting             = Image.new('RGBA', self.board_size, (255, 255, 255))
-
         self.background_layer     = Image.new('RGBA', self.board_size, (255, 255, 255))
-        self.promet_layer_command = None
 
     def init(self):
         self.current_frame        = None
-        self.layer_list           = None
-        self.selected_layer_list  = None
         self.selection_mask       = None
         self.promet_layer_command = None
 
-    def On_new_project_draw(self):
-        self.current_frame = self.frame_controller.Get_current_frame()
-        self.layer_list = self.current_frame.Get_layer_list()
-        self.selected_layer_list = [self.layer_list[0]]
-        self.promet_layer_command = None
 
+    def Genrate_painting(self):
         painting = self.background_layer.copy()
-        for layer in self.layer_list:
-            if not layer.hide_flag:
+        for layer in self.Get_layer_list():
+            if not layer.Get_hide_flag():
                 layer_image = layer.Draw_layer()
 
                 if layer.offset[0] < 0:
@@ -709,37 +760,40 @@ class Board_Layer_Controller:
                     layer_image = layer_image.crop((0, 0, layer_image.size[0], layer.offset[1] + layer_image.size[1] - self.board_size[1]))
 
                 if layer.mod_enum == '正常':
-                    painting.paste(layer.image,
-                                  (layer.offset[0] if layer.offset[0] >= 0 else 0,
-                                   layer.offset[1] if layer.offset[1] >= 0 else 0),
-                                   mask = layer.image)
+                    painting.paste(layer.image, (layer.offset[0],layer.offset[1]), mask = layer.image)
 
-        self.painting = painting.copy()
-        self.board_layer_view.On_new_project_print(painting)
+        return painting
 
     def Draw_painting(self):
-        painting = self.background_layer.copy()
-        for layer in self.layer_list:
-            if not layer.hide_flag:
-                layer_image = layer.Draw_layer()
-
-                if layer.offset[0] < 0:
-                    layer_image = layer_image.crop((-layer.offset[0], 0, layer_image.size[0], layer_image.size[1]))
-                if layer.offset[1] < 0:
-                    layer_image = layer_image.crop((0, -layer.offset[1], layer_image.size[0], layer_image.size[1]))
-                if layer.offset[0] + layer_image.size[0] > self.board_size[0]:
-                    layer_image = layer_image.crop((0, 0, layer.offset[0] + layer_image.size[0] - self.board_size[0], layer_image.size[1]))
-                if layer.offset[1] + layer_image.size[1] > self.board_size[1]:
-                    layer_image = layer_image.crop((0, 0, layer_image.size[0], layer.offset[1] + layer_image.size[1] - self.board_size[1]))
-
-                if layer.mod_enum == '正常':
-                    painting.paste(layer.image,
-                                  (layer.offset[0] if layer.offset[0] >= 0 else 0,
-                                   layer.offset[1] if layer.offset[1] >= 0 else 0),
-                                   mask = layer.image)
+        painting = self.Genrate_painting()
 
         self.painting = painting.copy()
         self.board_layer_view.Print_image(painting)
+
+    def Draw_painting_new_project(self):
+        self.current_frame = self.frame_controller.Get_current_frame()
+        self.current_frame.Set_selected_layer([0])
+        self.selection_mask       = None
+        self.promet_layer_command = None
+
+        painting = self.Genrate_painting()
+
+        self.painting = painting.copy()
+        self.board_layer_view.Print_image_new_project(painting)
+        self.backup_controller.Add_backup()
+
+    def Draw_painting_frame_change(self):
+        self.current_frame = self.frame_controller.Get_current_frame()
+        self.selection_mask       = None
+        self.promet_layer_command = None
+
+        painting = self.Genrate_painting()
+
+        self.painting = painting.copy()
+        self.board_layer_view.Print_image(painting)
+        self.board_layer_view.Update_layer_widget_list()
+
+
 
     def Prompt_selection(self, selection_vector):
         if selection_vector.type_enum == 'rect_selection':
@@ -777,23 +831,22 @@ class Board_Layer_Controller:
         if selected_layer == False:
             self.notify_controller.Send_label_notify('该工具只能作用于单个图层')
             return
-        if selected_layer.lock_flag:
+        if selected_layer.Get_lock_flag():
             self.notify_controller.Send_label_notify('该图层已锁定')
             return
 
         image = Image.new('RGBA', self.board_size, (0, 0, 0, 0))
-        image.paste(selected_layer.image, mask = self.selection_mask.mask_image)
+        image.paste(selected_layer.Get_image(), mask = self.selection_mask.mask_image)
 
-        bbox = image.getbbox()
-        if bbox == None:
+        bonding_box = image.getbbox()
+        if bonding_box == None:
             self.notify_controller.Send_label_notify('选定的区域内没有像素')
             return
-        image = image.crop(bbox)
-        offset = (bbox[0], bbox[1])
+        image = image.crop(bonding_box)
+        offset = (bonding_box[0], bonding_box[1])
 
         new_layer = Board_Layer_Controller.Bit_Layer(controller = self, widget = self.board_layer_view.Yield_layer_widget(), image = image, offset = offset)
-        selected_layer_index = self.layer_list.index(selected_layer)
-        self.layer_list.insert(selected_layer_index, new_layer)
+        self.Insert_layer(new_layer, self.Get_selected_layer_index())
 
         self.board_layer_view.Update_layer_widget_list()
         self.Cancel_selection()
@@ -807,27 +860,27 @@ class Board_Layer_Controller:
         if selected_layer == False:
             self.notify_controller.Send_label_notify('该工具只能作用于单个图层')
             return
-        if selected_layer.lock_flag:
+        if selected_layer.Get_lock_flag():
             self.notify_controller.Send_label_notify('该图层已锁定')
             return
 
         image = Image.new('RGBA', self.board_size, (0, 0, 0, 0))
-        image.paste(selected_layer.image, mask = self.selection_mask.mask_image)
+        image.paste(selected_layer.Get_image(), mask = self.selection_mask.mask_image)
 
-        bbox = image.getbbox()
-        if bbox == None:
+        bonding_box = image.getbbox()
+        if bonding_box == None:
             self.notify_controller.Send_label_notify('选定的区域内没有像素')
             return
-        image = image.crop(bbox)
-        offset = (bbox[0], bbox[1])
+        image = image.crop(bonding_box)
+        offset = (bonding_box[0], bonding_box[1])
 
         new_layer = Board_Layer_Controller.Bit_Layer(controller = self, widget = self.board_layer_view.Yield_layer_widget(), image = image, offset = offset)
-        selected_layer_index = self.layer_list.index(selected_layer)
-        self.layer_list.insert(selected_layer_index, new_layer)
+        self.Insert_layer(new_layer, self.Get_selected_layer_index())
 
         blank_image = Image.new('RGBA', self.board_size, (255, 255, 255, 0))
-        selected_layer.image.paste(blank_image, mask = self.selection_mask.mask_image)
-        selected_layer.Set_preview_label()
+        layer_image = selected_layer.Get_image()
+        layer_image.paste(blank_image, mask = self.selection_mask.mask_image)
+        selected_layer.Set_image(layer_image)
 
         self.board_layer_view.Update_layer_widget_list()
         self.Cancel_selection()
@@ -839,35 +892,28 @@ class Board_Layer_Controller:
 
     def Add_bit_layer(self):
         new_layer = Board_Layer_Controller.Bit_Layer(self, self.board_layer_view.Yield_layer_widget())
-        self.layer_list.insert(0, new_layer)
+        self.Insert_layer(new_layer, 0)
         self.board_layer_view.Update_layer_widget_list()
         self.backup_controller.Add_backup()
-
-    def On_frame_change_update_layer_list(self):
-        self.current_frame = self.frame_controller.Get_current_frame()
-        self.layer_list = self.current_frame.Get_layer_list()
-        self.selected_layer_list = []
-        self.promet_layer_command = None
 
 
     def Get_board_size(self):
         return self.board_size
 
-    def Get_selected_layer(self):
-        if len(self.selected_layer_list) == 1:
-            return self.selected_layer_list[0]
-        else:
-            return False
-
-    def Set_selected_layer(self, index_list):
-        self.selected_layer_list = []
-        for index in index_list:
-            self.selected_layer_list.append(self.layer_list[index])
-
-        self.board_layer_view.Update_layer_widget_list()
+    def Insert_layer(self, layer, index = None):
+        self.current_frame.Insert_layer(layer) if index == None else self.current_frame.Insert_layer(layer, index)
 
     def Get_layer_list(self):
-        return self.layer_list
+        return self.current_frame.Get_layer_list()
+
+    def Get_selected_layer_index(self):
+        return self.current_frame.Get_selected_layer_index()
+
+    def Get_selected_layer(self):
+        return self.current_frame.Get_selected_layer()
+
+    def Set_selected_layer(self, index_list):
+         self.current_frame.Set_selected_layer(index_list)
 
     def Get_promet_layer_command(self):
         return self.promet_layer_command
@@ -919,7 +965,7 @@ class Tool_Controller:
             if layer == False:
                 self.controller._Send_label_notify('该工具只能作用于单个图层')
                 return
-            if layer.lock_flag:
+            if layer.Get_lock_flag():
                 self.controller._Send_label_notify('该图层已锁定')
                 return
 
@@ -927,7 +973,7 @@ class Tool_Controller:
 
             board_size = self.controller._Get_board_size()
             layer_image = Image.new('RGBA', board_size, (255, 255, 255, 0))
-            layer_image.paste(layer.image, layer.offset)
+            layer_image.paste(layer.Get_image(), layer.Get_offset())
 
             if 0 <= board_x < layer_image.size[0] and 0 <= board_y < layer_image.size[1]:
                 radius = self.brush_size // 2
@@ -959,13 +1005,13 @@ class Tool_Controller:
 
                 layer_image = Image.fromarray(pixel_matrix_np)
 
-                if layer.Get_layer_size() == board_size and layer.offset == (0, 0):
-                    layer.image  = layer_image
-                    layer.offset = (0, 0)
+                if layer.Get_layer_size() == board_size and layer.Get_offset() == (0, 0):
+                    layer.Set_image(layer_image)
+                    layer.Set_offset((0, 0))
                 else:
-                    bbox         = layer_image.getbbox()
-                    layer.image  = layer_image.crop(bbox)
-                    layer.offset = (bbox[0], bbox[1])
+                    bonding_box = layer_image.getbbox()
+                    layer.Set_image(layer_image)
+                    layer.Set_offset((bonding_box[0], bonding_box[1]))
 
                 layer.Set_preview_label()
                 self.controller._Draw_painting()
@@ -1214,11 +1260,11 @@ class Backup_Controller:
         def __init__(self):
             self.frame_list                = []
             self.current_frame_index       = None
-            self.selected_layer_index_list = []
 
     class Frame_Backup_Struct:
         def __init__(self):
             self.layer_list = []
+            self.selected_layer_index_list = []
 
     class Layer_Backup_Struct:
         def __init__(self):
@@ -1237,7 +1283,7 @@ class Backup_Controller:
         self.main_window  = main_window
 
         self.backup_list  = []
-        self.backup_pin   = 0
+        self.backup_pin   = -1
 
         self.backup_limit = 30
 
@@ -1254,49 +1300,55 @@ class Backup_Controller:
         for frame in frame_list:
             frame_backup = Backup_Controller.Frame_Backup_Struct()
 
-            for layer in frame.layer_list:
-                layer_struct                 = Backup_Controller.Layer_Backup_Struct()
-                layer_struct.layer_type_enum = layer.layer_type_enum
-                layer_struct.image           = layer.image.copy()
-                layer_struct.offset          = layer.offset
-                layer_struct.name            = layer.name
-                layer_struct.hide_flag       = layer.hide_flag
-                layer_struct.lock_flag       = layer.lock_flag
-                layer_struct.mod_enum        = layer.mod_enum
-                layer_struct.opacity         = layer.opacity
+            layer_list = frame.Get_layer_list()
+            for layer in layer_list:
+                layer_backup                 = Backup_Controller.Layer_Backup_Struct()
+                layer_backup.layer_type_enum = layer.layer_type_enum
+                layer_backup.image           = layer.image.copy()
+                layer_backup.offset          = layer.offset
+                layer_backup.name            = layer.name
+                layer_backup.hide_flag       = layer.hide_flag
+                layer_backup.lock_flag       = layer.lock_flag
+                layer_backup.mod_enum        = layer.mod_enum
+                layer_backup.opacity         = layer.opacity
 
-                frame_backup.layer_list.append(layer_struct)
+                frame_backup.layer_list.append(layer_backup)
+
+            for selected_layer in frame.Get_selected_layer_list():
+                index = layer_list.index(selected_layer)
+                frame_backup.selected_layer_index_list.append(index)
 
             snapshot_backup.frame_list.append(frame_backup)
 
-
-
-
-        new_short = Backup_Controller.Backup_Snapshot_Struct()
-
-
-
-
-
-        new_short.frame_list = copy.deepcopy(self.frame_controller.Get_frame_list())
-        new_short.current_frame_index = self.frame_controller.Get_frame_list().index(self.frame_controller.Get_current_frame())
-
-        layer_list = self.board_layer_controller.Get_layer_list()
-        selected_layer_list = self.board_layer_controller.Get_selected_layer()
-        for selected_layer in selected_layer_list:
-            new_short.select_layer_index_list.append(layer_list.index(selected_layer))
+        return snapshot_backup
 
     def Revert_backup_snapshot(self, snapshot):
-        self.frame_controller.Set_frame_list(snapshot.frame_list)
+        frame_list = []
+
+        for frame_backup in snapshot.frame_list:
+            frame = Frame_Controller.Frame(self.frame_controller)
+
+            for layer_backup in frame_backup.layer_list:
+                if layer_backup.layer_type_enum == 'bit_layer':
+                    layer = Board_Layer_Controller.Bit_Layer(controller = self.board_layer_controller,
+                                                             widget     = self.board_layer_view.Yield_layer_widget(),
+                                                             image      = layer_backup.image,
+                                                             offset     = layer_backup.offset,   name    = layer_backup.name,
+                                                             mod_enum   = layer_backup.mod_enum, opacity = layer_backup.opacity,)
+                frame.Insert_layer(layer)
+
+            frame.Set_selected_layer(frame_backup.selected_layer_index_list)
+            frame_list.append(frame)
+
+        self.frame_controller.Set_frame_list(frame_list)
         self.frame_controller.Set_current_frame(snapshot.current_frame_index)
-        self.board_layer_controller.On_frame_change_update_layer_list()
-        self.board_layer_controller.Draw_painting()
-        self.board_layer_controller.Set_selected_layer(snapshot.select_layer_index_list)
-        self.board_layer_view.Update_layer_widget_list()
+
+        self.board_layer_controller.Draw_painting_frame_change()
+
 
     def Add_backup(self):
         if self.backup_pin != len(self.backup_list) - 1:
-            for i in range(self.backup_pin + 1, len(self.backup_list)):
+            while self.backup_pin != len(self.backup_list) - 1:
                 self.backup_list.pop()
 
             self.backup_list.append(self.Yield_backup_snapshot())
@@ -1304,24 +1356,24 @@ class Backup_Controller:
 
         else:
             if len(self.backup_list) < self.backup_limit:
-                self.backups.append(self.Yield_backup_snapshot())
+                self.backup_list.append(self.Yield_backup_snapshot())
                 self.backup_pin += 1
             else:
-                self.backups.pop(0)
-                self.backups.append(self.Yield_backup_snapshot())
+                self.backup_list.pop(0)
+                self.backup_list.append(self.Yield_backup_snapshot())
 
     def Revoke_backup(self):
         if self.backup_pin > 0:
-            self.Revert_backup_snapshot(self.backup_list[self.backup_pin - 1])
             self.backup_pin -= 1
+            self.Revert_backup_snapshot(self.backup_list[self.backup_pin])
 
-        elif self.backup_mod.backup_pin == 0:
+        elif self.backup_pin == 0:
             self.notify_controller.Send_label_notify('已经是第一个备份了')
 
     def Redo_backup(self):
         if self.backup_pin != len(self.backup_list) - 1:
-            self.Revert_backup_snapshot(self.backup_list[self.backup_pin + 1])
             self.backup_pin += 1
+            self.Revert_backup_snapshot(self.backup_list[self.backup_pin])
         else:
            self.notify_controller.Send_label_notify('已经是最后一个备份了')
 
@@ -1404,7 +1456,6 @@ class Event_And_Singal_Distributor:
 
         self.main_window.Revoke_Action.triggered.connect(self.backup_controller.On_revoke_action_triggered)
         self.main_window.Redo_Action.triggered.connect(self.backup_controller.On_redo_action_triggered)
-        self.main_window.Revoke_Action.triggered.connect(self.backup_controller.On_revoke_action_triggered)
         self.main_window.New_Bit_Layer_Action.triggered.connect(self.board_layer_view.On_new_bit_layer_action_triggered)
         self.main_window.Cancel_Selection_Action.triggered.connect(self.board_layer_view.On_cancel_selection_action_triggered)
         self.main_window.Copy_Selection_Action.triggered.connect(self.board_layer_view.On_copy_selection_action_triggered)
