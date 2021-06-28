@@ -503,7 +503,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QPushButton" name="Polygon_Selection_Button">
+                 <widget class="QPushButton" name="Rect_Selection_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -639,21 +639,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="3">
-                   <widget class="QPushButton" name="Spray_Button">
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>喷枪</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QPushButton" name="Pencil_Button">
+                  <item row="1" column="1">
+                   <widget class="QPushButton" name="Line_Button">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -667,7 +654,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>铅笔</string>
+                     <string>直线</string>
                     </property>
                    </widget>
                   </item>
@@ -687,6 +674,25 @@
                     </property>
                     <property name="text">
                      <string>橡皮</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QPushButton" name="Pencil_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>铅笔</string>
                     </property>
                    </widget>
                   </item>
@@ -728,6 +734,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="0" column="3">
+                   <widget class="QPushButton" name="Spray_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>喷枪</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="2">
                    <widget class="QPushButton" name="Oval_Button">
                     <property name="sizePolicy">
@@ -744,25 +763,6 @@
                     </property>
                     <property name="text">
                      <string>椭圆</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QPushButton" name="Line_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>直线</string>
                     </property>
                    </widget>
                   </item>
@@ -997,10 +997,19 @@
     <addaction name="separator"/>
     <addaction name="Setting_Action"/>
    </widget>
+   <widget class="QMenu" name="Selection_Menu_Tab">
+    <property name="title">
+     <string>选区</string>
+    </property>
+    <addaction name="Cancel_Selection_Action"/>
+    <addaction name="Copy_Selection_Action"/>
+    <addaction name="Cut_Selection_Action"/>
+   </widget>
    <addaction name="File_Menu_Tab"/>
    <addaction name="Edit_Menu_Tab"/>
    <addaction name="Image_Menu_Tab"/>
    <addaction name="Layer_Menu_Tab"/>
+   <addaction name="Selection_Menu_Tab"/>
    <addaction name="View_Menu_Tab"/>
    <addaction name="Anime_Menu_Tab"/>
    <addaction name="Other_Menu_Tab"/>
@@ -1311,6 +1320,21 @@
     <string>设置</string>
    </property>
   </action>
+  <action name="Cancel_Selection_Action">
+   <property name="text">
+    <string>取消选区</string>
+   </property>
+  </action>
+  <action name="Copy_Selection_Action">
+   <property name="text">
+    <string>复制选区到新图层</string>
+   </property>
+  </action>
+  <action name="Cut_Selection_Action">
+   <property name="text">
+    <string>剪切选区到新图层</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1326,6 +1350,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="All_Res.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Layer_Widget_UI</class>
  <widget class="QWidget" name="Layer_Widget_UI">
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <layout class="QVBoxLayout" name="Button_Layout">
@@ -67,6 +70,11 @@
        <width>80</width>
        <height>80</height>
       </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#Preview_Label{
+	border: 1px solid black;
+}</string>
      </property>
      <property name="text">
       <string>预览</string>

@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Layer_Widget_UI(object):
     def setupUi(self, Layer_Widget_UI):
         Layer_Widget_UI.setObjectName("Layer_Widget_UI")
+        Layer_Widget_UI.setStyleSheet("")
         self.horizontalLayout = QtWidgets.QHBoxLayout(Layer_Widget_UI)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.Button_Layout = QtWidgets.QVBoxLayout()
@@ -35,6 +36,9 @@ class Ui_Layer_Widget_UI(object):
         self.Preview_Label = QtWidgets.QLabel(Layer_Widget_UI)
         self.Preview_Label.setMinimumSize(QtCore.QSize(80, 80))
         self.Preview_Label.setMaximumSize(QtCore.QSize(80, 80))
+        self.Preview_Label.setStyleSheet("#Preview_Label{\n"
+"    border: 1px solid black;\n"
+"}")
         self.Preview_Label.setObjectName("Preview_Label")
         self.horizontalLayout.addWidget(self.Preview_Label)
         self.Attributes_Layout = QtWidgets.QVBoxLayout()

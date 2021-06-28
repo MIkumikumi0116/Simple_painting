@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="All_Res">
+    <file>res/pen.png</file>
+  </qresource>
+</RCC>
