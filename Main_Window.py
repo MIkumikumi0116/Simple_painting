@@ -41,20 +41,27 @@ class Frame_Controller:
         def Get_layer_list(self):
             return self.layer_list
 
-        def Get_selected_layer_index(self):
-            if len(self.selected_layer_list) == 1:
-                return self.layer_list.index(self.selected_layer_list[0])
-            else:
-                return False
-
         def Get_selected_layer(self):
             if len(self.selected_layer_list) == 1:
                 return self.selected_layer_list[0]
             else:
                 return False
 
+        def Get_selected_layer_index(self):
+            if len(self.selected_layer_list) == 1:
+                return self.layer_list.index(self.selected_layer_list[0])
+            else:
+                return False
+
         def Get_selected_layer_list(self):
             return self.selected_layer_list
+
+        def Get_selected_layer_list_index(self):
+            index_list = []
+            for layer in self.selected_layer_list:
+                index_list.append(self.layer_list.index(layer))
+
+            return index_list
 
         def Set_selected_layer(self, index_list):
             self.selected_layer_list = []
@@ -150,7 +157,7 @@ class Board_Layer_View:
             viewport_pos_list = list(map(viewport_pos_inverse_transform, viewport_pos_list))
 
             board_extend = (label_size[0] ** 2 + label_size[1] ** 2) ** 0.5 / camera_zoom * 1.2
-            r, g, b, _   = self.style_manage_controller.Get_stress_back_color().getRgb()
+            r, g, b, _   = self.style_manage_controller.Get_highlight_back_color().getRgb()
             image        = ImageOps.expand(image, border = round(board_extend), fill=(r, g, b))
 
             image_array  = np.array(image)
@@ -193,7 +200,7 @@ class Board_Layer_View:
                                 round(viewport_pos_list[3][0] + image.size[0] / 2 + camera_offset[0]),
                                 round(viewport_pos_list[3][1] + image.size[1] / 2 + camera_offset[1])))
 
-            r, g, b, _ = self.style_manage_controller.Get_stress_back_color().getRgb()
+            r, g, b, _ = self.style_manage_controller.Get_highlight_back_color().getRgb()
             label_background_image = Image.new('RGBA',
                                               (label_size[0], label_size[1]),
                                               (r, g, b))
@@ -245,7 +252,7 @@ class Board_Layer_View:
             camera_zoom = -(image_size[1] // label_size[1] + 1)
             image_transferred = image.resize((image_size[0] // -camera_zoom, image_size[1] // -camera_zoom), Image.NEAREST)
 
-        r, g, b, _ = self.style_manage_controller.Get_stress_back_color().getRgb()
+        r, g, b, _ = self.style_manage_controller.Get_highlight_back_color().getRgb()
         label_background_image = Image.new('RGBA',
                                            (label_size[0], label_size[1]),
                                            (r, g, b))
@@ -538,11 +545,31 @@ class Board_Layer_View:
             self.main_window.Layer_List_ScrollArea_Layout.removeItem(spacer)
             del spacer
 
-        self.main_window.update()
-
         for layer in self.board_layer_controller.Get_layer_list():
             layer.Set_widget(self.Yield_layer_widget())
+            layer.Set_selected_state_enum('unselected')
             self.main_window.Layer_List_ScrollArea_Layout.addWidget(layer.widget)
+
+        for layer in self.board_layer_controller.Get_selected_layer_list():
+            layer.Set_selected_state_enum('weak_selected')
+
+        if len(self.board_layer_controller.Get_selected_layer_list()) >= 0:
+            self.main_window.Layer_Name_LineEdit.setEnabled(True)
+            self.main_window.Mix_Mod_ComboBox.setEnabled(True)
+            self.main_window.Opacity_Slider.setEnabled(True)
+
+            strong_selected_layer = self.board_layer_controller.Get_selected_layer_list()[0]
+            strong_selected_layer.Set_selected_state_enum('strong_selected')
+
+            self.main_window.Layer_Name_LineEdit.setText(strong_selected_layer.Get_name())
+            mod_index = self.main_window.Mix_Mod_ComboBox.findText(strong_selected_layer.Get_mod_enum(), Qt.MatchFixedString)
+            self.main_window.Mix_Mod_ComboBox.setCurrentIndex(mod_index)
+            self.main_window.Opacity_Slider.Set_current_value(strong_selected_layer.Get_opacity())
+            self.main_window.Opacity_Slider.Set_right_text(str(strong_selected_layer.Get_opacity()))
+        else:
+            self.main_window.Layer_Name_LineEdit.setEnabled(False)
+            self.main_window.Mix_Mod_ComboBox.setEnabled(False)
+            self.main_window.Opacity_Slider.setEnabled(False)
 
         spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.main_window.Layer_List_ScrollArea_Layout.addItem(spacer)
@@ -568,6 +595,35 @@ class Board_Layer_View:
 
     def On_cut_selection_action_triggered(self):
         self.board_layer_controller.Cut_Selection()
+
+    def On_layer_name_lineedit_text_changed(self, text):
+        selected_layer = self.board_layer_controller.Get_selected_layer()
+        if selected_layer == None:
+            self.Notify_Controller.Send_label_notify('该设置只能作用于单个图层')
+            return
+
+        selected_layer.Set_name(text)
+
+    def On_mix_mod_combobox_text_changed(self, text):
+        selected_layer = self.board_layer_controller.Get_selected_layer()
+        if selected_layer == None:
+            self.Notify_Controller.Send_label_notify('该设置只能作用于单个图层')
+            return
+
+        selected_layer.Set_mod_enum(text)
+        self.board_layer_controller.Draw_painting()
+
+    def On_opacity_slider_value_change(self, value):
+        selected_layer = self.board_layer_controller.Get_selected_layer()
+        if selected_layer == None:
+            self.Notify_Controller.Send_label_notify('该设置只能作用于单个图层')
+            return
+
+        selected_layer.Set_opacity(value)
+        self.main_window.Opacity_Slider.Set_current_value(selected_layer.Get_opacity())
+        self.main_window.Opacity_Slider.Set_right_text(str(selected_layer.Get_opacity()))
+        self.board_layer_controller.Draw_painting()
+
 
     def Wheel_Event(self, event):
         label_x, label_y  = event.position().x(), event.position().y()
@@ -634,37 +690,39 @@ class Board_Layer_Controller:
         next_layer_index = 1
 
         def __init__(self, controller, widget, image = None, offset = (0, 0), name = '', mod_enum = '正常', opacity = 100):
-            self.layer_type_enum = 'bit_layer'
+            self.layer_type_enum     = 'bit_layer'
+            self.selected_state_enum = 'unselected'
 
-            self.controller = controller
-            self.widget = widget
+            self.controller          = controller
+            self.widget              = widget
             self.widget.init(self, self.controller.style_manage_controller)
             self.widget.Hide_Button.clicked.connect(self.On_hide_button_clicked)
             self.widget.Lock_Button.clicked.connect(self.On_lock_button_clicked)
+            self.widget.mouse_press_singal.connect(self.On_mouse_press_singal_emit)
 
             self.image = image if image != None else Image.new('RGBA',
                                                                self.controller.Get_board_size(),
                                                               (255, 255, 255, 0))
             self.offset = offset
 
+            self.hide_flag = False
+            self.lock_flag = False
             if name != '':
                 self.name = name
             else:
                 self.name = f'图层{controller.Bit_Layer.next_layer_index}'
                 controller.Bit_Layer.next_layer_index += 1
-            self.hide_flag = False
-            self.lock_flag = False
             self.mod_enum = mod_enum
             self.opacity = opacity
 
             self.Set_preview_label()
-            self.widget.Set_widget_info()
+            self.Set_widget_info()
 
         def Draw_layer(self):
             return self.image.copy()
 
         def Set_preview_label(self):
-            r, g, b, _ = self.controller._Get_stress_back_color().getRgb()
+            r, g, b, _ = self.controller._Get_highlight_back_color().getRgb()
             preview_background_image = Image.new('RGBA',
                                                   self.widget.Get_preview_label_size(),
                                                  (r, g, b))
@@ -687,25 +745,38 @@ class Board_Layer_Controller:
 
             self.widget.Set_preview_label(preview_background_image)
 
-        def Get_layer_size(self):
-            return self.image.size
+        def Set_widget_info(self):
+            self.widget.Set_widget_info()
+
 
         def On_hide_button_clicked(self):
             self.hide_flag = not self.hide_flag
-            self.widget.Set_widget_info()
+            self.Set_widget_info()
             self.controller.Draw_painting()
 
         def On_lock_button_clicked(self):
             self.lock_flag = not self.lock_flag
-            self.widget.Set_widget_info()
+            self.Set_widget_info()
+
+        def On_mouse_press_singal_emit(self):
+            self.controller.Change_select_state(self)
+
+
+        def Get_selected_state_enum(self):
+            return self.selected_state_enum
+
+        def Set_selected_state_enum(self, selected_state_enum):
+            self.selected_state_enum = selected_state_enum
+            self.Set_widget_info()
 
         def Set_widget(self, widget):
             self.widget = widget
             self.widget.init(self, self.controller.style_manage_controller)
             self.widget.Hide_Button.clicked.connect(self.On_hide_button_clicked)
             self.widget.Lock_Button.clicked.connect(self.On_lock_button_clicked)
+            self.widget.mouse_press_singal.connect(self.On_mouse_press_singal_emit)
             self.Set_preview_label()
-            self.widget.Set_widget_info()
+            self.Set_widget_info()
 
         def Get_image(self):
             return self.image
@@ -713,6 +784,9 @@ class Board_Layer_Controller:
         def Set_image(self, image):
             self.image = image.copy()
             self.Set_preview_label()
+
+        def Get_layer_size(self):
+            return self.image.size
 
         def Get_offset(self):
             return self.offset
@@ -725,6 +799,27 @@ class Board_Layer_Controller:
 
         def Get_lock_flag(self):
             return self.lock_flag
+
+        def Get_name(self):
+            return self.name
+
+        def Set_name(self, name):
+            self.name = name
+            self.Set_widget_info()
+
+        def Get_mod_enum(self):
+            return self.mod_enum
+
+        def Set_mod_enum(self, mod_enum):
+            self.mod_enum = mod_enum
+            self.Set_widget_info()
+
+        def Get_opacity(self):
+            return self.opacity
+
+        def Set_opacity(self, opacity):
+            self.opacity = opacity
+            self.Set_widget_info()
 
 
     def __init__(self, main_window):
@@ -746,9 +841,12 @@ class Board_Layer_Controller:
 
     def Genrate_painting(self):
         painting = self.background_layer.copy()
-        for layer in self.Get_layer_list():
+        for layer in self.Get_layer_list()[::-1]:
             if not layer.Get_hide_flag():
                 layer_image = layer.Draw_layer()
+                layer_image_array = np.array(layer_image, dtype = 'float64')
+                layer_image_array[:, :, 3] *= layer.Get_opacity() / 100
+                layer_image = Image.fromarray(layer_image_array.astype(np.uint8))
 
                 if layer.offset[0] < 0:
                     layer_image = layer_image.crop((-layer.offset[0], 0, layer_image.size[0], layer_image.size[1]))
@@ -760,7 +858,7 @@ class Board_Layer_Controller:
                     layer_image = layer_image.crop((0, 0, layer_image.size[0], layer.offset[1] + layer_image.size[1] - self.board_size[1]))
 
                 if layer.mod_enum == '正常':
-                    painting.paste(layer.image, (layer.offset[0],layer.offset[1]), mask = layer.image)
+                    painting.paste(layer_image, (layer.offset[0],layer.offset[1]), mask = layer_image)
 
         return painting
 
@@ -773,6 +871,7 @@ class Board_Layer_Controller:
     def Draw_painting_new_project(self):
         self.current_frame = self.frame_controller.Get_current_frame()
         self.current_frame.Set_selected_layer([0])
+        self.Get_selected_layer().Set_selected_state_enum('strong_selected')
         self.selection_mask       = None
         self.promet_layer_command = None
 
@@ -896,6 +995,21 @@ class Board_Layer_Controller:
         self.board_layer_view.Update_layer_widget_list()
         self.backup_controller.Add_backup()
 
+    def Change_select_state(self, layer):
+        selected_layer_index_list = self.Get_selected_layer_list_index()
+        layer_index = self.Get_layer_list().index(layer)
+
+        if self.main_window.Get_key_ctrl_pressed_flag():
+            if layer_index in selected_layer_index_list:
+                selected_layer_index_list.remove(layer_index)
+            else:
+                selected_layer_index_list.append(layer_index)
+        else:
+            selected_layer_index_list = [layer_index]
+
+        self.Set_selected_layer(selected_layer_index_list)
+        self.board_layer_view.Update_layer_widget_list()
+
 
     def Get_board_size(self):
         return self.board_size
@@ -906,11 +1020,17 @@ class Board_Layer_Controller:
     def Get_layer_list(self):
         return self.current_frame.Get_layer_list()
 
+    def Get_selected_layer(self):
+        return self.current_frame.Get_selected_layer()
+
     def Get_selected_layer_index(self):
         return self.current_frame.Get_selected_layer_index()
 
-    def Get_selected_layer(self):
-        return self.current_frame.Get_selected_layer()
+    def Get_selected_layer_list(self):
+        return self.current_frame.Get_selected_layer_list()
+
+    def Get_selected_layer_list_index(self):
+        return self.current_frame.Get_selected_layer_list_index()
 
     def Set_selected_layer(self, index_list):
          self.current_frame.Set_selected_layer(index_list)
@@ -923,8 +1043,8 @@ class Board_Layer_Controller:
             self.promet_layer_command = None
             self.board_layer_view.Print_image(self.painting)
 
-    def _Get_stress_back_color(self):
-        return self.style_manage_controller.Get_stress_back_color()
+    def _Get_highlight_back_color(self):
+        return self.style_manage_controller.Get_highlight_back_color()
 
 
 class Tool_View:
@@ -972,7 +1092,7 @@ class Tool_Controller:
             self.controller._Set_image_edited()
 
             board_size = self.controller._Get_board_size()
-            layer_image = Image.new('RGBA', board_size, (255, 255, 255, 0))
+            layer_image = Image.new('RGBA', board_size, (0, 0, 0, 0))
             layer_image.paste(layer.Get_image(), layer.Get_offset())
 
             if 0 <= board_x < layer_image.size[0] and 0 <= board_y < layer_image.size[1]:
@@ -1389,11 +1509,13 @@ class Style_Manage_Controller:
     def __init__(self, main_window):
         self.main_window = main_window
 
-        self.base_color         = QColor(240, 240, 240)
-        self.board_color        = QColor(160 ,160, 160)
-        self.text_color         = QColor(0, 0, 0)
-        self.stress_back_color  = QColor(176, 176, 176)
-        self.stress_front_color = QColor(255, 255, 255)
+        self.base_color            = QColor(240, 240, 240)
+        self.board_color           = QColor(160 ,160, 160)
+        self.text_color            = QColor(0, 0, 0)
+        self.highlight_back_color     = QColor(176, 176, 176)
+        self.highlight_front_color    = QColor(255, 255, 255)
+        self.weak_selected_color   = QColor(189, 242, 255)
+        self.strong_selected_color = QColor(219, 219, 255)
 
     def init(self):
         pass
@@ -1420,19 +1542,33 @@ class Style_Manage_Controller:
         r, g, b, _ = color.getRgb()
         self.text_color = QColor(r, g, b)
 
-    def Get_stress_back_color(self):
-        return self.stress_back_color
+    def Get_highlight_back_color(self):
+        return self.highlight_back_color
 
-    def Set_stress_back_color(self, color):
+    def Set_highlight_back_color(self, color):
         r, g, b, _ = color.getRgb()
-        self.stress_back_color = QColor(r, g, b)
+        self.highlight_back_color = QColor(r, g, b)
 
-    def Get_stress_front_color(self):
-        return self.stress_front_color
+    def Get_highlight_front_color(self):
+        return self.highlight_front_color
 
-    def Set_stress_front_color(self, color):
+    def Set_highlight_front_color(self, color):
         r, g, b, _ = color.getRgb()
-        self.stress_front_color = QColor(r, g, b)
+        self.highlight_front_color = QColor(r, g, b)
+
+    def Get_weak_selected_color(self):
+        return self.weak_selected_color
+
+    def Set_weak_selected_color(self, color):
+        r, g, b, _ = color.getRgb()
+        self.weak_selected_color = QColor(r, g, b)
+
+    def Get_strong_selected_color(self):
+        return self.strong_selected_color
+
+    def Set_strong_selected_color(self, color):
+        r, g, b, _ = color.getRgb()
+        self.strong_selected_color = QColor(r, g, b)
 
 
 class Event_And_Singal_Distributor:
@@ -1447,6 +1583,10 @@ class Event_And_Singal_Distributor:
         self.main_window.Board_Label.mousePressEvent   = self.board_layer_view.Mouse_press_event
         self.main_window.Board_Label.mouseMoveEvent    = self.board_layer_view.Mouse_move_event
         self.main_window.Board_Label.mouseReleaseEvent = self.board_layer_view.Mouse_release_event
+
+        self.main_window.Layer_Name_LineEdit.textChanged.connect(self.board_layer_view.On_layer_name_lineedit_text_changed)
+        self.main_window.Mix_Mod_ComboBox.currentTextChanged.connect(self.board_layer_view.On_mix_mod_combobox_text_changed)
+        self.main_window.Opacity_Slider.value_change_single.connect(self.board_layer_view.On_opacity_slider_value_change)
 
         self.main_window.Board_H_ScrollBar.valueChanged.connect(self.board_layer_view.On_Board_h_scrollbar_value_changed)
         self.main_window.Board_V_ScrollBar.valueChanged.connect(self.board_layer_view.On_Board_v_scrollbar_value_changed)
@@ -1468,8 +1608,9 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
 
         self.main_window = self
 
-        self.image_edited_flag = False
+        self.image_edited_flag      = False
         self.key_space_pressed_flag = False
+        self.key_ctrl_pressed_flag  = False
 
         self.frame_view = Frame_View(self.main_window)
         self.frame_controller = Frame_Controller(self.main_window)
@@ -1518,11 +1659,17 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.frame_controller.New_project()
 
     def init(self):
+        self.main_window.Board_Label.setFocus()
+
         self.main_window.Pencil_Size_ComboBox.setStyleSheet('''#Pencil_Size_ComboBox QAbstractItemView{min-width: 60px;}''')
         self.main_window.Board_Label_Widget.setStyleSheet('''#Board_Label_Widget{border:1px solid red}''')
 
         self.Color_Indicator_Widget = Color_Indicator_Widget(self)
         self.main_window.Quick_Func_Layout.addWidget(self.Color_Indicator_Widget, 0, 5, 2, 1, Qt.AlignHCenter)
+
+        self.main_window.Opacity_Slider.Set_min_value(0)
+        self.main_window.Opacity_Slider.Set_max_value(100)
+        self.main_window.Opacity_Slider.Set_left_text('')
 
     def Get_style_manage_controller(self):
         return self.style_manage_controller
@@ -1540,14 +1687,25 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
     def Set_key_space_pressed_flag(self, flag):
         self.key_space_pressed_flag = flag
 
+    def Get_key_ctrl_pressed_flag(self):
+        return self.key_ctrl_pressed_flag
+
+    def Set_key_ctrl_pressed_flag(self, flag):
+        self.key_ctrl_pressed_flag = flag
+
 
     def Main_window_key_press_event(self, event):
         if event.key() == Qt.Key_Space:
             self.Set_key_space_pressed_flag(True)
+        elif event.key() == Qt.Key_Control:
+            self.Set_key_ctrl_pressed_flag(True)
 
     def Main_window_key_release_event(self, event):
         if event.key() == Qt.Key_Space:
             self.Set_key_space_pressed_flag(False)
+        elif event.key() == Qt.Key_Control:
+            self.Set_key_ctrl_pressed_flag(False)
+
 
 
 if __name__ == '__main__':

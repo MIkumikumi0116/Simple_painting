@@ -25,6 +25,7 @@ class Text_In_Slider(QWidget):
 
     def Set_current_value(self, value):
         self.current_value = value
+        self.update()
 
     def Set_min_value(self, value):
         self.min_value = value
@@ -34,9 +35,11 @@ class Text_In_Slider(QWidget):
 
     def Set_left_text(self, text):
         self.left_text = text
+        self.update()
 
     def Set_right_text(self, text):
         self.right_text = text
+        self.update()
 
     def mousePressEvent(self, event):
         pos = event.pos()
