@@ -164,7 +164,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
             self.show_swatches_flag = True
 
     def On_r_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 255:
             value = 255
             self.R_LineEdit.setText('255')
@@ -175,7 +175,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_g_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 255:
             value = 255
             self.G_LineEdit.setText('255')
@@ -186,7 +186,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_b_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 255:
             value = 255
             self.B_LineEdit.setText('255')
@@ -197,7 +197,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_h_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 360:
             value = 360
             self.H_LineEdit.setText('360')
@@ -208,7 +208,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_s_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 255:
             value = 255
             self.S_LineEdit.setText('255')
@@ -219,7 +219,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_v_lineedit_textedited(self, text):
-        value = eval(text)
+        value = eval(text) if text != '' else 0
         if value > 255:
             value = 255
             self.V_LineEdit.setText('255')

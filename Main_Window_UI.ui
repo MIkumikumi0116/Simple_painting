@@ -67,7 +67,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="Board_Label">
+              <widget class="Board_Label_Overload_Resize_Event" name="Board_Label">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
                  <horstretch>0</horstretch>
@@ -119,7 +119,7 @@
       <widget class="QFrame" name="Layer_Frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>2</horstretch>
+         <horstretch>1</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -171,6 +171,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="Mix_Mod_ComboBox">
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
             <item>
              <property name="text">
               <string>正常</string>
@@ -267,6 +270,12 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
+              <height>21</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
               <height>21</height>
              </size>
             </property>
@@ -417,7 +426,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>194</width>
+               <width>203</width>
                <height>417</height>
               </rect>
              </property>
@@ -456,7 +465,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>493</width>
+             <width>349</width>
              <height>686</height>
             </rect>
            </property>
@@ -811,9 +820,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QStackedWidget" name="Func_Opinion_StackedWidget">
-              <widget class="QWidget" name="Pencil_Opinion_Page">
-               <layout class="QVBoxLayout" name="verticalLayout_6">
+             <widget class="QStackedWidget" name="Func_Option_StackedWidget">
+              <widget class="QWidget" name="Pencil_Tool_Option_Page">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <layout class="QHBoxLayout" name="Pencil_Size_Layout" stretch="1,0,0,1">
                   <item>
@@ -852,34 +861,88 @@
                     </property>
                     <item>
                      <property name="text">
-                      <string>×1</string>
+                      <string>×1     (1~100)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>×10</string>
+                      <string>×5     (1~500)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>×100</string>
+                      <string>×10   (10~1000)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>×1000</string>
+                      <string>×50   (50~5000)</string>
                      </property>
                     </item>
                    </widget>
                   </item>
                   <item>
-                   <widget class="Text_In_Slider" name="Pencil_Size_Slider" native="true"/>
+                   <widget class="Text_In_Slider" name="Pencil_Size_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="page_3"/>
+              <widget class="QWidget" name="Rect_Selection_Option_Page">
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <layout class="QGridLayout" name="Rect_Selection_Option_Layout">
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="Cut_Selection_Button">
+                    <property name="text">
+                     <string>剪切选区</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QPushButton" name="Copy_Selection_Button">
+                    <property name="text">
+                     <string>复制选区</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QPushButton" name="Cancel_Selection_Button">
+                    <property name="text">
+                     <string>取消选区</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QPushButton" name="Clear_Selection_Button">
+                    <property name="text">
+                     <string>清空选区</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
             <item>
@@ -1041,6 +1104,7 @@
     <addaction name="Cancel_Selection_Action"/>
     <addaction name="Copy_Selection_Action"/>
     <addaction name="Cut_Selection_Action"/>
+    <addaction name="Clear_Selection_Action"/>
    </widget>
    <addaction name="File_Menu_Tab"/>
    <addaction name="Edit_Menu_Tab"/>
@@ -1372,6 +1436,11 @@
     <string>剪切选区到新图层</string>
    </property>
   </action>
+  <action name="Clear_Selection_Action">
+   <property name="text">
+    <string>清空选区</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1385,6 +1454,11 @@
    <extends>QWidget</extends>
    <header>Custom_Widgets/Text_In_Slider.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Board_Label_Overload_Resize_Event</class>
+   <extends>QLabel</extends>
+   <header>Custom_Widgets/Board_Label_Overload_Resize_Event.h</header>
   </customwidget>
  </customwidgets>
  <resources>

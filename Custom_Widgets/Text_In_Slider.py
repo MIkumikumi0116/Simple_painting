@@ -21,7 +21,7 @@ class Text_In_Slider(QWidget):
         self.right_text = '90'
 
     def Get_current_value(self):
-        return self.current_value
+        return round(self.current_value)
 
     def Set_current_value(self, value):
         self.current_value = value
@@ -29,9 +29,13 @@ class Text_In_Slider(QWidget):
 
     def Set_min_value(self, value):
         self.min_value = value
+        self.current_value = max(self.current_value, self.min_value)
+        self.update()
 
     def Set_max_value(self, value):
         self.max_value = value
+        self.current_value = min(self.current_value, self.max_value)
+        self.update()
 
     def Set_left_text(self, text):
         self.left_text = text
@@ -52,7 +56,7 @@ class Text_In_Slider(QWidget):
         value = max(value, self.min_value)
         self.current_value = value
 
-        self.value_change_single.emit(self.current_value)
+        self.value_change_single.emit(round(self.current_value))
         self.update()
 
     def mouseMoveEvent(self, event):
@@ -66,7 +70,7 @@ class Text_In_Slider(QWidget):
         value = max(value, self.min_value)
         self.current_value = value
 
-        self.value_change_single.emit(self.current_value)
+        self.value_change_single.emit(round(self.current_value))
         self.update()
 
     def mouseReleaseEvent(self, event):
@@ -80,7 +84,7 @@ class Text_In_Slider(QWidget):
         value = max(value, self.min_value)
         self.current_value = value
 
-        self.value_change_single.emit(self.current_value)
+        self.value_change_single.emit(round(self.current_value))
         self.update()
 
     def paintEvent(self, event):
