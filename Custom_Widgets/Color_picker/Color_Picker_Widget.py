@@ -1,4 +1,3 @@
-# TODO:常用颜色
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
@@ -22,7 +21,6 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.show_color_wheel_flag = True
         self.show_rgb_flag = True
         self.show_hsv_flag = True
-        self.show_swatches_flag = False
 
         self.Color_Wheel_Widget.Set_current_color(self.current_color)
 
@@ -51,7 +49,6 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Color_Wheel_Button.clicked.connect(self.On_color_wheel_button_clicked)
         self.RGB_Button.clicked.connect(self.On_rgb_button_clicked)
         self.HSV_Button.clicked.connect(self.On_hsv_button_clicked)
-        self.Swatches_Button.clicked.connect(self.On_swatches_button_clicked)
 
         self.Color_Wheel_Widget.color_wheel_change_single.connect(self.On_color_wheel_change_single_emit)
 
@@ -69,12 +66,14 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.S_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
         self.V_Slider.color_slider_change_singal.connect(self.On_color_slider_change_singal_emit)
 
+
     def Update_color_wheel(self):
         self.Color_Wheel_Widget.Set_current_color(self.current_color)
 
     def Update_lineedit(self):
         r, g, b, _ = self.current_color.getRgb()
         h, s, v, _ = self.current_color.getHsv()
+        h = max(0, h)
 
         self.R_LineEdit.setText(str(r))
         self.G_LineEdit.setText(str(g))
@@ -122,6 +121,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_lineedit()
         self.Update_slider()
 
+
     def Get_current_color(self):
         return self.current_color
 
@@ -132,6 +132,7 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color_wheel()
         self.Update_lineedit()
         self.Update_slider()
+
 
     def On_color_wheel_button_clicked(self):
         if self.show_color_wheel_flag:
@@ -157,17 +158,21 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
             self.HSV_Layout.setVisible(True)
             self.show_hsv_flag = True
 
-    def On_swatches_button_clicked(self):
-        if self.show_swatches_flag:
-            self.show_swatches_flag = False
-        else:
-            self.show_swatches_flag = True
 
     def On_r_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 255:
-            value = 255
-            self.R_LineEdit.setText('255')
+        if not text.isdigit():
+            self.R_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.R_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 255:
+                    self.R_LineEdit.setText('255')
+                    value = 255
 
         r, g, b, _ = self.current_color.getRgb()
         self.current_color.setRgb(value, g, b)
@@ -175,10 +180,19 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_g_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 255:
-            value = 255
-            self.G_LineEdit.setText('255')
+        if not text.isdigit():
+            self.G_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.G_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 255:
+                    self.G_LineEdit.setText('255')
+                    value = 255
 
         r, g, b, _ = self.current_color.getRgb()
         self.current_color.setRgb(r, value, b)
@@ -186,10 +200,19 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_b_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 255:
-            value = 255
-            self.B_LineEdit.setText('255')
+        if not text.isdigit():
+            self.B_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.B_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 255:
+                    self.B_LineEdit.setText('255')
+                    value = 255
 
         r, g, b, _ = self.current_color.getRgb()
         self.current_color.setRgb(r, g, value)
@@ -197,10 +220,19 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_h_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 360:
-            value = 360
-            self.H_LineEdit.setText('360')
+        if not text.isdigit():
+            self.H_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.H_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 359:
+                    self.H_LineEdit.setText('359')
+                    value = 359
 
         h, s, v, _ = self.current_color.getHsv()
         self.current_color.setHsv(value, s, v)
@@ -208,10 +240,19 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_s_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 255:
-            value = 255
-            self.S_LineEdit.setText('255')
+        if not text.isdigit():
+            self.S_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.S_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 255:
+                    self.S_LineEdit.setText('255')
+                    value = 255
 
         h, s, v, _ = self.current_color.getHsv()
         self.current_color.setHsv(h, value, v)
@@ -219,15 +260,25 @@ class Color_Picker_Widget(QWidget, Ui_Color_Picker_Widget_UI):
         self.Update_color()
 
     def On_v_lineedit_textedited(self, text):
-        value = eval(text) if text != '' else 0
-        if value > 255:
-            value = 255
-            self.V_LineEdit.setText('255')
+        if not text.isdigit():
+            self.V_LineEdit.setText('0')
+            value = 0
+        else:
+            if text.startswith('0'):
+                text = text.lstrip('0')
+                self.V_LineEdit.setText('0' if len(text) == 0 else text)
+                value = 0 if len(text) == 0 else eval(text)
+            else:
+                value = eval(text)
+                if value > 255:
+                    self.V_LineEdit.setText('255')
+                    value = 255
 
         h, s, v, _ = self.current_color.getHsv()
         self.current_color.setHsv(h, s, value)
 
         self.Update_color()
+
 
     def On_color_wheel_change_single_emit(self, color):
         h, s, v, _ = color.getHsv()

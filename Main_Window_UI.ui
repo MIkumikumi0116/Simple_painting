@@ -67,7 +67,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="Board_Label_Overload_Resize_Event" name="Board_Label">
+              <widget class="Board_Label" name="Board_Label">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
                  <horstretch>0</horstretch>
@@ -469,9 +469,16 @@
              <height>686</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,1">
+           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,0,1">
             <item>
              <widget class="Color_Picker_Widget" name="Color_Picker_Widget" native="true"/>
+            </item>
+            <item>
+             <widget class="Line" name="line_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="Quick_Func_Container_Layout">
@@ -1456,9 +1463,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>Board_Label_Overload_Resize_Event</class>
+   <class>Board_Label</class>
    <extends>QLabel</extends>
-   <header>Custom_Widgets/Board_Label_Overload_Resize_Event.h</header>
+   <header>Custom_Widgets/Board_Label.h</header>
   </customwidget>
  </customwidgets>
  <resources>

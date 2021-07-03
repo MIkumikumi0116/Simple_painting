@@ -1,6 +1,6 @@
 from PIL import ImageQt
 
-from PyQt5.QtWidgets import QWidget, QApplication
+from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPen, QPalette
 from PyQt5.QtCore import pyqtSignal
 
@@ -48,6 +48,7 @@ class Layer_Widget(QWidget,Ui_Layer_Widget_UI):
             palette.setColor(QPalette.Background, self.style_manage_controller.Get_weak_selected_color())
 
         self.setPalette(palette)
+
 
     def mousePressEvent(self, event):
         self.mouse_press_singal.emit()

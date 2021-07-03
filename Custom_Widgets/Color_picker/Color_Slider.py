@@ -27,6 +27,7 @@ class Color_Slider(QWidget):
         self.style_handel_width = 12
         self.style_handel_height = 10
 
+
     def Pick_value(self, click_pos):
         slider_rect = self.rect().adjusted(self.style_margin + self.style_handel_width / 2 - self.style_padding,
                                            self.style_margin,
@@ -34,10 +35,10 @@ class Color_Slider(QWidget):
                                           -self.style_margin - self.style_handel_height)
         slider_rect = slider_rect.adjusted(self.style_padding, self.style_padding, -self.style_padding, -self.style_padding)
 
-        value = int((click_pos.x() - slider_rect.x()) / slider_rect.width() * (self.max_value - self.min_value) + self.min_value)
-        value = max(value, self.min_value)
-        value = min(value, self.max_value)
+        value = round((click_pos.x() - slider_rect.x()) / slider_rect.width() * (self.max_value - self.min_value) + self.min_value)
+        value = max(self.min_value, min(value, self.max_value))
         self.current_value = value
+
 
     def Set_start_color(self, start_color):
         if self.slider_type_enum in ['s_slider', 'v_slider']:
@@ -73,6 +74,28 @@ class Color_Slider(QWidget):
         else:
             self.max_value = 255
 
+
+    def mousePressEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()
+
+    def mouseMoveEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()
+
+    def mouseReleaseEvent(self, event):
+        click_pos = event.pos()
+
+        self.Pick_value(click_pos)
+        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
+        self.update()
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -103,34 +126,13 @@ class Color_Slider(QWidget):
         painter.drawRoundedRect(slider_rect, 4, 4)
 
         # 绘制滑动手柄
-        painter.setBrush(self.style_manage_controller.Get_board_color())
         handle_pos_x = self.current_value / (self.max_value - self.min_value) * slider_rect.width() + slider_rect.x()
         handle_pos = QPoint(handle_pos_x, slider_rect.bottom() + self.style_padding + 1)
         polygon = QPolygon()
         polygon.append(handle_pos)
         polygon.append(QPoint(handle_pos.x() - self.style_handel_width / 2, handle_pos.y() + self.style_handel_height))
         polygon.append(QPoint(handle_pos.x() + self.style_handel_width / 2, handle_pos.y() + self.style_handel_height))
+        painter.setBrush(self.style_manage_controller.Get_board_color())
         painter.drawPolygon(polygon)
 
         super().paintEvent(event)
-
-    def mousePressEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()
-
-    def mouseMoveEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()
-
-    def mouseReleaseEvent(self, event):
-        click_pos = event.pos()
-
-        self.Pick_value(click_pos)
-        self.color_slider_change_singal.emit(self.slider_type_enum, self.current_value)
-        self.update()

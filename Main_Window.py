@@ -1,4 +1,3 @@
-import io
 import re
 import sys
 import time
@@ -1837,9 +1836,9 @@ class Color_Controller:
         self.main_window.Color_Picker_Widget.color_change_singal.connect(self.On_color_change_singal_emit)
         self.main_window.Color_Indicator_Widget.switch_color_singal.connect(self.On_switch_color_singal_emit)
 
+        self.main_window.Color_Picker_Widget.Set_current_color(self.front_color)
         self.main_window.Color_Indicator_Widget.Set_front_color(self.front_color)
         self.main_window.Color_Indicator_Widget.Set_back_color(self.back_color)
-        self.main_window.Color_Picker_Widget.Set_current_color(self.front_color)
 
 
     def On_color_change_singal_emit(self, color):
@@ -2251,6 +2250,8 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.style_manage_controller      = Style_Manage_Controller(self.main_window)
         self.file_project_controller      = File_Project_Controller(self.main_window)
         self.menu_tab_distributor         = Menu_Tab_Distributor(self.main_window)
+        
+        
         self.event_and_singal_distributor = Event_And_Singal_Distributor(self.main_window)
 
         self.setupUi(self)
@@ -2320,7 +2321,6 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.main_window.Pencil_Size_Slider.Set_current_value(10)
         self.main_window.Pencil_Size_Slider.Set_left_text('×1')
         self.main_window.Pencil_Size_Slider.Set_right_text('10')
-
 
     def Get_style_manage_controller(self):
         return self.style_manage_controller

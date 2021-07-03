@@ -42,7 +42,7 @@ class Ui_Main_Window_UI(object):
         self.Board_H_Layout = QtWidgets.QVBoxLayout()
         self.Board_H_Layout.setSpacing(0)
         self.Board_H_Layout.setObjectName("Board_H_Layout")
-        self.Board_Label = Board_Label_Overload_Resize_Event(self.Board_Label_Widget)
+        self.Board_Label = Board_Label(self.Board_Label_Widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -206,6 +206,11 @@ class Ui_Main_Window_UI(object):
         self.Color_Picker_Widget = Color_Picker_Widget(self.Func_ScrollArea_Widget)
         self.Color_Picker_Widget.setObjectName("Color_Picker_Widget")
         self.verticalLayout_4.addWidget(self.Color_Picker_Widget)
+        self.line_3 = QtWidgets.QFrame(self.Func_ScrollArea_Widget)
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.verticalLayout_4.addWidget(self.line_3)
         self.Quick_Func_Container_Layout = QtWidgets.QHBoxLayout()
         self.Quick_Func_Container_Layout.setObjectName("Quick_Func_Container_Layout")
         self.Quick_Func_Layout = QtWidgets.QGridLayout()
@@ -404,7 +409,7 @@ class Ui_Main_Window_UI(object):
         self.verticalLayout_4.addWidget(self.Func_Option_StackedWidget)
         spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem3)
-        self.verticalLayout_4.setStretch(6, 1)
+        self.verticalLayout_4.setStretch(7, 1)
         self.Func_ScrollArea.setWidget(self.Func_ScrollArea_Widget)
         self.verticalLayout_2.addWidget(self.Func_ScrollArea)
         self.horizontalLayout.addWidget(self.Splitter_Layout)
@@ -774,7 +779,7 @@ class Ui_Main_Window_UI(object):
         self.Copy_Selection_Action.setText(_translate("Main_Window_UI", "复制选区到新图层"))
         self.Cut_Selection_Action.setText(_translate("Main_Window_UI", "剪切选区到新图层"))
         self.Clear_Selection_Action.setText(_translate("Main_Window_UI", "清空选区"))
-from Custom_Widgets.Board_Label_Overload_Resize_Event import Board_Label_Overload_Resize_Event
+from Custom_Widgets.Board_Label import Board_Label
 from Custom_Widgets.Color_Picker.Color_Picker_Widget import Color_Picker_Widget
 from Custom_Widgets.Text_In_Slider import Text_In_Slider
 import All_Res_rc

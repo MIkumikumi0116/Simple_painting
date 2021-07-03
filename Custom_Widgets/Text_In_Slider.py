@@ -20,6 +20,7 @@ class Text_In_Slider(QWidget):
         self.left_text = '10'
         self.right_text = '90'
 
+
     def Get_current_value(self):
         return round(self.current_value)
 
@@ -45,6 +46,7 @@ class Text_In_Slider(QWidget):
         self.right_text = text
         self.update()
 
+
     def mousePressEvent(self, event):
         pos = event.pos()
 
@@ -52,11 +54,10 @@ class Text_In_Slider(QWidget):
         slider_rect = slider_rect.adjusted(2, 2, -2, -2)
 
         value = (pos.x() - slider_rect.x()) / slider_rect.width() * (self.max_value - self.min_value)
-        value = min(value, self.max_value)
-        value = max(value, self.min_value)
-        self.current_value = value
+        value = max(self.min_value, min(value, self.max_value))
+        self.current_value = round(value)
 
-        self.value_change_single.emit(round(self.current_value))
+        self.value_change_single.emit(self.current_value)
         self.update()
 
     def mouseMoveEvent(self, event):
@@ -66,11 +67,10 @@ class Text_In_Slider(QWidget):
         slider_rect = slider_rect.adjusted(2, 2, -2, -2)
 
         value = (pos.x() - slider_rect.x()) / slider_rect.width() * (self.max_value - self.min_value)
-        value = min(value, self.max_value)
-        value = max(value, self.min_value)
-        self.current_value = value
+        value = max(self.min_value, min(value, self.max_value))
+        self.current_value = round(value)
 
-        self.value_change_single.emit(round(self.current_value))
+        self.value_change_single.emit(self.current_value)
         self.update()
 
     def mouseReleaseEvent(self, event):
@@ -80,11 +80,10 @@ class Text_In_Slider(QWidget):
         slider_rect = slider_rect.adjusted(2, 2, -2, -2)
 
         value = (pos.x() - slider_rect.x()) / slider_rect.width() * (self.max_value - self.min_value)
-        value = min(value, self.max_value)
-        value = max(value, self.min_value)
-        self.current_value = value
+        value = max(self.min_value, min(value, self.max_value))
+        self.current_value = round(value)
 
-        self.value_change_single.emit(round(self.current_value))
+        self.value_change_single.emit(self.current_value)
         self.update()
 
     def paintEvent(self, event):
@@ -95,7 +94,7 @@ class Text_In_Slider(QWidget):
         painter.setPen(QPen(self.style_manage_controller.Get_board_color()))
         painter.drawRoundedRect(slider_rect, 2, 2)
 
-        slider_rect.adjust(2, 2, -2, -2)
+        slider_rect.adjust(3, 3, -3, -3)
         gray_rect = slider_rect.adjusted(0, 0, self.current_value / (self.max_value - self.min_value) * slider_rect.width(), 0)
         white_rect = slider_rect.adjusted(self.current_value / (self.max_value - self.min_value) * slider_rect.width(), 0, 0, 0)
 
@@ -105,7 +104,7 @@ class Text_In_Slider(QWidget):
         painter.setBrush(QColor(255, 255, 255))
         painter.drawRect(white_rect)
 
-        slider_rect.adjust(2, 0, -2, 0)
+        slider_rect.adjust(3, 0, -3, 0)
         painter.setPen(QPen(self.style_manage_controller.Get_text_color()))
         painter.setBrush(Qt.NoBrush)
         painter.drawText(slider_rect, Qt.AlignLeft, self.left_text)

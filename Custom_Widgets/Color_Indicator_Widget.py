@@ -1,7 +1,7 @@
 import math
 
 from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtGui import QPainter, QPen, QColor, QConicalGradient, QLinearGradient, QVector2D, QBrush, QPolygonF
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPolygonF
 from PyQt5.QtCore import Qt, QPoint, QRect, pyqtSignal
 
 
@@ -30,6 +30,27 @@ class Color_Indicator_Widget(QWidget):
     def Set_back_color(self, color):
         r, g, b, _ = color.getRgb()
         self.back_color.setRgb(r, g, b)
+        self.update()
+
+
+    def mousePressEvent(self, event):
+        if QRect(43, 6, 21, 21).contains(event.pos()):
+            self.mouse_clicked_flag = True
+            self.update()
+
+    def mouseMoveEvent(self, event):
+        if QRect(43, 6, 21, 21).contains(event.pos()):
+            self.mouse_in_flag = True
+        else:
+            self.mouse_in_flag = False
+
+        self.update()
+
+    def mouseReleaseEvent(self, event):
+        if QRect(43, 6, 21, 21).contains(event.pos()):
+            self.switch_color_singal.emit()
+
+        self.mouse_clicked_flag = False
         self.update()
 
     def paintEvent(self, event):
@@ -78,32 +99,12 @@ class Color_Indicator_Widget(QWidget):
         point_list = [QPoint(52, 20), QPoint(62, 20), QPoint(58, 25)]
         painter.drawPolygon(QPolygonF(point_list))
 
-        if not self.mouse_clicked_flag:
+        if self.mouse_clicked_flag:
+            painter.setPen(QPen(QColor(0, 0, 0, 150)))
+            painter.setBrush(QBrush(QColor(0, 0, 0, 96)))
+            painter.drawRoundedRect(QRect(43, 6, 21, 21), 2, 2)
+        else:
             if self.mouse_in_flag:
                 painter.setPen(QPen(QColor(0, 0, 0, 128)))
                 painter.setBrush(QBrush(QColor(0, 0, 0, 48)))
                 painter.drawRoundedRect(QRect(43, 6, 21, 21), 2, 2)
-        else:
-            painter.setPen(QPen(QColor(0, 0, 0, 150)))
-            painter.setBrush(QBrush(QColor(0, 0, 0, 96)))
-            painter.drawRoundedRect(QRect(43, 6, 21, 21), 2, 2)
-
-    def mousePressEvent(self, event):
-        click_pos = event.pos()
-        if QRect(43, 6, 21, 21).contains(click_pos):
-            self.mouse_clicked_flag = True
-            self.update()
-            self.switch_color_singal.emit()
-
-    def mouseReleaseEvent(self, event):
-        self.mouse_clicked_flag = False
-        self.update()
-
-    def mouseMoveEvent(self, event):
-        click_pos = event.pos()
-        if QRect(43, 6, 21, 21).contains(click_pos):
-            self.mouse_in_flag = True
-            self.update()
-        else:
-            self.mouse_in_flag = False
-            self.update()

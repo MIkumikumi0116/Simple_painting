@@ -38,7 +38,7 @@
       <number>6</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="Display_Button_Layout" stretch="0,0,0,0,1">
+      <layout class="QHBoxLayout" name="Display_Button_Layout" stretch="0,0,0,1">
        <item>
         <widget class="QPushButton" name="Color_Wheel_Button">
          <property name="minimumSize">
@@ -55,6 +55,12 @@
          </property>
          <property name="text">
           <string>色轮</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -75,6 +81,12 @@
          <property name="text">
           <string>RGB</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -94,24 +106,11 @@
          <property name="text">
           <string>HSV</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Swatches_Button">
-         <property name="minimumSize">
-          <size>
-           <width>28</width>
-           <height>28</height>
-          </size>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>28</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>常用</string>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -119,6 +118,12 @@
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
         </spacer>
        </item>
@@ -182,9 +187,6 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="inputMask">
-             <string>D00</string>
-            </property>
             <property name="text">
              <string>0</string>
             </property>
@@ -231,9 +233,6 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="inputMask">
-             <string>D00</string>
-            </property>
             <property name="text">
              <string>0</string>
             </property>
@@ -279,9 +278,6 @@
               <width>40</width>
               <height>16777215</height>
              </size>
-            </property>
-            <property name="inputMask">
-             <string>D00</string>
             </property>
             <property name="text">
              <string>0</string>
@@ -357,9 +353,6 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="inputMask">
-             <string>D00</string>
-            </property>
             <property name="text">
              <string>0</string>
             </property>
@@ -406,9 +399,6 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="inputMask">
-             <string>D00</string>
-            </property>
             <property name="text">
              <string>0</string>
             </property>
@@ -454,9 +444,6 @@
               <width>40</width>
               <height>16777215</height>
              </size>
-            </property>
-            <property name="inputMask">
-             <string>D00</string>
             </property>
             <property name="text">
              <string>0</string>

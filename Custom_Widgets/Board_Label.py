@@ -3,8 +3,9 @@ from PyQt5.QtCore import pyqtSignal
 
 
 
-class Board_Label_Overload_Resize_Event(QLabel):
+class Board_Label(QLabel):
     resize_signal = pyqtSignal()
+
     def __init__(self, parent_widget):
         super().__init__(parent_widget)
 
