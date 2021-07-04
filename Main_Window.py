@@ -22,6 +22,7 @@ from Custom_Widgets.Color_Indicator_Widget import Color_Indicator_Widget
 #TODO 图层拖动排序
 
 class Frame_View:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -30,6 +31,7 @@ class Frame_View:
 
 
 class Frame_Controller:
+
     class Frame:
         def __init__(self, controller):
             self.controller = controller
@@ -115,6 +117,75 @@ class Frame_Controller:
         self.current_frame = None
 
 
+    def New_frame(self):
+        new_frame = Frame_Controller.Frame(self)
+        new_frame.Insert_layer(self.board_layer_controller.Yield_bit_layer())
+
+        self.frame_list.insert(self.frame_list.index(self.current_frame), new_frame)
+
+        self.current_frame = new_frame
+        self.board_layer_controller.Draw_painting_frame_change()
+
+    def Copy_frame(self):
+        new_frame = Frame_Controller.Frame(self)
+
+        for layer in self.current_frame.Get_layer_list():
+            if layer.layer_type_enum == 'bit_layer':
+                new_layer = Board_Layer_Controller.Bit_Layer.__new__(Board_Layer_Controller.Bit_Layer)
+                new_layer.layer_type_enum = layer.layer_type_enum
+                new_layer.image           = layer.image.copy()
+            elif layer.layer_type_enum == 'vector_layer':
+                new_layer = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
+                new_layer.layer_type_enum = layer.layer_type_enum
+                new_layer.command_list    = copy.deepcopy(layer.command_list)
+                new_layer.rotate          = layer.rotate
+                new_layer.zoom            = layer.zoom
+                new_layer.layer_size      = layer.layer_size
+                new_layer.prompt_command  = None
+
+            new_layer.selected_state_enum = layer.selected_state_enum
+            new_layer.controller          = self.board_layer_controller
+
+            new_layer.offset              = layer.offset
+            new_layer.hide_flag           = layer.hide_flag
+            new_layer.lock_flag           = layer.lock_flag
+            new_layer.name                = layer.name + '_copy'
+            new_layer.mod_enum            = layer.mod_enum
+            new_layer.opacity             = layer.opacity
+
+            new_layer.widget              = self.board_layer_view.Yield_layer_widget()
+            new_layer.widget.                         init(new_layer, self.style_manage_controller)
+            new_layer.widget.Hide_Button.clicked.     connect(new_layer.On_hide_button_clicked)
+            new_layer.widget.Lock_Button.clicked.     connect(new_layer.On_lock_button_clicked)
+            new_layer.widget.Move_Up_Button.clicked.  connect(new_layer.On_move_up_button_clicked)
+            new_layer.widget.Move_Down_Button.clicked.connect(new_layer.On_move_down_button_clicked)
+            new_layer.widget.mouse_press_singal.      connect(new_layer.On_mouse_press_singal_emit)
+
+            new_layer.Set_preview_label()
+            new_layer.Set_widget_info()
+
+            new_frame.Insert_layer(new_layer)
+
+        self.frame_list.insert(self.frame_list.index(self.current_frame), new_frame)
+
+        self.current_frame = new_frame
+        self.board_layer_controller.Draw_painting_frame_change()
+
+    def Next_frame(self):
+        if self.frame_list.index(self.current_frame) != len(self.frame_list) - 1:
+            self.current_frame = self.frame_list[self.frame_list.index(self.current_frame) + 1]
+            self.board_layer_controller.Draw_painting_frame_change()
+        else:
+            self.notify_controller.Send_label_notify('已经是最后一帧了')
+
+    def Previous_frame(self):
+        if self.frame_list.index(self.current_frame) != 0:
+            self.current_frame = self.frame_list[self.frame_list.index(self.current_frame) - 1]
+            self.board_layer_controller.Draw_painting_frame_change()
+        else:
+            self.notify_controller.Send_label_notify('已经是第一帧了')
+
+
     def Get_frame_list(self):
         return self.frame_list
 
@@ -130,6 +201,7 @@ class Frame_Controller:
 
 
 class Board_Layer_View:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -704,6 +776,7 @@ class Board_Layer_View:
 
 
 class Board_Layer_Controller:
+
     class Promet_Layer_Command_Struct:
         def __init__(self):
             self.command_enum = None
@@ -1070,7 +1143,6 @@ class Board_Layer_Controller:
 
         def Set_prompt_command(self, command):
             self.prompt_command = command
-            self.Draw_layer()
 
         def Formaliz_prompt_command(self):
             if self.prompt_command is not None:
@@ -1078,6 +1150,7 @@ class Board_Layer_Controller:
                 self.prompt_command = None
                 self.Set_preview_label()
                 self.Draw_layer()
+
 
     def __init__(self, main_window):
         self.main_window = main_window
@@ -1539,6 +1612,9 @@ class Board_Layer_Controller:
         self.base_layer           = Image.new('RGBA', self.board_size, (255, 255, 255, 0))
         self.background_layer     = Image.new('RGBA', self.board_size, (255, 255, 255, 255))
 
+    def Get_board_image(self):
+        return self.painting.copy()
+
     def Get_promet_layer_command(self):
         return self.promet_layer_command
 
@@ -1553,6 +1629,7 @@ class Board_Layer_Controller:
 
 
 class Tool_View:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -1568,7 +1645,7 @@ class Tool_View:
                                       self.main_window.Polyline_Tool_Button,        self.main_window.Path_Tool_Button,
 
                                       self.main_window.Zoom_Tool_Button,            self.main_window.Rotate_Tool_Button,
-                                      self.main_window.Dragger_Tool_Button,         self.main_window.Pick_Color_Tool_Button,
+                                      self.main_window.Dragger_Tool_Button,         self.main_window.Color_Picker_Tool_Button,
                                       self.main_window.Rect_Selection_Tool_Button,  self.main_window.Free_Selection_Tool_Button,
                                       self.main_window.Magic_Selection_Tool_Button, self.main_window.Move_Layer_Tool_Button,]
 
@@ -1629,7 +1706,16 @@ class Tool_View:
         self.main_window.Path_Tool_Button.setChecked(True)
 
 
-    def On_rect_selection_button_clicked(self):
+    def On_color_picker_tool_button_clicked(self):
+        self.tool_controller.Select_color_picker_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Blank_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Color_Picker_Tool_Button.setChecked(True)
+
+    def On_rect_selection_tool_button_clicked(self):
         self.tool_controller.Select_rect_selection_tool()
 
         self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Rect_Selection_Option_Page))
@@ -1784,6 +1870,7 @@ class Tool_View:
 
 
 class Tool_Controller:
+
     class Tool_Interface:
         def __init__(self, controller):
             self.controller = controller
@@ -2373,6 +2460,11 @@ class Tool_Controller:
         def Destructor(self):
             self.pos_list   = []
 
+            layer = self.controller._Get_strong_selected_layer()
+            if layer != False and layer.Get_layer_type_enum() == 'vector_layer':
+                layer.Set_prompt_command(None)
+                self.controller._Draw_painting()
+
         def Mouse_press_event(self, board_pos, event):
             if event.button() == Qt.LeftButton:
                 board_size = self.controller._Get_board_size()
@@ -2392,7 +2484,7 @@ class Tool_Controller:
             pass
 
         def Key_event(self, event):
-            if event.key() == Qt.Key_Enter:
+            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
                 self.Formaliz_prompt_command()
                 self.pos_list = []
 
@@ -2455,6 +2547,31 @@ class Tool_Controller:
                 self.second_pos = board_pos
                 self.Create_selection_vector(board_pos)
 
+    class Color_Picker_Tool(Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+        def Constructor(self):
+            pass
+
+        def Destructor(self):
+            pass
+
+        def Mouse_press_event(self, board_pos, event):
+            board_size = self.controller._Get_board_size()
+            if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1] and event.button() == Qt.LeftButton:
+                r, g, b, _ = self.controller._Get_board_image().load()[board_pos[0], board_pos[1]]
+                self.controller._Set_front_color(QColor(r, g, b))
+
+        def Mouse_move_event(self, board_pos, event):
+            board_size = self.controller._Get_board_size()
+            if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1] and event.buttons() == Qt.LeftButton:
+                r, g, b, _ = self.controller._Get_board_image().load()[board_pos[0], board_pos[1]]
+                self.controller._Set_front_color(QColor(r, g, b))
+
+        def Mouse_release_event(self, board_pos, event):
+            pass
+
 
     def __init__(self, main_window):
         self.main_window = main_window
@@ -2469,11 +2586,12 @@ class Tool_Controller:
         self.square_tool         = Tool_Controller.Square_Tool(self)
         self.path_tool           = Tool_Controller.Path_Tool(self)
 
+        self.color_picker_tool   = Tool_Controller.Color_Picker_Tool(self)
         self.rect_selection_tool = Tool_Controller.Rect_Selection_Tool(self)
 
         self.board_pos_only_list = [self.pencil_tool, self.eraser_tool, self.paintbrush_tool, self.fill_tool,
                                     self.square_tool, self.path_tool,
-                                    self.rect_selection_tool]
+                                    self.color_picker_tool, self.rect_selection_tool]
         self.label_pos_only_list = []
         self.both_pos_list       = []
 
@@ -2544,6 +2662,11 @@ class Tool_Controller:
         self.current_tool = self.path_tool
         self.current_tool.Constructor()
 
+
+    def Select_color_picker_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.color_picker_tool
+        self.current_tool.Constructor()
 
     def Select_rect_selection_tool(self):
         self.current_tool.Destructor()
@@ -2616,8 +2739,15 @@ class Tool_Controller:
     def _Set_image_edited(self):
         self.main_window.Set_image_edited_flag(True)
 
+    def _Get_board_image(self):
+        return self.board_layer_controller.Get_board_image()
+
+    def _Set_front_color(self, color):
+        self.color_controller.Set_front_color(color)
+
 
 class Color_Controller:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -2667,6 +2797,7 @@ class Color_Controller:
 
 
 class Notify_Controller(QObject):
+
     release_label_notify_singal = pyqtSignal(str)
 
     def __init__(self, main_window):
@@ -2710,6 +2841,7 @@ class Notify_Controller(QObject):
 
 
 class Backup_Controller:
+
     class Snapshot_Backup_Struct:
         def __init__(self):
             self.frame_list          = []
@@ -2738,13 +2870,14 @@ class Backup_Controller:
             self.rotate          = None
             self.zoom            = None
 
+
     def __init__(self, main_window):
         self.main_window  = main_window
 
         self.backup_list  = []
         self.backup_pin   = -1
 
-        self.backup_limit = 30
+        self.backup_limit = 100
 
     def init(self):
         pass
@@ -2793,16 +2926,17 @@ class Backup_Controller:
 
             for layer_backup in frame_backup.layer_list:
                 if layer_backup.layer_type_enum == 'bit_layer':
-                    layer       = Board_Layer_Controller.Bit_Layer.__new__(Board_Layer_Controller.Bit_Layer)
-                    layer.image = layer_backup.image.copy()
+                    layer                 = Board_Layer_Controller.Bit_Layer.__new__(Board_Layer_Controller.Bit_Layer)
+                    layer.layer_type_enum = layer_backup.layer_type_enum
+                    layer.image           = layer_backup.image.copy()
                 elif layer_backup.layer_type_enum == 'vector_layer':
-                    layer = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
+                    layer                 = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
+                    layer.layer_type_enum = layer_backup.layer_type_enum
                     layer.command_list    = copy.deepcopy(layer_backup.command_list)
                     layer.rotate          = layer_backup.rotate
                     layer.zoom            = layer_backup.zoom
                     layer.layer_size      = layer_backup.layer_size
 
-                layer.layer_type_enum     = layer_backup.layer_type_enum
                 layer.selected_state_enum = layer_backup.selected_state_enum
                 layer.controller          = self.board_layer_controller
 
@@ -2868,6 +3002,7 @@ class Backup_Controller:
 
 
 class Style_Manage_Controller:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -2939,6 +3074,7 @@ class Style_Manage_Controller:
 
 
 class File_Project_Controller:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -3082,11 +3218,9 @@ class File_Project_Controller:
 
     def Save_as_project(self, path):
         if path == None:
-            saning_path = QFileDialog.getSaveFileName(self.main_window)[0]
+            saning_path = QFileDialog.getSaveFileName(self.main_window, caption = '保存项目' ,filter = '"Easy Paint 项目 (*.easypaint)"')[0]
             if len(saning_path) == 0:
                 return
-            if not saning_path.endswith('.easypaint'):
-                saning_path += '.easypaint'
 
         save = {'board_size' : self.board_layer_controller.Get_board_size()}
         frame_save_list = []
@@ -3172,8 +3306,17 @@ class File_Project_Controller:
         with open(saning_path, 'w', encoding = 'utf-8') as file:
             file.write(json.dumps(save, ensure_ascii = False))
 
+    def Export_project(self):
+        saning_path = QFileDialog.getSaveFileName(self.main_window, caption = '保存项目' ,filter = '"图片文件 (*.png *.jpg *.webp *.ico *.bmp *.tif)"')[0]
+        if len(saning_path) == 0:
+            return
+
+        painting = self.board_layer_controller.Get_board_image()
+        painting.save(saning_path)
+
 
 class Menu_Tab_Distributor:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -3182,13 +3325,16 @@ class Menu_Tab_Distributor:
 
 
     def On_new_action_triggered(self):
-        
+        pass
 
     def On_open_action_triggered(self):
         self.file_project_controller.Open_project()
 
     def On_save_as_action_triggered(self):
-        self.file_project_controller.Save_project(None)
+        self.file_project_controller.Save_as_project(None)
+
+    def On_export_action_triggered(self):
+        self.file_project_controller.Export_project()
 
 
     def On_revoke_action_triggered(self):
@@ -3216,6 +3362,19 @@ class Menu_Tab_Distributor:
 
     def On_clear_selection_action_triggered(self):
         self.board_layer_controller.Clear_selection()
+
+
+    def On_new_frame_action_triggered(self):
+        self.frame_controller.New_frame()
+
+    def On_copy_frame_action_triggered(self):
+        self.frame_controller.Copy_frame()
+
+    def On_next_frame_action_triggered(self):
+        self.frame_controller.Next_frame()
+
+    def On_previous_frame_action_triggered(self):
+        self.frame_controller.Previous_frame()
 
 
     def On_normal_color_action_triggered(self):
@@ -3250,6 +3409,7 @@ class Menu_Tab_Distributor:
 
 
 class Event_And_Singal_Distributor:
+
     def __init__(self, main_window):
         self.main_window = main_window
 
@@ -3281,7 +3441,8 @@ class Event_And_Singal_Distributor:
         self.main_window.Square_Tool_Button.clicked.        connect(self.tool_view.On_square_tool_button_clicked)
         self.main_window.Path_Tool_Button.clicked.          connect(self.tool_view.On_path_tool_button_clicked)
 
-        self.main_window.Rect_Selection_Tool_Button.clicked.connect(self.tool_view.On_rect_selection_button_clicked)
+        self.main_window.Color_Picker_Tool_Button.clicked.  connect(self.tool_view.On_color_picker_tool_button_clicked)
+        self.main_window.Rect_Selection_Tool_Button.clicked.connect(self.tool_view.On_rect_selection_tool_button_clicked)
 
 
         self.main_window.Pencil_Size_ComboBox.currentTextChanged.    connect(self.tool_view.On_pencil_size_combobox_text_changed)
@@ -3319,6 +3480,8 @@ class Event_And_Singal_Distributor:
         self.main_window.New_Action.triggered.             connect(self.menu_tab_distributor.On_new_action_triggered)
         self.main_window.Open_Action.triggered.            connect(self.menu_tab_distributor.On_open_action_triggered)
         self.main_window.Save_As_Action.triggered.         connect(self.menu_tab_distributor.On_save_as_action_triggered)
+        self.main_window.Export_Action.triggered.          connect(self.menu_tab_distributor.On_export_action_triggered)
+
         self.main_window.Revoke_Action.triggered.          connect(self.menu_tab_distributor.On_revoke_action_triggered)
         self.main_window.Redo_Action.triggered.            connect(self.menu_tab_distributor.On_redo_action_triggered)
 
@@ -3329,6 +3492,11 @@ class Event_And_Singal_Distributor:
         self.main_window.Copy_Selection_Action.triggered.  connect(self.menu_tab_distributor.On_copy_selection_action_triggered)
         self.main_window.Cut_Selection_Action.triggered.   connect(self.menu_tab_distributor.On_cut_selection_action_triggered)
         self.main_window.Clear_Selection_Action.triggered. connect(self.menu_tab_distributor.On_clear_selection_action_triggered)
+
+        self.main_window.New_Frame_Action.triggered.       connect(self.menu_tab_distributor.On_new_frame_action_triggered)
+        self.main_window.Copy_Frame_Action.triggered.      connect(self.menu_tab_distributor.On_copy_frame_action_triggered)
+        self.main_window.Next_Frame_Action.triggered.      connect(self.menu_tab_distributor.On_next_frame_action_triggered)
+        self.main_window.Previous_Frame_Action.triggered.  connect(self.menu_tab_distributor.On_previous_frame_action_triggered)
 
         self.main_window.Normal_Color_Action.triggered.    connect(self.menu_tab_distributor.On_normal_color_action_triggered)
         self.main_window.Miku_Color_Action.triggered.      connect(self.menu_tab_distributor.On_miku_color_action_triggered)
@@ -3343,6 +3511,7 @@ class Event_And_Singal_Distributor:
 
 
 class Main_Window(QMainWindow, Ui_Main_Window_UI):
+
     def __init__(self):
         super().__init__()
 

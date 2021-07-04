@@ -287,75 +287,12 @@
          <layout class="QVBoxLayout" name="Layer_List_Layout">
           <item>
            <layout class="QGridLayout" name="Layer_Action_Layout">
-            <item row="1" column="1">
-             <widget class="QPushButton" name="Clear_Layer_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>清除</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="Del_Layer_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>删除</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="New_Layer_Group_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>组</string>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="0">
              <widget class="QPushButton" name="New_Bit_Layer_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
-                <width>30</width>
-                <height>30</height>
+                <width>60</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -363,18 +300,25 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QPushButton" name="Merge_Visible_Layer_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="Del_Layer_Button">
               <property name="maximumSize">
                <size>
-                <width>30</width>
-                <height>30</height>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>删除</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="Merge_Visible_Layer_Button">
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -382,37 +326,44 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="New_Vector_Layer_Button">
-              <property name="minimumSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="Clear_Layer_Button">
               <property name="maximumSize">
                <size>
-                <width>30</width>
-                <height>30</height>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>清除</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="New_Layer_Group_Button">
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>成组</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="New_Vector_Layer_Button">
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
                <string>矢量图</string>
               </property>
              </widget>
-            </item>
-            <item row="0" column="3">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -427,7 +378,7 @@
                <x>0</x>
                <y>0</y>
                <width>239</width>
-               <height>417</height>
+               <height>421</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="Layer_List_ScrollArea_Layout"/>
@@ -486,16 +437,10 @@
                <layout class="QGridLayout" name="Quick_Func_Layout">
                 <item row="1" column="4">
                  <widget class="QPushButton" name="Move_Layer_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -508,16 +453,10 @@
                 </item>
                 <item row="0" column="2">
                  <widget class="QPushButton" name="Rotate_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -530,16 +469,10 @@
                 </item>
                 <item row="0" column="1">
                  <widget class="QPushButton" name="Zoom_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -552,16 +485,10 @@
                 </item>
                 <item row="1" column="1">
                  <widget class="QPushButton" name="Rect_Selection_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -574,16 +501,10 @@
                 </item>
                 <item row="0" column="3">
                  <widget class="QPushButton" name="Dragger_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -595,17 +516,11 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="QPushButton" name="Pick_Color_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
+                 <widget class="QPushButton" name="Color_Picker_Tool_Button">
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -618,16 +533,10 @@
                 </item>
                 <item row="1" column="2">
                  <widget class="QPushButton" name="Free_Selection_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -640,16 +549,10 @@
                 </item>
                 <item row="1" column="3">
                  <widget class="QPushButton" name="Magic_Selection_Tool_Button">
-                  <property name="minimumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>60</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -936,8 +839,9 @@
             <item>
              <widget class="QStackedWidget" name="Func_Option_StackedWidget">
               <property name="currentIndex">
-               <number>5</number>
+               <number>1</number>
               </property>
+              <widget class="QWidget" name="Blank_Page"/>
               <widget class="QWidget" name="Pencil_Tool_Option_Page">
                <layout class="QVBoxLayout" name="verticalLayout_5">
                 <item>
