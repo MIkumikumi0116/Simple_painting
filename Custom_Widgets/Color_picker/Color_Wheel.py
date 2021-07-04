@@ -138,6 +138,10 @@ class Color_Wheel(QWidget):
         square_rect.adjust(2, 2, -2, -2)
 
         # 绘制渐变
+        painter.setBrush(QColor(255, 255, 255))
+        painter.drawRect(square_rect)
+        painter.setBrush(Qt.NoBrush)
+
         painter.setCompositionMode(QPainter.CompositionMode_Multiply)
         h, s, v, _ = self.current_color.getHsv()
         color = QColor()
