@@ -23,7 +23,7 @@
       <widget class="QFrame" name="Board_Frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>10</horstretch>
+         <horstretch>15</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -119,7 +119,7 @@
       <widget class="QFrame" name="Layer_Frame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
+         <horstretch>2</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -397,7 +397,7 @@
                </size>
               </property>
               <property name="text">
-               <string>钢笔</string>
+               <string>矢量图</string>
               </property>
              </widget>
             </item>
@@ -441,7 +441,7 @@
       <widget class="QWidget" name="Func_Layout" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
+         <horstretch>2</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -485,7 +485,7 @@
               <item>
                <layout class="QGridLayout" name="Quick_Func_Layout">
                 <item row="1" column="4">
-                 <widget class="QPushButton" name="Move_Layer_Button">
+                 <widget class="QPushButton" name="Move_Layer_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -501,10 +501,13 @@
                   <property name="text">
                    <string>移动图层</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QPushButton" name="Rotate_Button">
+                 <widget class="QPushButton" name="Rotate_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -520,10 +523,13 @@
                   <property name="text">
                    <string>旋转</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QPushButton" name="Zoom_Button">
+                 <widget class="QPushButton" name="Zoom_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -539,10 +545,13 @@
                   <property name="text">
                    <string>缩放</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QPushButton" name="Rect_Selection_Button">
+                 <widget class="QPushButton" name="Rect_Selection_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -558,10 +567,13 @@
                   <property name="text">
                    <string>矩形选区</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QPushButton" name="Dragger_Button">
+                 <widget class="QPushButton" name="Dragger_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -577,10 +589,13 @@
                   <property name="text">
                    <string>抓手</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="QPushButton" name="Pick_Color_Button">
+                 <widget class="QPushButton" name="Pick_Color_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -596,10 +611,13 @@
                   <property name="text">
                    <string>取色</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QPushButton" name="Free_Selection_Button">
+                 <widget class="QPushButton" name="Free_Selection_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -615,10 +633,13 @@
                   <property name="text">
                    <string>任意选区</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QPushButton" name="Magic_Selection_Button">
+                 <widget class="QPushButton" name="Magic_Selection_Tool_Button">
                   <property name="minimumSize">
                    <size>
                     <width>30</width>
@@ -634,22 +655,25 @@
                   <property name="text">
                    <string>魔棒选区</string>
                   </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
-                <item row="0" column="5">
-                 <spacer name="horizontalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                </layout>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -662,50 +686,15 @@
             </item>
             <item>
              <widget class="QStackedWidget" name="Func_Folder_StackedWidget">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
               <widget class="QWidget" name="Bit_Layer_Page">
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <layout class="QGridLayout" name="Bit_Layer_Layout">
-                  <item row="1" column="3">
-                   <widget class="QPushButton" name="Rect_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>矩形</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QPushButton" name="Line_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>直线</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="0" column="1">
-                   <widget class="QPushButton" name="Eraser_Button">
+                   <widget class="QPushButton" name="Eraser_Tool_Button">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -721,29 +710,13 @@
                     <property name="text">
                      <string>橡皮</string>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QPushButton" name="Pencil_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>铅笔</string>
+                    <property name="checkable">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="QPushButton" name="Hair_Pencil_Button">
+                   <widget class="QPushButton" name="Paintbrush_Tool_Button">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -759,10 +732,13 @@
                     <property name="text">
                      <string>画笔</string>
                     </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QPushButton" name="FIll_Button">
+                  <item row="0" column="3">
+                   <widget class="QPushButton" name="Fill_Tool_Button">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -778,23 +754,13 @@
                     <property name="text">
                      <string>油漆桶</string>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QPushButton" name="Spray_Button">
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>喷枪</string>
+                    <property name="checkable">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="2">
-                   <widget class="QPushButton" name="Oval_Button">
+                  <item row="0" column="0">
+                   <widget class="QPushButton" name="Pencil_Tool_Button">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -808,7 +774,10 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>椭圆</string>
+                     <string>铅笔</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -816,7 +785,142 @@
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="page_2"/>
+              <widget class="QWidget" name="Vector_Layer_Page">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout">
+                  <item row="0" column="1">
+                   <widget class="QPushButton" name="Rect_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>矩形</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QPushButton" name="Square_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>正方形</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="Circle_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>圆</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QPushButton" name="Ellipse_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>椭圆</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QPushButton" name="Polygon_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>多边形</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QPushButton" name="Line_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>直线</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QPushButton" name="Polyline_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>多段线</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="3">
+                   <widget class="QPushButton" name="Path_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>路径</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
             <item>
@@ -829,13 +933,13 @@
             <item>
              <widget class="QStackedWidget" name="Func_Option_StackedWidget">
               <widget class="QWidget" name="Pencil_Tool_Option_Page">
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
                 <item>
                  <layout class="QHBoxLayout" name="Pencil_Size_Layout" stretch="1,0,0,1">
                   <item>
                    <widget class="QLabel" name="Pencil_Size_Label">
                     <property name="text">
-                     <string>画笔大小</string>
+                     <string>铅笔大小</string>
                     </property>
                    </widget>
                   </item>
@@ -914,8 +1018,273 @@
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="Eraser_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <layout class="QHBoxLayout" name="Eraser_Size_Layout" stretch="1,0,0,1">
+                  <item>
+                   <widget class="QLabel" name="Eraser_Size_Label">
+                    <property name="text">
+                     <string>橡皮大小</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_5">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="Eraser_Size_ComboBox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>23</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>23</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>×1     (1~100)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×5     (1~500)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×10   (10~1000)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×50   (50~5000)</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Eraser_Size_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Paintbrush_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_7">
+                <item>
+                 <layout class="QHBoxLayout" name="Paintbrush_Size_Layout" stretch="1,0,0,1">
+                  <item>
+                   <widget class="QLabel" name="Paintbrush_Size_Label">
+                    <property name="text">
+                     <string>画笔大小</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="Paintbrush_Size_ComboBox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>23</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>23</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>×1     (1~100)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×5     (1~500)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×10   (10~1000)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>×50   (50~5000)</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Paintbrush_Size_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Paintbrush_Type_Layout">
+                  <item>
+                   <widget class="QRadioButton" name="Deepen_Radio_Button">
+                    <property name="text">
+                     <string>加深</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="Fade_Radio_Button">
+                    <property name="text">
+                     <string>减淡</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Fill_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_8">
+                <item>
+                 <layout class="QHBoxLayout" name="Fill_Tolerance_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Fill_Tolerance_Label">
+                    <property name="text">
+                     <string>容差</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_6">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Fill_Tolerance_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <item>
+                   <widget class="QRadioButton" name="Cutout_Radio_Button">
+                    <property name="text">
+                     <string>填充</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="Filling_Radio_Button">
+                    <property name="text">
+                     <string>抠图</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Square_Tool_Option_Page"/>
               <widget class="QWidget" name="Rect_Selection_Option_Page">
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <layout class="QVBoxLayout" name="verticalLayout_6">
                 <item>
                  <layout class="QGridLayout" name="Rect_Selection_Option_Layout">
                   <item row="0" column="2">
@@ -1260,12 +1629,12 @@
   </action>
   <action name="New_Bit_Layer_Action">
    <property name="text">
-    <string>新建彩色图层</string>
+    <string>新建位图图层</string>
    </property>
   </action>
   <action name="New_Vector_Layer_Action">
    <property name="text">
-    <string>新建钢笔图层</string>
+    <string>新建矢量图层</string>
    </property>
   </action>
   <action name="New_Layer_Group_Action">

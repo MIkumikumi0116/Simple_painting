@@ -7,7 +7,7 @@ from threading import Thread
 from PIL import Image, ImageQt, ImageDraw, ImageOps
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QSpacerItem, QSizePolicy, QStyledItemDelegate
-from PyQt5.QtGui import QImage, QColor, QPainter, QPen, QPolygon, QPixmap, QTransform
+from PyQt5.QtGui import QImage, QColor, QPainter, QPen, QPolygon, QPixmap, QTransform, QBrush
 from PyQt5.QtCore import Qt, QTimer, QPoint, pyqtSignal, QObject, QSize
 from PyQt5 import sip
 
@@ -587,6 +587,10 @@ class Board_Layer_View:
 
             strong_selected_layer = self.board_layer_controller.Get_selected_layer_list()[0]
             strong_selected_layer.Set_selected_state_enum('strong_selected')
+            if strong_selected_layer.Get_layer_type_enum() == 'bit_layer':
+                self.main_window.Func_Folder_StackedWidget.setCurrentIndex(0)
+            elif strong_selected_layer.Get_layer_type_enum() == 'vector_layer':
+                self.main_window.Func_Folder_StackedWidget.setCurrentIndex(1)
 
             self.main_window.Layer_Name_LineEdit.setText(strong_selected_layer.Get_name())
             mod_index = self.main_window.Mix_Mod_ComboBox.findText(strong_selected_layer.Get_mod_enum())
@@ -752,6 +756,7 @@ class Board_Layer_Controller:
             self.widget.Move_Down_Button.clicked.connect(self.On_move_down_button_clicked)
             self.widget.mouse_press_singal.connect(self.On_mouse_press_singal_emit)
 
+            self.image     = None
             self.offset    = offset
 
             self.hide_flag = False
@@ -923,10 +928,13 @@ class Board_Layer_Controller:
             super().__init__(controller, widget, offset, mod_enum, opacity)
             self.layer_type_enum = 'vector_layer'
 
-            self.command_list = []
-            self.rotate       = 0
-            self.zoom         = (1, 1)
-            self.layer_size   = (controller.Get_board_size()[0], controller.Get_board_size()[1])
+            self.command_list   = []
+            self.prompt_command = None
+            self.image          = None
+
+            self.rotate         = 0
+            self.zoom           = (1, 1)
+            self.layer_size     = (controller.Get_board_size()[0], controller.Get_board_size()[1])
 
             if name != '':
                 self.name = name
@@ -940,6 +948,7 @@ class Board_Layer_Controller:
         def Draw_layer(self):
             board_size = self.controller.Get_board_size()
             image      = QImage(board_size[0], board_size[1], QImage.Format_ARGB32)
+            image.fill(QColor(0, 0, 0, 0))
             painter    = QPainter(image)
             painter.setRenderHint(QPainter.Antialiasing)
 
@@ -948,37 +957,44 @@ class Board_Layer_Controller:
             transform.rotate(self.rotate)
             transform.translate(board_size[0] // 2,   board_size[1] // 2)
             transform.scale(self.zoom[0], self.zoom[1])
-            painter.setTransform(transform);
+            # painter.setTransform(transform)
 
-            for command in command_list:
-                pen = QPen(QColor(command.outline_color))
-                pen.setWidth(command.outline_width)
-                brush = QBrush(QColor(command.fill_color))
-                painter.setPen(pen)
-                painter.setBrush(brush)
+            for command in (self.command_list + [self.prompt_command]) if self.prompt_command != None else self.command_list:
+                if command.data.outline_color != None:
+                    pen = QPen(QColor(command.data.outline_color))
+                    pen.setWidth(command.data.outline_width)
+                    painter.setPen(pen)
+                else:
+                    painter.setPen(Qt.NoPen)
+
+                if command.data.fill_color != None:
+                    brush = QBrush(QColor(command.data.fill_color))
+                    painter.setBrush(brush)
+                else:
+                    painter.setBrush(Qt.NoBrush)
 
                 if command.command_enum == 'rect':
-                    painter.drawRoundedRect(command.x, command.y, command.width, command.height, command.x_radius, command.y_radius)
+                    painter.drawRoundedRect(command.data.x, command.data.y, command.data.width, command.data.height, command.data.x_radius, command.data.y_radius)
 
                 elif command.command_enum == 'circle':
-                    painter.drawEllipse(command.x, command.y, command.radius, command.radius)
+                    painter.drawEllipse(command.data.x, command.data.y, command.data.radius, command.data.radius)
 
                 elif command.command_enum == 'ellipse':
-                    painter.drawEllipse(command.x, command.y, command.x_radius, command.y_radius)
+                    painter.drawEllipse(command.data.x, command.data.y, command.data.x_radius, command.data.y_radius)
 
                 elif command.command_enum == 'line':
-                    painter.drawLine(command.first_pos[0], command.first_pos[1], command.second_pos[0], command.second_pos[1])
+                    painter.drawLine(command.data.first_pos[0], command.data.first_pos[1], command.data.second_pos[0], command.data.second_pos[1])
 
                 elif command.command_enum == 'polygon':
                     point_list = []
-                    for pos in command.pos_list:
+                    for pos in command.data.pos_list:
                         point_list.append(QPoint(pos[0], pos[1]))
 
                     painter.drawPolygon(point_list, len(point_list))
 
                 elif command.command_enum == 'polyline':
                     point_list = []
-                    for pos in command.pos_list:
+                    for pos in command.data.pos_list:
                         point_list.append(QPoint(pos[0], pos[1]))
 
                     painter.drawPolyline(point_list, len(point_list))
@@ -987,11 +1003,12 @@ class Board_Layer_Controller:
                     pass
                     #TODO
 
+            vector_image = ImageQt.fromqimage(image)
+            # vector_image = vector_image.crop(vector_image.getbbox())
+            self.image = vector_image.copy()
+            self.layer_size = vector_image.size
             painter.end()
-            image = ImageQt.fromqimage(image)
-            image = image.crop(image.getbbox())
-            self.layer_size = image.size
-            return image
+            return vector_image
 
         def Rotate_layer(self, angle):
             pass
@@ -1004,13 +1021,20 @@ class Board_Layer_Controller:
             return self.layer_size
 
 
-        def Append_command(self, command):
-            self.command_list.append(commamd)
-            self.Set_preview_label()
-
-        def Update_command(self, command_list):
+        def Set_command_list(self, command_list):
             self.command_list = command_list
             self.Set_preview_label()
+            self.Draw_layer()
+
+        def Set_prompt_command(self, command):
+            self.prompt_command = command
+            self.Draw_layer()
+
+        def Formaliz_prompt_command(self):
+            self.command_list.append(copy.copy(self.prompt_command))
+            self.prompt_command = None
+            self.Set_preview_label()
+            self.Draw_layer()
 
     def __init__(self, main_window):
         self.main_window = main_window
@@ -1395,6 +1419,17 @@ class Board_Layer_Controller:
         self.board_layer_view.Update_layer_widget_list()
         self.backup_controller.Add_backup()
 
+    def Add_vector_layer(self):
+        new_layer = Board_Layer_Controller.Vector_Layer(self, self.board_layer_view.Yield_layer_widget())
+
+        strong_selected_layer_index = self.Get_strong_selected_layer_index()
+        if strong_selected_layer_index != None:
+            self.Insert_layer_and_select(new_layer, strong_selected_layer_index)
+        else:
+            self.Insert_layer_and_select(new_layer, 0)
+        self.board_layer_view.Update_layer_widget_list()
+        self.backup_controller.Add_backup()
+
     def Change_layer_select_state(self, layer):
         selected_layer_index_list = self.Get_selected_layer_index_list()
         layer_index = self.Get_layer_list().index(layer)
@@ -1468,22 +1503,78 @@ class Tool_View:
     def __init__(self, main_window):
         self.main_window = main_window
 
+        self.checkable_button_list = []
+
     def init(self):
-        pass
+        self.checkable_button_list = [self.main_window.Pencil_Tool_Button,          self.main_window.Eraser_Tool_Button,
+                                      self.main_window.Paintbrush_Tool_Button,      self.main_window.Fill_Tool_Button,
+
+                                      self.main_window.Square_Tool_Button,          self.main_window.Rect_Tool_Button,
+                                      self.main_window.Circle_Tool_Button,          self.main_window.Ellipse_Tool_Button,
+                                      self.main_window.Polygon_Tool_Button,         self.main_window.Line_Tool_Button,
+                                      self.main_window.Polyline_Tool_Button,        self.main_window.Path_Tool_Button,
+
+                                      self.main_window.Zoom_Tool_Button,            self.main_window.Rotate_Tool_Button,
+                                      self.main_window.Dragger_Tool_Button,         self.main_window.Pick_Color_Tool_Button,
+                                      self.main_window.Rect_Selection_Tool_Button,  self.main_window.Free_Selection_Tool_Button,
+                                      self.main_window.Magic_Selection_Tool_Button, self.main_window.Move_Layer_Tool_Button,]
 
 
-    def Set_rect_selection_option(self):
-        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Rect_Selection_Option_Page))
+    def On_pencil_tool_button_clicked(self):
+        self.tool_controller.Select_pencil_tool()
 
-    def Set_pencil_tool_option(self):
         self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Pencil_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Pencil_Tool_Button.setChecked(True)
+
+    def On_eraser_tool_button_clicked(self):
+        self.tool_controller.Select_eraser_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Eraser_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Eraser_Tool_Button.setChecked(True)
+
+    def On_paintbrush_tool_button_clicked(self):
+        self.tool_controller.Select_paintbrush_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Paintbrush_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Paintbrush_Tool_Button.setChecked(True)
+
+    def On_fill_tool_button_clicked(self):
+        self.tool_controller.Select_fill_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Fill_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Fill_Tool_Button.setChecked(True)
+
+
+    def On_square_tool_button_clicked(self):
+        self.tool_controller.Select_square_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Square_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Square_Tool_Button.setChecked(True)
 
 
     def On_rect_selection_button_clicked(self):
-        self.tool_controller.Select_rect_selection()
+        self.tool_controller.Select_rect_selection_tool()
 
-    def On_pencil_button_clicked(self):
-        self.tool_controller.Select_pencil()
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Rect_Selection_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Rect_Selection_Tool_Button.setChecked(True)
 
 
     def On_pencil_size_combobox_text_changed(self, text):
@@ -1495,9 +1586,52 @@ class Tool_View:
         self.main_window.Pencil_Size_Slider.Set_right_text(str(self.main_window.Pencil_Size_Slider.Get_current_value()))
         self.tool_controller._Set_pencil_tool_brush_size(self.main_window.Pencil_Size_Slider.Get_current_value())
 
-    def On_pencil_size_slider_value_change(self, value):
+    def On_pencil_size_slider_value_changed(self, value):
         self.tool_controller._Set_pencil_tool_brush_size(value)
         self.main_window.Pencil_Size_Slider.Set_right_text(f'{value}')
+
+    def On_eraser_size_combobox_text_changed(self, text):
+        range_dict = {1:(1,100), 5:(1,500), 10:(10,1000), 50:(50,5000)}
+        mutlip_time = eval(re.findall('×(\d*)', text)[0])
+        self.main_window.Eraser_Size_Slider.Set_left_text(f'×{mutlip_time}')
+        self.main_window.Eraser_Size_Slider.Set_min_value(range_dict[mutlip_time][0])
+        self.main_window.Eraser_Size_Slider.Set_max_value(range_dict[mutlip_time][1])
+        self.main_window.Eraser_Size_Slider.Set_right_text(str(self.main_window.Eraser_Size_Slider.Get_current_value()))
+        self.tool_controller._Set_eraser_tool_brush_size(self.main_window.Eraser_Size_Slider.Get_current_value())
+
+    def On_eraser_size_slider_value_changed(self, value):
+        self.tool_controller._Set_eraser_tool_brush_size(value)
+        self.main_window.Eraser_Size_Slider.Set_right_text(f'{value}')
+
+    def On_paintbrush_size_combobox_text_changed(self, text):
+        range_dict = {1:(1,100), 5:(1,500), 10:(10,1000), 50:(50,5000)}
+        mutlip_time = eval(re.findall('×(\d*)', text)[0])
+        self.main_window.Paintbrush_Size_Slider.Set_left_text(f'×{mutlip_time}')
+        self.main_window.Paintbrush_Size_Slider.Set_min_value(range_dict[mutlip_time][0])
+        self.main_window.Paintbrush_Size_Slider.Set_max_value(range_dict[mutlip_time][1])
+        self.main_window.Paintbrush_Size_Slider.Set_right_text(str(self.main_window.Paintbrush_Size_Slider.Get_current_value()))
+        self.tool_controller._Set_paintbrush_tool_brush_size(self.main_window.Paintbrush_Size_Slider.Get_current_value())
+
+    def On_paintbrush_size_slider_value_changed(self, value):
+        self.tool_controller._Set_paintbrush_tool_brush_size(value)
+        self.main_window.Paintbrush_Size_Slider.Set_right_text(f'{value}')
+
+    def On_deepen_radio_button_clicked(self):
+        self.tool_controller._Set_paintbrush_tool_brush_type('加深')
+
+    def On_fade_radio_button_clicked(self):
+        self.tool_controller._Set_paintbrush_tool_brush_type('减淡')
+
+    def On_fill_tolerance_slider_value_changed(self, value):
+        self.tool_controller._Set_fill_tool_tolerance(value)
+        self.main_window.Fill_Tolerance_Slider.Set_right_text(f'{value}')
+
+    def On_filling_radio_button_clicked(self):
+        self.tool_controller._Set_fill_tool_fill_type_enum('抠图')
+
+    def On_cutout_radio_button_clicked(self):
+        self.tool_controller._Set_fill_tool_fill_type_enum('抠图')
+
 
     def On_copy_selection_button_clicked(self):
         self.board_layer_controller.Copy_selection()
@@ -1514,11 +1648,18 @@ class Tool_View:
 
 class Tool_Controller:
     class Tool_Interface:
+        def __init__(self, controller):
+            self.controller = controller
+
         def Constructor(self):
             #victual function
             pass
 
         def Destructor(self):
+            #victual function
+            pass
+
+        def Draw(self):
             #victual function
             pass
 
@@ -1534,20 +1675,98 @@ class Tool_Controller:
             #victual function
             pass
 
-    class Pencil_Tool(Tool_Interface):
+
+    class Bit_Draw_Tool_Interface(Tool_Interface):
         def __init__(self, controller):
-            self.controller = controller
+            super().__init__(controller)
 
             self.brush_size = 10
 
             self.first_pos  = None
             self.second_pos = None
 
-            self.STEP_COUNT = 60
+        def Draw(self, board_pos):
+            layer = self.controller._Get_strong_selected_layer()
+            if layer == False:
+                self.controller._Send_label_notify('未选中图层')
+                return
+            if layer.Get_layer_type_enum() != 'bit_layer':
+                self.controller._Send_label_notify('该工具只支持对位图操作')
+                return
+            if layer.Get_hide_flag():
+                self.controller._Send_label_notify('该图层已隐藏')
+                return
+            if layer.Get_lock_flag():
+                self.controller._Send_label_notify('该图层已锁定')
+                return
+
+            self.controller._Set_image_edited()
+
+            radius       = self.brush_size // 2
+            board_size   = self.controller._Get_board_size()
+            layer_size   = layer.Get_layer_size()
+            layer_offset = layer.Get_offset()
+
+            left   = 0 if layer_offset[0] >= 0 else layer_offset[0]
+            top    = 0 if layer_offset[1] >= 0 else layer_offset[1]
+            right  = board_size[0] if layer_offset[0] + layer_size[0] <= board_size[0] else layer_offset[0] + layer_size[0]
+            button = board_size[1] if layer_offset[1] + layer_size[1] <= board_size[1] else layer_offset[1] + layer_size[1]
+
+            layer_pos = (board_pos[0] - left, board_pos[1] - top)
+
+            layer_image = Image.new('RGBA', (right - left, button - top), (0, 0, 0, 0))
+            layer_image.paste(layer.Draw_layer(), (layer_offset[0] if layer_offset[0] >= 0 else 0, layer_offset[1] if layer_offset[1] >= 0 else 0))
+            layer_image_array = np.array(layer_image)
+
+            if self.first_pos == None:
+                self.first_pos = layer_pos
+
+                painting_area_set = {(i, j) for i in range(layer_pos[0] - radius, layer_pos[0] + radius + 1)
+                                            for j in range(layer_pos[1] - radius, layer_pos[1] + radius + 1)
+                                            if (i - layer_pos[0]) ** 2 + (j - layer_pos[1]) ** 2 <= (radius) ** 2
+                                            and 0 <= i < right - left and 0 <= j < button - top}
+            else:
+                self.second_pos = layer_pos
+
+                step_count = round(((self.second_pos[0] - self.first_pos[0]) ** 2 + (self.second_pos[1] - self.first_pos[1]) ** 2) ** 0.5 * 1.2)
+                i_array    = np.linspace(self.first_pos[0], self.second_pos[0], step_count)
+                j_array    = np.linspace(self.first_pos[1], self.second_pos[1], step_count)
+
+                pos_set    = {self.second_pos}
+                pos_set.update({(round(i), round(j)) for i,j in zip(i_array, j_array)})
+
+                painting_area_set = set()
+                for pos in pos_set:
+                    painting_area_set.update({(i, j) for i in range(pos[0] - radius, pos[0] + radius + 1)
+                                                     for j in range(pos[1] - radius, pos[1] + radius + 1)
+                                                     if (i - pos[0]) ** 2 + (j - pos[1]) ** 2 <= (radius) ** 2
+                                                     and 0 <= i < right - left and 0 <= j < button - top})
+
+                self.first_pos = self.second_pos
+
+            painting_area_array = np.array(list(painting_area_set))
+            layer_image_array = self.Process_painting_area(layer_image_array, painting_area_array)
+            layer_image = Image.fromarray(layer_image_array)
+
+            if layer_size == board_size and layer_offset == (0, 0):
+                layer.Set_image(layer_image)
+            else:
+                bonding_box = layer_image.getbbox()
+                layer.Set_image(layer_image.crop(bonding_box))
+                layer.Shift_layer((bonding_box[0], bonding_box[1]))
+
+            layer.Set_preview_label()
+            self.controller._Draw_painting()
+
+        def Process_painting_area(self, layer_image_array, painting_area_array):
+            #virtual function
+            pass
+
+        def Set_brush_size(self, value):
+            self.brush_size = value
+
 
         def Constructor(self):
-            self.controller._Set_pencil_tool_option()
-
             self.first_pos  = None
             self.second_pos = None
 
@@ -1555,14 +1774,161 @@ class Tool_Controller:
             self.first_pos  = None
             self.second_pos = None
 
+        def Mouse_press_event(self, board_pos, event):
+            if event.button() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
 
-        def Pencil_draw(self, board_pos, first_point_flag, button_enum):
+                if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
+                    self.Draw(board_pos)
+                else:
+                    self.first_pos  = None
+                    self.second_pos = None
+
+        def Mouse_move_event(self, board_pos, event):
+            if event.buttons() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
+
+                if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
+                    self.Draw(board_pos)
+                else:
+                    self.first_pos  = None
+                    self.second_pos = None
+
+        def Mouse_release_event(self, board_pos, event):
+            self.first_pos  = None
+            self.second_pos = None
+
+            if event.button() == Qt.LeftButton:
+                self.controller._Add_backup()
+
+    class Pencil_Tool(Bit_Draw_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+        def Process_painting_area(self, layer_image_array, painting_area_array):
+            r, g, b, _ = self.controller._Get_front_color().getRgb()
+            color_array = np.array((r, g, b, 255))
+
+            layer_image_array[painting_area_array[:,1], painting_area_array[:,0]] = color_array
+            return layer_image_array
+
+    class Eraser_Tool(Bit_Draw_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+        def Process_painting_area(self, layer_image_array, painting_area_array):
+            color_array = np.array((0, 0, 0, 0))
+
+            layer_image_array[painting_area_array[:,1], painting_area_array[:,0]] = color_array
+            return layer_image_array
+
+    class Paintbrush_Tool(Bit_Draw_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.brush_type_enum      = '加深'
+            self.unpainted_mask_array = None
+
+        def Set_brush_type_enum(self, type_enum):
+            self.brush_type_enum = type_enum
+
+
+        def Constructor(self):
+            super().Constructor()
+
+            self.paintbrush_layer_image_array = None
+            self.unpainted_mask_array         = None
+
+        def Destructor(self):
+            super().Destructor()
+            self.paintbrush_layer_image_array = None
+            self.unpainted_mask_array         = None
+
+        def Process_painting_area(self, layer_image_array, painting_area_array):
+            r, g, b, _ = self.controller._Get_front_color().getRgb()
+            color_array = np.array((r, g, b, 0))
+
+            if self.brush_type_enum == '加深':
+                new_paint_area_mask_array = np.zeros(self.paintbrush_layer_image_array[:, :, 0].shape, dtype = 'bool')
+                new_paint_area_mask_array[painting_area_array[:,1], painting_area_array[:,0]] = True
+
+                self.paintbrush_layer_image_array[new_paint_area_mask_array & self.unpainted_mask_array] += color_array
+                self.paintbrush_layer_image_array[new_paint_area_mask_array & self.unpainted_mask_array] += np.array((0, 0, 0, 255))
+
+                self.unpainted_mask_array[painting_area_array[:,1], painting_area_array[:,0]] = False
+
+            elif self.brush_type_enum == '减淡':
+                new_paint_area_mask_array = np.zeros(self.paintbrush_layer_image_array[:, :, 0].shape, dtype = 'bool')
+                new_paint_area_mask_array[painting_area_array[:,1], painting_area_array[:,0]] = True
+
+                self.paintbrush_layer_image_array[new_paint_area_mask_array & self.unpainted_mask_array] -= color_array
+                self.paintbrush_layer_image_array[new_paint_area_mask_array & self.unpainted_mask_array] += np.array((0, 0, 0, 255))
+
+                self.unpainted_mask_array[painting_area_array[:,1], painting_area_array[:,0]] = False
+
+            self.paintbrush_layer_image_array = np.clip(self.paintbrush_layer_image_array, 0, 255)
+            layer_image_array = self.paintbrush_layer_image_array.copy()
+            layer_image_array = layer_image_array.astype('uint8')
+
+            return layer_image_array
+
+        def Mouse_press_event(self, board_pos, event):
+            if event.button() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
+                if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
+                    layer = self.controller._Get_strong_selected_layer()
+                    if layer == False:
+                        self.controller._Send_label_notify('未选中图层')
+                        return
+                    if layer.Get_layer_type_enum() != 'bit_layer':
+                        self.controller._Send_label_notify('该工具只支持对位图操作')
+                        return
+                    if layer.Get_lock_flag():
+                        self.controller._Send_label_notify('该图层已锁定')
+                        return
+
+                    board_size   = self.controller._Get_board_size()
+                    layer_size   = layer.Get_layer_size()
+                    layer_offset = layer.Get_offset()
+
+                    left   = 0 if layer_offset[0] >= 0 else layer_offset[0]
+                    top    = 0 if layer_offset[1] >= 0 else layer_offset[1]
+                    right  = board_size[0] if layer_offset[0] + layer_size[0] <= board_size[0] else layer_offset[0] + layer_size[0]
+                    button = board_size[1] if layer_offset[1] + layer_size[1] <= board_size[1] else layer_offset[1] + layer_size[1]
+
+                    layer_image = Image.new('RGBA', (right - left, button - top), (0, 0, 0, 0))
+                    layer_image.paste(layer.Draw_layer(), (layer_offset[0] if layer_offset[0] >= 0 else 0, layer_offset[1] if layer_offset[1] >= 0 else 0))
+                    self.paintbrush_layer_image_array = np.array(layer_image).astype('int32')
+                    self.unpainted_mask_array         = np.ones(layer_image.size, dtype = 'bool')
+
+                    self.Draw(board_pos)
+                else:
+                    self.first_pos  = None
+                    self.second_pos = None
+
+    class Fill_Tool(Tool_Interface):
+        def __init__(self, controller):
+            self.controller     = controller
+
+            self.tolerance      = 0
+            self.fill_type_enum = '填充'
+
+        def Set_tolerance(self, value):
+            self.tolerance = value
+
+        def Set_fill_type_enum(self, fill_type_enum):
+            self.fill_type_enum = fill_type_enum
+
+        def Fill_layer(self, board_pos):
             layer = self.controller._Get_strong_selected_layer()
             if layer == False:
                 self.controller._Send_label_notify('未选中图层')
                 return
             if layer.Get_layer_type_enum() != 'bit_layer':
                 self.controller._Send_label_notify('该工具只支持对位图操作')
+                return
+            if layer.Get_hide_flag():
+                self.controller._Send_label_notify('该图层已隐藏')
                 return
             if layer.Get_lock_flag():
                 self.controller._Send_label_notify('该图层已锁定')
@@ -1579,47 +1945,16 @@ class Tool_Controller:
             right  = board_size[0] if layer_offset[0] + layer_size[0] <= board_size[0] else layer_offset[0] + layer_size[0]
             button = board_size[1] if layer_offset[1] + layer_size[1] <= board_size[1] else layer_offset[1] + layer_size[1]
 
+            layer_pos = (board_pos[0] - left, board_pos[1] - top)
+
             layer_image = Image.new('RGBA', (right - left, button - top), (0, 0, 0, 0))
             layer_image.paste(layer.Draw_layer(), (layer_offset[0] if layer_offset[0] >= 0 else 0, layer_offset[1] if layer_offset[1] >= 0 else 0))
 
-            radius = self.brush_size // 2
-            layer_image_array = np.array(layer_image)
-            layer_pos = (board_pos[0] - left, board_pos[1] - top)
-
-            if button_enum == 'left_button':
+            if self.fill_type_enum == '填充':
                 r, g, b, _ = self.controller._Get_front_color().getRgb()
-            elif button_enum == 'right_button':
-                r, g, b, _ = self.controller._Get_back_color().getRgb()
-            else:
-                return
-            color_array = np.array((r, g, b, 255))
-
-            if first_point_flag:
-                self.first_pos = layer_pos
-
-                painting_area_set = {(i, j) for i in range(layer_pos[0] - radius, layer_pos[0] + radius + 1)
-                                            for j in range(layer_pos[1] - radius, layer_pos[1] + radius + 1)
-                                            if (i - layer_pos[0]) ** 2 + (j - layer_pos[1]) ** 2 <= (radius) ** 2
-                                            and 0 <= i < right - left and 0 <= j < button - top}
-            else:
-                self.second_pos = layer_pos
-                i_array = np.linspace(self.first_pos[0], self.second_pos[0], self.STEP_COUNT)
-                j_array = np.linspace(self.first_pos[1], self.second_pos[1], self.STEP_COUNT)
-                pos_set = {(round(i), round(j)) for i,j in zip(i_array, j_array)}
-
-                painting_area_set = set()
-                for pos in pos_set:
-                    painting_area_set.update({(i, j) for i in range(pos[0] - radius, pos[0] + radius + 1)
-                                                     for j in range(pos[1] - radius, pos[1] + radius + 1)
-                                                     if (i - pos[0]) ** 2 + (j - pos[1]) ** 2 <= (radius) ** 2
-                                                     and 0 <= i < right - left and 0 <= j < button - top})
-
-                self.first_pos = self.second_pos
-
-            painting_area_array = np.array(list(painting_area_set))
-            layer_image_array[painting_area_array[:,1],painting_area_array[:,0]] = color_array
-
-            layer_image = Image.fromarray(layer_image_array)
+                ImageDraw.floodfill(image = layer_image, xy = board_pos, value = (r, g, b, 255), thresh = self.tolerance + 1)
+            elif self.fill_type_enum == '抠图':
+                ImageDraw.floodfill(image = layer_image, xy = board_pos, value = (0, 0, 0, 0), thresh = self.tolerance + 1)
 
             if layer_size == board_size and layer_offset == (0, 0):
                 layer.Set_image(layer_image)
@@ -1630,47 +1965,142 @@ class Tool_Controller:
 
             layer.Set_preview_label()
             self.controller._Draw_painting()
+            self.controller._Add_backup()
 
-
-        def Set_brush_size(self, value):
-            self.brush_size = value
 
         def Mouse_press_event(self, board_pos, event):
-            board_size = self.controller._Get_board_size()
-            if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
-                if event.button() == Qt.LeftButton:
-                    self.Pencil_draw(board_pos, True, 'left_button')
-                elif event.button() == Qt.RightButton:
-                    self.Pencil_draw(board_pos, True, 'right_button')
-                else:
-                    return
-            else:
-                self.first_pos   = None
-                self.second_pos_ = None
+            if event.button() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
+
+                if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
+                    self.Fill_layer(board_pos)
 
         def Mouse_move_event(self, board_pos, event):
-            board_size = self.controller._Get_board_size()
-            if 0 <= board_pos[0] < board_size[0] and 0 <= board_pos[1] < board_size[1]:
-                if event.buttons() == Qt.LeftButton:
-                    button_enum = 'left_button'
-                elif event.buttons() == Qt.RightButton:
-                    button_enum = 'right_button'
-                else:
-                    return
-
-                if self.first_pos != None:
-                    self.Pencil_draw(board_pos, False, button_enum)
-                else:
-                    self.Pencil_draw(board_pos, True,  button_enum)
-            else:
-                self.first_pos   = None
-                self.second_pos_ = None
+            pass
 
         def Mouse_release_event(self, board_pos, event):
-            if event.button() == Qt.LeftButton or event.button() == Qt.RightButton:
-                self.controller._Add_backup()
+            pass
 
-    class Rect_Selection(Tool_Interface):
+
+    class Vector_Tool_Interface(Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.outline_color = QColor(0, 0, 0)
+            self.outline_width = 2
+            self.fill_color    = QColor(255, 255, 255)
+
+        def Set_outline_color(self, color):
+            r, g, b, _ = color.getRgb()
+            self.outline_color.setRgb(r, g, b)
+
+        def Set_outline_width(self, value):
+            self.outline_width = value
+
+        def Set_fill_color(self, color):
+            r, g, b, _ = color.getRgb()
+            self.fill_color.setRgb(r, g, b)
+
+    class Square_Tool(Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.first_pos  = None
+            self.second_pos = None
+
+            self.x_radius   = 0
+            self.y_radius   = 0
+
+        def Constructor(self):
+            self.first_pos  = None
+            self.second_pos = None
+
+        def Destructor(self):
+            self.first_pos  = None
+            self.second_pos = None
+
+
+        def Draw_prompt(self):
+            layer = self.controller._Get_strong_selected_layer()
+            if layer == False:
+                self.controller._Send_label_notify('未选中图层')
+                return
+            if layer.Get_layer_type_enum() != 'vector_layer':
+                self.controller._Send_label_notify('该工具只支持对矢量图操作')
+                return
+            if layer.Get_hide_flag():
+                self.controller._Send_label_notify('该图层已隐藏')
+                return
+            if layer.Get_lock_flag():
+                self.controller._Send_label_notify('该图层已锁定')
+                return
+
+            self.controller._Set_image_edited()
+
+            square_command = Board_Layer_Controller.Vector_Layer_Command_Struct()
+            square_command.command_enum = 'rect'
+
+            square_command.data.outline_color = self.outline_color
+            square_command.data.outline_width = self.outline_width
+            square_command.data.fill_color    = self.fill_color
+
+            square_command.data.x        = self.first_pos[0]
+            square_command.data.y        = self.first_pos[1]
+            square_command.data.width    = abs(self.second_pos[0] - self.first_pos[0])
+            square_command.data.height   = abs(self.second_pos[1] - self.first_pos[1])
+            square_command.data.x_radius = self.x_radius
+            square_command.data.y_radius = self.y_radius
+
+            layer.Set_prompt_command(square_command)
+            self.controller._Draw_painting()
+
+        def Formaliz_prompt_command(self):
+            layer = self.controller._Get_strong_selected_layer()
+            if layer == False:
+                self.controller._Send_label_notify('未选中图层')
+                return
+            if layer.Get_layer_type_enum() != 'vector_layer':
+                self.controller._Send_label_notify('该工具只支持对矢量图操作')
+                return
+            if layer.Get_hide_flag():
+                self.controller._Send_label_notify('该图层已隐藏')
+                return
+            if layer.Get_lock_flag():
+                self.controller._Send_label_notify('该图层已锁定')
+                return
+
+            self.controller._Set_image_edited()
+
+            layer.Formaliz_prompt_command()
+            layer.Set_preview_label()
+            self.controller._Draw_painting()
+
+
+        def Mouse_press_event(self, board_pos, event):
+            if event.button() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
+                board_pos  = (max(0, min(board_pos[0], board_size[0])),
+                              max(0, min(board_pos[1], board_size[1])))
+                self.first_pos  = board_pos
+                self.second_pos = None
+
+        def Mouse_move_event(self, board_pos, event):
+            if event.buttons() == Qt.LeftButton:
+                board_size = self.controller._Get_board_size()
+                board_pos  = (max(0, min(board_pos[0], board_size[0])),
+                              max(0, min(board_pos[1], board_size[1])))
+                self.second_pos = board_pos
+                self.Draw_prompt()
+
+        def Mouse_release_event(self, board_pos, event):
+            if event.buttons() == Qt.LeftButton:
+                self.Formaliz_prompt_command()
+
+                self.first_pos  = None
+                self.second_pos = None
+
+
+    class Rect_Selection_Tool(Tool_Interface):
         def __init__(self, controller):
             self.controller = controller
 
@@ -1679,8 +2109,6 @@ class Tool_Controller:
 
 
         def Constructor(self):
-            self.controller._Set_rect_selection_option()
-
             self.first_pos  = None
             self.second_pos = None
 
@@ -1736,10 +2164,18 @@ class Tool_Controller:
 
         self.current_tool = None
 
-        self.pencil_tool = Tool_Controller.Pencil_Tool(self)
-        self.rect_selection = Tool_Controller.Rect_Selection(self)
+        self.pencil_tool         = Tool_Controller.Pencil_Tool(self)
+        self.eraser_tool         = Tool_Controller.Eraser_Tool(self)
+        self.paintbrush_tool     = Tool_Controller.Paintbrush_Tool(self)
+        self.fill_tool           = Tool_Controller.Fill_Tool(self)
 
-        self.board_pos_only_list = [self.pencil_tool, self.rect_selection]
+        self.square_tool         = Tool_Controller.Square_Tool(self)
+
+        self.rect_selection_tool = Tool_Controller.Rect_Selection_Tool(self)
+
+        self.board_pos_only_list = [self.pencil_tool, self.eraser_tool, self.paintbrush_tool, self.fill_tool,
+                                    self.square_tool,
+                                    self.rect_selection_tool]
         self.label_pos_only_list = []
         self.both_pos_list       = []
 
@@ -1773,25 +2209,56 @@ class Tool_Controller:
              self.current_tool.Mouse_release_event(label_pos, board_pos, event)
 
 
-    def Select_pencil(self):
+    def Select_pencil_tool(self):
         self.current_tool.Destructor()
         self.current_tool = self.pencil_tool
         self.current_tool.Constructor()
 
-    def Select_rect_selection(self):
+    def Select_eraser_tool(self):
         self.current_tool.Destructor()
-        self.current_tool = self.rect_selection
+        self.current_tool = self.eraser_tool
+        self.current_tool.Constructor()
+
+    def Select_paintbrush_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.paintbrush_tool
+        self.current_tool.Constructor()
+
+    def Select_fill_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.fill_tool
         self.current_tool.Constructor()
 
 
-    def _Set_pencil_tool_option(self):
-        self.tool_view.Set_pencil_tool_option()
+    def Select_square_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.square_tool
+        self.current_tool.Constructor()
 
-    def _Set_rect_selection_option(self):
-        self.tool_view.Set_rect_selection_option()
+
+    def Select_rect_selection_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.rect_selection_tool
+        self.current_tool.Constructor()
+
 
     def _Set_pencil_tool_brush_size(self, value):
         self.pencil_tool.Set_brush_size(value)
+
+    def _Set_eraser_tool_brush_size(self, value):
+        self.eraser_tool.Set_brush_size(value)
+
+    def _Set_paintbrush_tool_brush_size(self, value):
+        self.paintbrush_tool.Set_brush_size(value)
+
+    def _Set_paintbrush_tool_brush_type(self, type_enum):
+        self.paintbrush_tool.Set_brush_type_enum(type_enum)
+
+    def _Set_fill_tool_tolerance(self, value):
+        self.fill_tool.Set_tolerance(value)
+
+    def _Set_fill_tool_fill_type_enum(self, fill_type_enum):
+        self.fill_tool.Set_fill_type_enum(fill_type_enum)
 
 
     def _Draw_painting(self):
@@ -2169,6 +2636,9 @@ class Menu_Tab_Distributor:
     def On_new_bit_layer_action_triggered(self):
         self.board_layer_controller.Add_bit_layer()
 
+    def On_new_vector_layer_action_triggered(self):
+        self.board_layer_controller.Add_vector_layer()
+
     def On_cancel_selection_action_triggered(self):
         self.board_layer_controller.Cancel_selection()
 
@@ -2209,19 +2679,36 @@ class Event_And_Singal_Distributor:
         self.main_window.Mix_Mod_ComboBox.currentTextChanged.connect(self.board_layer_view.On_mix_mod_combobox_text_changed)
         self.main_window.Opacity_Slider.value_change_single. connect(self.board_layer_view.On_opacity_slider_value_change)
 
-        self.main_window.Rect_Selection_Button.clicked.connect(self.tool_view.On_rect_selection_button_clicked)
-        self.main_window.Pencil_Button.clicked.        connect(self.tool_view.On_pencil_button_clicked)
+        self.main_window.Pencil_Tool_Button.clicked.        connect(self.tool_view.On_pencil_tool_button_clicked)
+        self.main_window.Eraser_Tool_Button.clicked.        connect(self.tool_view.On_eraser_tool_button_clicked)
+        self.main_window.Paintbrush_Tool_Button.clicked.    connect(self.tool_view.On_paintbrush_tool_button_clicked)
+        self.main_window.Fill_Tool_Button.clicked.          connect(self.tool_view.On_fill_tool_button_clicked)
 
-        self.main_window.Pencil_Size_ComboBox.currentTextChanged.connect(self.tool_view.On_pencil_size_combobox_text_changed)
-        self.main_window.Pencil_Size_Slider.value_change_single. connect(self.tool_view.On_pencil_size_slider_value_change)
-        self.main_window.Copy_Selection_Button.clicked.          connect(self.tool_view.On_copy_selection_button_clicked)
-        self.main_window.Cut_Selection_Button.clicked.           connect(self.tool_view.On_cut_selection_button_clicked)
-        self.main_window.Clear_Selection_Button.clicked.         connect(self.tool_view.On_clear_selection_button_clicked)
-        self.main_window.Cancel_Selection_Button.clicked.        connect(self.tool_view.On_cancel_selection_button_clicked)
+        self.main_window.Square_Tool_Button.clicked.        connect(self.tool_view.On_square_tool_button_clicked)
+
+        self.main_window.Rect_Selection_Tool_Button.clicked.connect(self.tool_view.On_rect_selection_button_clicked)
+
+        self.main_window.Pencil_Size_ComboBox.currentTextChanged.    connect(self.tool_view.On_pencil_size_combobox_text_changed)
+        self.main_window.Pencil_Size_Slider.value_change_single.     connect(self.tool_view.On_pencil_size_slider_value_changed)
+        self.main_window.Eraser_Size_ComboBox.currentTextChanged.    connect(self.tool_view.On_eraser_size_combobox_text_changed)
+        self.main_window.Eraser_Size_Slider.value_change_single.     connect(self.tool_view.On_eraser_size_slider_value_changed)
+        self.main_window.Paintbrush_Size_ComboBox.currentTextChanged.connect(self.tool_view.On_paintbrush_size_combobox_text_changed)
+        self.main_window.Paintbrush_Size_Slider.value_change_single. connect(self.tool_view.On_paintbrush_size_slider_value_changed)
+        self.main_window.Deepen_Radio_Button.clicked.                connect(self.tool_view.On_deepen_radio_button_clicked)
+        self.main_window.Fade_Radio_Button.clicked.                  connect(self.tool_view.On_fade_radio_button_clicked)
+        self.main_window.Fill_Tolerance_Slider.value_change_single.  connect(self.tool_view.On_fill_tolerance_slider_value_changed)
+        self.main_window.Cutout_Radio_Button.clicked.                connect(self.tool_view.On_cutout_radio_button_clicked)
+        self.main_window.Filling_Radio_Button.clicked.               connect(self.tool_view.On_filling_radio_button_clicked)
+
+        self.main_window.Copy_Selection_Button.clicked.  connect(self.tool_view.On_copy_selection_button_clicked)
+        self.main_window.Cut_Selection_Button.clicked.   connect(self.tool_view.On_cut_selection_button_clicked)
+        self.main_window.Clear_Selection_Button.clicked. connect(self.tool_view.On_clear_selection_button_clicked)
+        self.main_window.Cancel_Selection_Button.clicked.connect(self.tool_view.On_cancel_selection_button_clicked)
 
         self.main_window.Revoke_Action.triggered.          connect(self.menu_tab_distributor.On_revoke_action_triggered)
         self.main_window.Redo_Action.triggered.            connect(self.menu_tab_distributor.On_redo_action_triggered)
         self.main_window.New_Bit_Layer_Action.triggered.   connect(self.menu_tab_distributor.On_new_bit_layer_action_triggered)
+        self.main_window.New_Vector_Layer_Action.triggered.connect(self.menu_tab_distributor.On_new_vector_layer_action_triggered)
         self.main_window.Cancel_Selection_Action.triggered.connect(self.menu_tab_distributor.On_cancel_selection_action_triggered)
         self.main_window.Copy_Selection_Action.triggered.  connect(self.menu_tab_distributor.On_copy_selection_action_triggered)
         self.main_window.Cut_Selection_Action.triggered.   connect(self.menu_tab_distributor.On_cut_selection_action_triggered)
@@ -2296,9 +2783,15 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.main_window.Board_Label.setFocus()
 
         self.main_window.Color_Indicator_Widget = Color_Indicator_Widget(self)
-        self.main_window.Quick_Func_Layout.addWidget(self.Color_Indicator_Widget, 0, 5, 2, 1, Qt.AlignHCenter)
+        self.main_window.Quick_Func_Container_Layout.addWidget(self.Color_Indicator_Widget, Qt.AlignHCenter)
 
         self.main_window.Pencil_Size_ComboBox.setStyleSheet('''#Pencil_Size_ComboBox QAbstractItemView{
+                                                                min-width: 130px;
+                                                            }''')
+        self.main_window.Eraser_Size_ComboBox.setStyleSheet('''#Eraser_Size_ComboBox QAbstractItemView{
+                                                                min-width: 130px;
+                                                            }''')
+        self.main_window.Paintbrush_Size_ComboBox.setStyleSheet('''#Paintbrush_Size_ComboBox QAbstractItemView{
                                                                 min-width: 130px;
                                                             }''')
         self.main_window.Board_Label_Widget.setStyleSheet('''#Board_Label_Widget{
@@ -2321,6 +2814,24 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.main_window.Pencil_Size_Slider.Set_current_value(10)
         self.main_window.Pencil_Size_Slider.Set_left_text('×1')
         self.main_window.Pencil_Size_Slider.Set_right_text('10')
+
+        self.main_window.Eraser_Size_Slider.Set_min_value(1)
+        self.main_window.Eraser_Size_Slider.Set_max_value(100)
+        self.main_window.Eraser_Size_Slider.Set_current_value(10)
+        self.main_window.Eraser_Size_Slider.Set_left_text('×1')
+        self.main_window.Eraser_Size_Slider.Set_right_text('10')
+
+        self.main_window.Paintbrush_Size_Slider.Set_min_value(1)
+        self.main_window.Paintbrush_Size_Slider.Set_max_value(100)
+        self.main_window.Paintbrush_Size_Slider.Set_current_value(10)
+        self.main_window.Paintbrush_Size_Slider.Set_left_text('×1')
+        self.main_window.Paintbrush_Size_Slider.Set_right_text('10')
+
+        self.main_window.Fill_Tolerance_Slider.Set_min_value(0)
+        self.main_window.Fill_Tolerance_Slider.Set_max_value(255)
+        self.main_window.Fill_Tolerance_Slider.Set_current_value(0)
+        self.main_window.Fill_Tolerance_Slider.Set_left_text('')
+        self.main_window.Fill_Tolerance_Slider.Set_right_text('0')
 
     def Get_style_manage_controller(self):
         return self.style_manage_controller
