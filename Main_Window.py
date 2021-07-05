@@ -1047,35 +1047,31 @@ class Board_Layer_Controller:
                     painter.drawRoundedRect(command.x, command.y, command.width, command.height, command.x_radius, command.y_radius)
 
                 elif command.command_enum == 'circle':
-                    painter.drawEllipse(command.x, command.y, command.radius, command.radius)
+                    painter.drawEllipse(QPoint(command.x, command.y), command.radius, command.radius)
 
                 elif command.command_enum == 'ellipse':
-                    painter.drawEllipse(command.x, command.y, command.x_radius, command.y_radius)
+                    painter.drawEllipse(QPoint(command.x, command.y), command.x_radius, command.y_radius)
 
                 elif command.command_enum == 'line':
                     painter.drawLine(command.first_pos[0], command.first_pos[1], command.second_pos[0], command.second_pos[1])
 
                 elif command.command_enum == 'polygon':
-                    point_list = []
-                    for pos in command.pos_list:
-                        point_list.append(QPoint(pos[0], pos[1]))
+                    point_list = list(map(lambda pos : QPoint(pos[0], pos[1]), command.pos_list))
 
-                    painter.drawPolygon(point_list, len(point_list))
+                    painter.drawPolygon(* point_list)
 
                 elif command.command_enum == 'polyline':
-                    point_list = []
-                    for pos in command.pos_list:
-                        point_list.append(QPoint(pos[0], pos[1]))
+                    point_list = list(map(lambda pos : QPoint(pos[0], pos[1]), command.pos_list))
 
-                    painter.drawPolyline(point_list, len(point_list))
+                    painter.drawPolyline(* point_list)
 
                 elif command.command_enum == 'path':
                     path = QPainterPath()
                     for path_command in command.path_command_list:
                         if path_command.command_enum == 'M':
-                            path.moveTo(*path_command.pos)
+                            path.moveTo(* path_command.pos)
                         elif path_command.command_enum == 'L':
-                            path.lineTo(*path_command.pos)
+                            path.lineTo(* path_command.pos)
                         elif path_command.command_enum == 'C':
                             path.cubicTo(path_command.pos[0][0], path_command.pos[0][1],
                                          path_command.pos[1][0], path_command.pos[1][1],
@@ -1101,9 +1097,9 @@ class Board_Layer_Controller:
                     path = QPainterPath()
                     for path_command in command.path_command_list:
                         if path_command.command_enum == 'M':
-                            path.moveTo(*path_command.pos)
+                            path.moveTo(* path_command.pos)
                         elif path_command.command_enum == 'L':
-                            path.lineTo(*path_command.pos)
+                            path.lineTo(* path_command.pos)
                         elif path_command.command_enum == 'C':
                             path.cubicTo(path_command.pos[0][0], path_command.pos[0][1],
                                          path_command.pos[1][0], path_command.pos[1][1],
@@ -1696,6 +1692,60 @@ class Tool_View:
 
         self.main_window.Square_Tool_Button.setChecked(True)
 
+    def On_rect_tool_button_clicked(self):
+        self.tool_controller.Select_rect_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Rect_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Rect_Tool_Button.setChecked(True)
+
+    def On_circle_tool_button_clicked(self):
+        self.tool_controller.Select_circle_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Circle_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Circle_Tool_Button.setChecked(True)
+
+    def On_ellipse_tool_button_clicked(self):
+        self.tool_controller.Select_ellipse_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Ellipse_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Ellipse_Tool_Button.setChecked(True)
+
+    def On_line_tool_button_clicked(self):
+        self.tool_controller.Select_line_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Line_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Line_Tool_Button.setChecked(True)
+
+    def On_polygon_tool_button_clicked(self):
+        self.tool_controller.Select_polygon_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Polygon_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Polygon_Tool_Button.setChecked(True)
+
+    def On_polyline_tool_button_clicked(self):
+        self.tool_controller.Select_polyline_tool()
+
+        self.main_window.Func_Option_StackedWidget.setCurrentIndex(self.main_window.Func_Option_StackedWidget.indexOf(self.main_window.Polyline_Tool_Option_Page))
+        for button in self.checkable_button_list:
+            button.setChecked(False)
+
+        self.main_window.Polyline_Tool_Button.setChecked(True)
+
     def On_path_tool_button_clicked(self):
         self.tool_controller.Select_path_tool()
 
@@ -1807,53 +1857,156 @@ class Tool_View:
         if self.main_window.Square_Fill_Color_Radio_Button.isChecked():
             self.tool_controller._Set_square_tool_fill_color(self.main_window.Square_Fill_Color_Indicator_Label.Get_color())
 
-    def On_square_x_radius_slider_lineEdit_text_changed(self, text):
-        if not text.isdigit():
-            self.main_window.Square_X_Radius_Slider_LineEdit.setText('0')
-            value = 0
-        else:
-            if text.startswith('0'):
-                text = text.lstrip('0')
-                self.main_window.Square_X_Radius_Slider_LineEdit.setText('0' if len(text) == 0 else text)
-                value = 0 if len(text) == 0 else eval(text)
-            else:
-                value = eval(text)
-                if value > 100:
-                    self.main_window.Square_X_Radius_Slider_LineEdit.setText('100')
-                    value = 100
-
-        self.tool_controller._Set_square_x_radius(value)
-        self.main_window.Square_X_Radius_Slider.Set_current_value(value)
-        self.main_window.Square_X_Radius_Slider.Set_right_text(f'{value}')
-
-    def On_square_y_radius_slider_lineEdit_text_changed(self, text):
-        if not text.isdigit():
-            self.main_window.Square_Y_Radius_Slider_LineEdit.setText('0')
-            value = 0
-        else:
-            if text.startswith('0'):
-                text = text.lstrip('0')
-                self.main_window.Square_Y_Radius_Slider_LineEdit.setText('0' if len(text) == 0 else text)
-                value = 0 if len(text) == 0 else eval(text)
-            else:
-                value = eval(text)
-                if value > 100:
-                    self.main_window.Square_Y_Radius_Slider_LineEdit.setText('100')
-                    value = 100
-
-        self.tool_controller._Set_square_y_radius(value)
-        self.main_window.Square_Y_Radius_Slider.Set_current_value(value)
-        self.main_window.Square_Y_Radius_Slider.Set_right_text(f'{value}')
-
     def On_square_x_radius_slider_value_changed(self, value):
         self.tool_controller._Set_square_x_radius(value)
-        self.main_window.Square_X_Radius_Slider.Set_right_text(f'{value}')
-        self.main_window.Square_X_Radius_Slider_LineEdit.setText(str(value))
+        self.main_window.Square_X_Radius_Slider.Set_right_text(f'{value}%')
 
     def On_square_y_radius_slider_value_changed(self, value):
         self.tool_controller._Set_square_y_radius(value)
-        self.main_window.Square_Y_Radius_Slider.Set_right_text(f'{value}')
-        self.main_window.Square_Y_Radius_Slider_LineEdit.setText(str(value))
+        self.main_window.Square_Y_Radius_Slider.Set_right_text(f'{value}%')
+
+
+    def On_rect_outline_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_rect_tool_outline_color(None)
+
+    def On_rect_outline_color_radio_button_clicked(self):
+        self.tool_controller._Set_rect_tool_outline_color(self.main_window.Rect_Outline_Color_Indicator_Label.Get_color())
+
+    def On_rect_outline_color_indicator_label_update_color(self):
+        self.main_window.Rect_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Rect_Outline_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_rect_tool_outline_color(self.main_window.Rect_Outline_Color_Indicator_Label.Get_color())
+
+    def On_rect_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_rect_tool_outline_width(value)
+        self.main_window.Rect_Outline_Width_Slider.Set_right_text(f'{value}')
+
+    def On_rect_fill_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_rect_tool_fill_color(None)
+
+    def On_rect_fill_color_radio_button_clicked(self):
+        self.tool_controller._Set_rect_tool_fill_color(self.main_window.Rect_Fill_Color_Indicator_Label.Get_color())
+
+    def On_rect_fill_color_indicator_label_update_color(self):
+        self.main_window.Rect_Fill_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Rect_Fill_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_rect_tool_fill_color(self.main_window.Rect_Fill_Color_Indicator_Label.Get_color())
+
+    def On_rect_x_radius_slider_value_changed(self, value):
+        self.tool_controller._Set_rect_x_radius(value)
+        self.main_window.Rect_X_Radius_Slider.Set_right_text(f'{value}%')
+
+    def On_rect_y_radius_slider_value_changed(self, value):
+        self.tool_controller._Set_rect_y_radius(value)
+        self.main_window.Rect_Y_Radius_Slider.Set_right_text(f'{value}%')
+
+
+    def On_circle_outline_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_circle_tool_outline_color(None)
+
+    def On_circle_outline_color_radio_button_clicked(self):
+        self.tool_controller._Set_circle_tool_outline_color(self.main_window.Circle_Outline_Color_Indicator_Label.Get_color())
+
+    def On_circle_outline_color_indicator_label_update_color(self):
+        self.main_window.Circle_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Circle_Outline_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_circle_tool_outline_color(self.main_window.Circle_Outline_Color_Indicator_Label.Get_color())
+
+    def On_circle_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_circle_tool_outline_width(value)
+        self.main_window.Circle_Outline_Width_Slider.Set_right_text(f'{value}')
+
+    def On_circle_fill_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_circle_tool_fill_color(None)
+
+    def On_circle_fill_color_radio_button_clicked(self):
+        self.tool_controller._Set_circle_tool_fill_color(self.main_window.Circle_Fill_Color_Indicator_Label.Get_color())
+
+    def On_circle_fill_color_indicator_label_update_color(self):
+        self.main_window.Circle_Fill_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Circle_Fill_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_circle_tool_fill_color(self.main_window.Circle_Fill_Color_Indicator_Label.Get_color())
+
+
+    def On_ellipse_outline_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_ellipse_tool_outline_color(None)
+
+    def On_ellipse_outline_color_radio_button_clicked(self):
+        self.tool_controller._Set_ellipse_tool_outline_color(self.main_window.Ellipse_Outline_Color_Indicator_Label.Get_color())
+
+    def On_ellipse_outline_color_indicator_label_update_color(self):
+        self.main_window.Ellipse_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Ellipse_Outline_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_ellipse_tool_outline_color(self.main_window.Ellipse_Outline_Color_Indicator_Label.Get_color())
+
+    def On_ellipse_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_ellipse_tool_outline_width(value)
+        self.main_window.Ellipse_Outline_Width_Slider.Set_right_text(f'{value}')
+
+    def On_ellipse_fill_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_ellipse_tool_fill_color(None)
+
+    def On_ellipse_fill_color_radio_button_clicked(self):
+        self.tool_controller._Set_ellipse_tool_fill_color(self.main_window.Ellipse_Fill_Color_Indicator_Label.Get_color())
+
+    def On_ellipse_fill_color_indicator_label_update_color(self):
+        self.main_window.Ellipse_Fill_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Ellipse_Fill_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_ellipse_tool_fill_color(self.main_window.Ellipse_Fill_Color_Indicator_Label.Get_color())
+
+
+    def On_line_outline_color_indicator_label_update_color(self):
+        self.main_window.Line_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        self.tool_controller._Set_line_tool_outline_color(self.main_window.Line_Outline_Color_Indicator_Label.Get_color())
+
+    def On_line_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_line_tool_outline_width(value)
+        self.main_window.Line_Outline_Width_Slider.Set_right_text(f'{value}')
+
+
+    def On_polygon_outline_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_polygon_tool_outline_color(None)
+
+    def On_polygon_outline_color_radio_button_clicked(self):
+        self.tool_controller._Set_polygon_tool_outline_color(self.main_window.Polygon_Outline_Color_Indicator_Label.Get_color())
+
+    def On_polygon_outline_color_indicator_label_update_color(self):
+        self.main_window.Polygon_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Polygon_Outline_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_polygon_tool_outline_color(self.main_window.Polygon_Outline_Color_Indicator_Label.Get_color())
+
+    def On_polygon_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_polygon_tool_outline_width(value)
+        self.main_window.Polygon_Outline_Width_Slider.Set_right_text(f'{value}')
+
+    def On_polygon_fill_color_none_radio_button_clicked(self):
+        self.tool_controller._Set_polygon_tool_fill_color(None)
+
+    def On_polygon_fill_color_radio_button_clicked(self):
+        self.tool_controller._Set_polygon_tool_fill_color(self.main_window.Polygon_Fill_Color_Indicator_Label.Get_color())
+
+    def On_polygon_fill_color_indicator_label_update_color(self):
+        self.main_window.Polygon_Fill_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        if self.main_window.Polygon_Fill_Color_Radio_Button.isChecked():
+            self.tool_controller._Set_polygon_tool_fill_color(self.main_window.Polygon_Fill_Color_Indicator_Label.Get_color())
+
+
+    def On_polyline_outline_color_indicator_label_update_color(self):
+        self.main_window.Polyline_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        self.tool_controller._Set_polyline_tool_outline_color(self.main_window.Polyline_Outline_Color_Indicator_Label.Get_color())
+
+    def On_polyline_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_polyline_tool_outline_width(value)
+        self.main_window.Polyline_Outline_Width_Slider.Set_right_text(f'{value}')
+
+
+    def On_path_outline_color_indicator_label_update_color(self):
+        self.main_window.Path_Outline_Color_Indicator_Label.Set_color(self.color_controller.Get_front_color())
+        self.tool_controller._Set_path_tool_outline_color(self.main_window.Path_Outline_Color_Indicator_Label.Get_color())
+
+    def On_path_outline_width_slider_value_changed(self, value):
+        self.tool_controller._Set_path_tool_outline_width(value)
+        self.main_window.Path_Outline_Width_Slider.Set_right_text(f'{value}')
 
 
     def On_copy_selection_button_clicked(self):
@@ -2219,6 +2372,7 @@ class Tool_Controller:
             layer.Formaliz_prompt_command()
             layer.Set_preview_label()
             self.controller._Draw_painting()
+            self.controller._Add_backup()
 
 
         def Constructor(self):
@@ -2241,12 +2395,91 @@ class Tool_Controller:
             #victual function
             pass
 
-    class Square_Tool(Vector_Tool_Interface):
+
+    class Two_Point_Vector_Tool_Interface(Vector_Tool_Interface):
         def __init__(self, controller):
             super().__init__(controller)
 
             self.first_pos  = None
             self.second_pos = None
+
+
+        def Draw_prompt(self):
+            layer = self.controller._Get_strong_selected_layer()
+
+            self.controller._Set_image_edited()
+
+            command = Board_Layer_Controller.Vector_Layer_Command_Struct()
+            command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
+            command.outline_width = self.outline_width
+            command.fill_color    = QColor(self.fill_color)    if self.fill_color    is not None else None
+
+            command = self.Fill_command_date(command)
+
+            layer.Set_prompt_command(command)
+            self.controller._Draw_painting()
+
+        def Fill_command_date(self, command):
+            #victual function
+            pass
+
+
+        def Constructor(self):
+            self.first_pos  = None
+            self.second_pos = None
+
+        def Destructor(self):
+            self.first_pos  = None
+            self.second_pos = None
+
+
+        def Mouse_press_event(self, board_pos, event):
+            if event.button() == Qt.LeftButton:
+                layer = self.controller._Get_strong_selected_layer()
+                if layer == False:
+                    self.controller._Send_label_notify('未选中图层')
+                    return
+                if layer.Get_layer_type_enum() != 'vector_layer':
+                    self.controller._Send_label_notify('该工具只支持对矢量图层操作')
+                    return
+                if layer.Get_hide_flag():
+                    self.controller._Send_label_notify('该图层已隐藏')
+                    return
+                if layer.Get_lock_flag():
+                    self.controller._Send_label_notify('该图层已锁定')
+                    return
+
+                layer_offset    = layer.Get_offset()
+                board_size      = self.controller._Get_board_size()
+                board_pos       = (max(0, min(board_pos[0], board_size[0])),
+                                   max(0, min(board_pos[1], board_size[1])))
+                layer_pos       = (board_pos[0] - layer_offset[0], board_pos[1] - layer_offset[1])
+                self.first_pos  = layer_pos
+                self.second_pos = None
+
+        def Mouse_move_event(self, board_pos, event):
+            if event.buttons() == Qt.LeftButton:
+                if self.first_pos is not None:
+                    layer           = self.controller._Get_strong_selected_layer()
+
+                    layer_offset    = layer.Get_offset()
+                    board_size      = self.controller._Get_board_size()
+                    board_pos       = (max(0, min(board_pos[0], board_size[0])),
+                                       max(0, min(board_pos[1], board_size[1])))
+                    layer_pos       = (board_pos[0] - layer_offset[0], board_pos[1] - layer_offset[1])
+                    self.second_pos = layer_pos
+                    self.Draw_prompt()
+
+        def Mouse_release_event(self, board_pos, event):
+            if event.button() == Qt.LeftButton:
+                self.Formaliz_prompt_command()
+
+                self.first_pos  = None
+                self.second_pos = None
+
+    class Square_Tool(Two_Point_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
 
             self.x_radius   = 0
             self.y_radius   = 0
@@ -2258,151 +2491,248 @@ class Tool_Controller:
             self.y_radius = value
 
 
-        def Draw_prompt(self):
+        def Fill_command_date(self, command):
+            command.command_enum = 'rect'
+
+            length = min(abs(self.second_pos[0] - self.first_pos[0]), abs(self.second_pos[1] - self.first_pos[1]))
+            command.x      = self.first_pos[0] if self.first_pos[0] < self.second_pos[0] else self.first_pos[0] - length
+            command.y      = self.first_pos[1] if self.first_pos[1] < self.second_pos[1] else self.first_pos[1] - length
+            command.width  = length
+            command.height = length
+
+            command.x_radius = length * self.x_radius / 100 / 2
+            command.y_radius = length * self.y_radius / 100 / 2
+
+            return command
+
+    class Rect_Tool(Two_Point_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.x_radius   = 0
+            self.y_radius   = 0
+
+        def Set_x_radius(self, value):
+            self.x_radius = value
+
+        def Set_y_radius(self, value):
+            self.y_radius = value
+
+
+        def Fill_command_date(self, command):
+            command.command_enum = 'rect'
+
+            width          = abs(self.second_pos[0] - self.first_pos[0])
+            height         = abs(self.second_pos[1] - self.first_pos[1])
+            command.x      = self.first_pos[0] if self.first_pos[0] < self.second_pos[0] else self.first_pos[0] - width
+            command.y      = self.first_pos[1] if self.first_pos[1] < self.second_pos[1] else self.first_pos[1] - height
+            command.width  = width
+            command.height = height
+
+            command.x_radius = width *  self.x_radius / 100 / 2
+            command.y_radius = height * self.y_radius / 100 / 2
+
+            return command
+
+    class Circle_Tool(Two_Point_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+        def Fill_command_date(self, command):
+            command.command_enum = 'circle'
+
+            radius         = min(abs(self.second_pos[0] - self.first_pos[0]), abs(self.second_pos[1] - self.first_pos[1])) / 2
+            command.x      = self.first_pos[0] + radius
+            command.y      = self.first_pos[1] + radius
+            command.radius = radius
+
+            return command
+
+    class Ellipse_Tool(Two_Point_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+        def Fill_command_date(self, command):
+            command.command_enum = 'ellipse'
+
+            x_radius         = abs(self.second_pos[0] - self.first_pos[0]) / 2
+            y_radius         = abs(self.second_pos[1] - self.first_pos[1]) / 2
+            command.x      = self.first_pos[0] + x_radius
+            command.y      = self.first_pos[1] + y_radius
+            command.x_radius = x_radius
+            command.y_radius = y_radius
+
+            return command
+
+    class Line_Tool(Two_Point_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.fill_color = None
+
+        def Fill_command_date(self, command):
+            command.command_enum = 'line'
+
+            command.first_pos  = self.first_pos
+            command.second_pos = self.second_pos
+
+            return command
+
+
+    class Points_Vector_Tool_Interface(Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
+            self.pos_list       = []
+            self.painting_layer = None
+
+        def Genrate_command(self, key_enter_flag):
             layer = self.controller._Get_strong_selected_layer()
-            if layer == False:
-                self.controller._Send_label_notify('未选中图层')
-                return
-            if layer.Get_layer_type_enum() != 'vector_layer':
-                self.controller._Send_label_notify('该工具只支持对矢量图层操作')
-                return
-            if layer.Get_hide_flag():
-                self.controller._Send_label_notify('该图层已隐藏')
-                return
-            if layer.Get_lock_flag():
-                self.controller._Send_label_notify('该图层已锁定')
-                return
-            layer_offset = layer.Get_offset()
 
             self.controller._Set_image_edited()
 
-            square_command = Board_Layer_Controller.Vector_Layer_Command_Struct()
-            square_command.command_enum = 'rect'
+            command = Board_Layer_Controller.Vector_Layer_Command_Struct()
+            command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
+            command.outline_width = self.outline_width
+            command.fill_color    = QColor(self.fill_color)    if self.fill_color    is not None else None
 
-            square_command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
-            square_command.outline_width = self.outline_width
-            square_command.fill_color    = QColor(self.fill_color) if self.fill_color is not None else None
+            command = self.Fill_command_date(command, key_enter_flag)
 
-            length = min(abs(self.second_pos[0] - self.first_pos[0]), abs(self.second_pos[1] - self.first_pos[1]))
-            square_command.x      = (self.first_pos[0] if self.first_pos[0] < self.second_pos[0] else self.first_pos[0] - length) - layer_offset[0]
-            square_command.y      = (self.first_pos[1] if self.first_pos[1] < self.second_pos[1] else self.first_pos[1] - length) - layer_offset[1]
-            square_command.width  = length
-            square_command.height = length
-
-            square_command.x_radius = self.x_radius
-            square_command.y_radius = self.y_radius
-
-            layer.Set_prompt_command(square_command)
+            layer.Set_prompt_command(command)
+            if key_enter_flag:
+                layer.Formaliz_prompt_command()
+                self.controller._Add_backup()
             self.controller._Draw_painting()
+
+        def Fill_command_date(self, command):
+            #victual function
+            pass
 
 
         def Constructor(self):
-            self.first_pos  = None
-            self.second_pos = None
+            self.pos_list       = []
+            self.painting_layer = None
 
         def Destructor(self):
-            self.first_pos  = None
-            self.second_pos = None
+            if self.painting_layer is not None:
+                self.painting_layer.Formaliz_prompt_command()
+            self.controller._Draw_painting()
+
+            self.pos_list       = []
+            self.painting_layer = None
 
         def Mouse_press_event(self, board_pos, event):
             if event.button() == Qt.LeftButton:
-                board_size = self.controller._Get_board_size()
-                board_pos  = (max(0, min(board_pos[0], board_size[0])),
-                              max(0, min(board_pos[1], board_size[1])))
-                self.first_pos  = board_pos
-                self.second_pos = None
+                layer = self.controller._Get_strong_selected_layer()
+                if layer == False:
+                    self.controller._Send_label_notify('未选中图层')
+                    return
+                if layer.Get_layer_type_enum() != 'vector_layer':
+                    self.controller._Send_label_notify('该工具只支持对矢量图层操作')
+                    return
+                if layer.Get_hide_flag():
+                    self.controller._Send_label_notify('该图层已隐藏')
+                    return
+                if layer.Get_lock_flag():
+                    self.controller._Send_label_notify('该图层已锁定')
+                    return
+
+                if self.painting_layer is not None and self.painting_layer is not layer:
+                    self.painting_layer.Set_prompt_command(None)
+                    self.controller._Draw_painting()
+                    self.painting_layer = layer
+                else:
+                    self.painting_layer = layer
+
+
+                layer_offset    = layer.Get_offset()
+                board_size      = self.controller._Get_board_size()
+                board_pos       = (max(0, min(board_pos[0], board_size[0])),
+                                   max(0, min(board_pos[1], board_size[1])))
+                layer_pos       = (board_pos[0] - layer_offset[0], board_pos[1] - layer_offset[1])
+                self.pos_list.append(layer_pos)
+                self.Genrate_command(key_enter_flag = False)
+
+            elif event.button() == Qt.RightButton:
+                layer = self.controller._Get_strong_selected_layer()
+                if layer == False:
+                    self.controller._Send_label_notify('未选中图层')
+                    return
+                if layer.Get_layer_type_enum() != 'vector_layer':
+                    self.controller._Send_label_notify('该工具只支持对矢量图层操作')
+                    return
+                if layer.Get_hide_flag():
+                    self.controller._Send_label_notify('该图层已隐藏')
+                    return
+                if layer.Get_lock_flag():
+                    self.controller._Send_label_notify('该图层已锁定')
+                    return
+
+                if self.painting_layer is not None and self.painting_layer is not layer:
+                    self.painting_layer.Set_prompt_command(None)
+                    self.controller._Draw_painting()
+                    self.painting_layer = layer
+                else:
+                    self.painting_layer = layer
+
+                if len(self.pos_list) > 1:
+                    self.pos_list.pop()
+                    self.Genrate_command(key_enter_flag = False)
 
         def Mouse_move_event(self, board_pos, event):
-            if event.buttons() == Qt.LeftButton:
-                board_size = self.controller._Get_board_size()
-                board_pos  = (max(0, min(board_pos[0], board_size[0])),
-                              max(0, min(board_pos[1], board_size[1])))
-                self.second_pos = board_pos
-                self.Draw_prompt()
+            pass
 
         def Mouse_release_event(self, board_pos, event):
-            if event.button() == Qt.LeftButton:
-                self.Formaliz_prompt_command()
+            pass
 
-                self.first_pos  = None
-                self.second_pos = None
+        def Key_event(self, event):
+            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+                self.Genrate_command(key_enter_flag = True)
+                self.pos_list       = []
+                self.painting_layer = None
 
-    class Path_Tool(Vector_Tool_Interface):
+    class Polygon_Tool(Points_Vector_Tool_Interface):
         def __init__(self, controller):
             super().__init__(controller)
+
+        def Fill_command_date(self, command, key_enter_flag):
+            command.command_enum = 'polygon'
+            command.pos_list     = copy.copy(self.pos_list)
+
+            return command
+
+    class Polyline_Tool(Points_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
+
             self.fill_color = None
 
-            self.pos_list   = []
+        def Fill_command_date(self, command, key_enter_flag):
+            command.command_enum = 'polyline'
+            command.pos_list     = copy.copy(self.pos_list)
 
+            return command
 
-        def Draw_prompt(self):
-            layer = self.controller._Get_strong_selected_layer()
-            if layer == False:
-                self.controller._Send_label_notify('未选中图层')
-                return
-            if layer.Get_layer_type_enum() != 'vector_layer':
-                self.controller._Send_label_notify('该工具只支持对矢量图层操作')
-                return
-            if layer.Get_hide_flag():
-                self.controller._Send_label_notify('该图层已隐藏')
-                return
-            if layer.Get_lock_flag():
-                self.controller._Send_label_notify('该图层已锁定')
-                return
-            layer_offset = layer.Get_offset()
+    class Path_Tool(Points_Vector_Tool_Interface):
+        def __init__(self, controller):
+            super().__init__(controller)
 
-            self.controller._Set_image_edited()
+            self.fill_color = None
 
-            path_command = Board_Layer_Controller.Vector_Layer_Command_Struct()
-            path_command.command_enum = 'path_with_dot'
+        def Fill_command_date(self, command, key_enter_flag):
+            if key_enter_flag == False:
+                command.command_enum      = 'path_with_dot'
+                command.point_list        = copy.copy(self.pos_list)
+                command.path_command_list = self.Parse_path()
+                return command
+            else:
+                command.command_enum      = 'path'
+                command.path_command_list = self.Parse_path()
+                return command
 
-            path_command.outline_color     = QColor(self.outline_color) if self.outline_color is not None else None
-            path_command.outline_width     = self.outline_width
-            path_command.fill_color        = None
+            return command
 
-            path_command.point_list        = copy.copy(self.pos_list)
-            path_command.path_command_list = self.Parse_path(layer_offset)
-
-            layer.Set_prompt_command(path_command)
-            self.controller._Draw_painting()
-
-        def Formaliz_prompt_command(self):
-            if len(self.pos_list) == 0:
-                return
-
-            layer = self.controller._Get_strong_selected_layer()
-            if layer == False:
-                self.controller._Send_label_notify('未选中图层')
-                return
-            if layer.Get_layer_type_enum() != 'vector_layer':
-                self.controller._Send_label_notify('该工具只支持对矢量图层操作')
-                return
-            if layer.Get_hide_flag():
-                self.controller._Send_label_notify('该图层已隐藏')
-                return
-            if layer.Get_lock_flag():
-                self.controller._Send_label_notify('该图层已锁定')
-                return
-            layer_offset = layer.Get_offset()
-
-            self.controller._Set_image_edited()
-
-            path_command = Board_Layer_Controller.Vector_Layer_Command_Struct()
-            path_command.command_enum = 'path'
-
-            path_command.outline_color     = QColor(self.outline_color) if self.outline_color is not None else None
-            path_command.outline_width     = self.outline_width
-            path_command.fill_color        = None
-
-            path_command.path_command_list = self.Parse_path(layer_offset)
-
-            layer.Set_prompt_command(path_command)
-            layer.Formaliz_prompt_command()
-            layer.Set_preview_label()
-            self.controller._Draw_painting()
-
-
-        def Parse_path(self, layer_offset):
+        def Parse_path(self):
             class Path_Command_Struct:
                 pass
 
@@ -2452,41 +2782,6 @@ class Tool_Controller:
                     path_command_list.append(copy.copy(new_command))
 
                 return path_command_list
-
-
-        def Constructor(self):
-            self.pos_list   = []
-
-        def Destructor(self):
-            self.pos_list   = []
-
-            layer = self.controller._Get_strong_selected_layer()
-            if layer != False and layer.Get_layer_type_enum() == 'vector_layer':
-                layer.Set_prompt_command(None)
-                self.controller._Draw_painting()
-
-        def Mouse_press_event(self, board_pos, event):
-            if event.button() == Qt.LeftButton:
-                board_size = self.controller._Get_board_size()
-                board_pos  = (max(0, min(board_pos[0], board_size[0])),
-                              max(0, min(board_pos[1], board_size[1])))
-                self.pos_list.append(board_pos)
-                self.Draw_prompt()
-            elif event.button() == Qt.RightButton:
-                if len(self.pos_list) > 1:
-                    self.pos_list.pop()
-                    self.Draw_prompt()
-
-        def Mouse_move_event(self, board_pos, event):
-            pass
-
-        def Mouse_release_event(self, board_pos, event):
-            pass
-
-        def Key_event(self, event):
-            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
-                self.Formaliz_prompt_command()
-                self.pos_list = []
 
 
     class Rect_Selection_Tool(Tool_Interface):
@@ -2578,24 +2873,30 @@ class Tool_Controller:
 
         self.current_tool = None
 
-        self.pencil_tool         = Tool_Controller.Pencil_Tool(self)
-        self.eraser_tool         = Tool_Controller.Eraser_Tool(self)
-        self.paintbrush_tool     = Tool_Controller.Paintbrush_Tool(self)
-        self.fill_tool           = Tool_Controller.Fill_Tool(self)
+        self.pencil_tool           = Tool_Controller.Pencil_Tool(self)
+        self.eraser_tool           = Tool_Controller.Eraser_Tool(self)
+        self.paintbrush_tool       = Tool_Controller.Paintbrush_Tool(self)
+        self.fill_tool             = Tool_Controller.Fill_Tool(self)
 
-        self.square_tool         = Tool_Controller.Square_Tool(self)
-        self.path_tool           = Tool_Controller.Path_Tool(self)
+        self.square_tool           = Tool_Controller.Square_Tool(self)
+        self.rect_tool             = Tool_Controller.Rect_Tool(self)
+        self.circle_tool           = Tool_Controller.Circle_Tool(self)
+        self.ellipse_tool          = Tool_Controller.Ellipse_Tool(self)
+        self.line_tool             = Tool_Controller.Line_Tool(self)
+        self.polygon_tool          = Tool_Controller.Polygon_Tool(self)
+        self.polyline_tool         = Tool_Controller.Polyline_Tool(self)
+        self.path_tool             = Tool_Controller.Path_Tool(self)
 
-        self.color_picker_tool   = Tool_Controller.Color_Picker_Tool(self)
-        self.rect_selection_tool = Tool_Controller.Rect_Selection_Tool(self)
+        self.color_picker_tool     = Tool_Controller.Color_Picker_Tool(self)
+        self.rect_selection_tool   = Tool_Controller.Rect_Selection_Tool(self)
 
-        self.board_pos_only_list = [self.pencil_tool, self.eraser_tool, self.paintbrush_tool, self.fill_tool,
-                                    self.square_tool, self.path_tool,
-                                    self.color_picker_tool, self.rect_selection_tool]
-        self.label_pos_only_list = []
-        self.both_pos_list       = []
+        self.board_pos_only_list   = [self.pencil_tool, self.eraser_tool, self.paintbrush_tool, self.fill_tool,
+                                      self.square_tool, self.rect_tool, self.circle_tool, self.ellipse_tool, self.line_tool, self.polygon_tool, self.polyline_tool, self.path_tool,
+                                      self.color_picker_tool, self.rect_selection_tool]
+        self.label_pos_only_list   = []
+        self.both_pos_list         = []
 
-        self.accept_key_event_list = [self.path_tool]
+        self.accept_key_event_list = [self.polygon_tool, self.polyline_tool, self.path_tool]
 
     def init(self):
         self.current_tool = self.pencil_tool
@@ -2657,6 +2958,36 @@ class Tool_Controller:
         self.current_tool = self.square_tool
         self.current_tool.Constructor()
 
+    def Select_rect_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.rect_tool
+        self.current_tool.Constructor()
+
+    def Select_circle_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.circle_tool
+        self.current_tool.Constructor()
+
+    def Select_ellipse_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.ellipse_tool
+        self.current_tool.Constructor()
+
+    def Select_line_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.line_tool
+        self.current_tool.Constructor()
+
+    def Select_polygon_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.polygon_tool
+        self.current_tool.Constructor()
+
+    def Select_polyline_tool(self):
+        self.current_tool.Destructor()
+        self.current_tool = self.polyline_tool
+        self.current_tool.Constructor()
+
     def Select_path_tool(self):
         self.current_tool.Destructor()
         self.current_tool = self.path_tool
@@ -2693,6 +3024,7 @@ class Tool_Controller:
         self.fill_tool.Set_fill_type_enum(fill_type_enum)
 
 
+
     def _Set_square_tool_outline_color(self, color):
         self.square_tool.Set_outline_color(color)
 
@@ -2707,6 +3039,74 @@ class Tool_Controller:
 
     def _Set_square_y_radius(self, value):
         self.square_tool.Set_y_radius(value)
+
+
+    def _Set_rect_tool_outline_color(self, color):
+        self.rect_tool.Set_outline_color(color)
+
+    def _Set_rect_tool_outline_width(self, value):
+        self.rect_tool.Set_outline_width(value)
+
+    def _Set_rect_tool_fill_color(self, color):
+        self.rect_tool.Set_fill_color(color)
+
+    def _Set_rect_x_radius(self, value):
+        self.rect_tool.Set_x_radius(value)
+
+    def _Set_rect_y_radius(self, value):
+        self.rect_tool.Set_y_radius(value)
+
+
+    def _Set_circle_tool_outline_color(self, color):
+        self.circle_tool.Set_outline_color(color)
+
+    def _Set_circle_tool_outline_width(self, value):
+        self.circle_tool.Set_outline_width(value)
+
+    def _Set_circle_tool_fill_color(self, color):
+        self.circle_tool.Set_fill_color(color)
+
+
+    def _Set_ellipse_tool_outline_color(self, color):
+        self.ellipse_tool.Set_outline_color(color)
+
+    def _Set_ellipse_tool_outline_width(self, value):
+        self.ellipse_tool.Set_outline_width(value)
+
+    def _Set_ellipse_tool_fill_color(self, color):
+        self.ellipse_tool.Set_fill_color(color)
+
+
+    def _Set_line_tool_outline_color(self, color):
+        self.line_tool.Set_outline_color(color)
+
+    def _Set_line_tool_outline_width(self, value):
+        self.line_tool.Set_outline_width(value)
+
+
+    def _Set_polygon_tool_outline_color(self, color):
+        self.polygon_tool.Set_outline_color(color)
+
+    def _Set_polygon_tool_outline_width(self, value):
+        self.polygon_tool.Set_outline_width(value)
+
+    def _Set_polygon_tool_fill_color(self, color):
+        self.polygon_tool.Set_fill_color(color)
+
+
+    def _Set_polyline_tool_outline_color(self, color):
+        self.polyline_tool.Set_outline_color(color)
+
+    def _Set_polyline_tool_outline_width(self, value):
+        self.polyline_tool.Set_outline_width(value)
+
+
+    def _Set_path_tool_outline_color(self, color):
+        self.path_tool.Set_outline_color(color)
+
+    def _Set_path_tool_outline_width(self, value):
+        self.path_tool.Set_outline_width(value)
+
 
 
     def _Draw_painting(self):
@@ -3315,99 +3715,6 @@ class File_Project_Controller:
         painting.save(saning_path)
 
 
-class Menu_Tab_Distributor:
-
-    def __init__(self, main_window):
-        self.main_window = main_window
-
-    def init(self):
-        pass
-
-
-    def On_new_action_triggered(self):
-        pass
-
-    def On_open_action_triggered(self):
-        self.file_project_controller.Open_project()
-
-    def On_save_as_action_triggered(self):
-        self.file_project_controller.Save_as_project(None)
-
-    def On_export_action_triggered(self):
-        self.file_project_controller.Export_project()
-
-
-    def On_revoke_action_triggered(self):
-        self.backup_controller.Revoke_backup()
-
-    def On_redo_action_triggered(self):
-        self.backup_controller.Redo_backup()
-
-
-    def On_new_bit_layer_action_triggered(self):
-        self.board_layer_controller.Add_bit_layer()
-
-    def On_new_vector_layer_action_triggered(self):
-        self.board_layer_controller.Add_vector_layer()
-
-
-    def On_cancel_selection_action_triggered(self):
-        self.board_layer_controller.Cancel_selection()
-
-    def On_copy_selection_action_triggered(self):
-        self.board_layer_controller.Copy_selection()
-
-    def On_cut_selection_action_triggered(self):
-        self.board_layer_controller.Cut_selection()
-
-    def On_clear_selection_action_triggered(self):
-        self.board_layer_controller.Clear_selection()
-
-
-    def On_new_frame_action_triggered(self):
-        self.frame_controller.New_frame()
-
-    def On_copy_frame_action_triggered(self):
-        self.frame_controller.Copy_frame()
-
-    def On_next_frame_action_triggered(self):
-        self.frame_controller.Next_frame()
-
-    def On_previous_frame_action_triggered(self):
-        self.frame_controller.Previous_frame()
-
-
-    def On_normal_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(240, 240, 240))
-
-    def On_miku_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(57, 197, 187))
-
-    def On_bili_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(249, 131, 151))
-
-    def On_red_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(243, 67, 52))
-
-    def On_yellow_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(253, 192, 5))
-
-    def On_green_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(138, 193, 74))
-
-    def On_blue_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(31, 148, 243))
-
-    def On_purple_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(154, 38, 175))
-
-    def On_white_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(255, 255, 255))
-
-    def On_black_color_action_triggered(self):
-        self.style_manage_controller.Set_base_color(QColor(0, 0, 0))
-
-
 class Event_And_Singal_Distributor:
 
     def __init__(self, main_window):
@@ -3416,6 +3723,7 @@ class Event_And_Singal_Distributor:
     def init(self):
         self.main_window.keyPressEvent                 = self.main_window.Main_window_key_press_event
         self.main_window.keyReleaseEvent               = self.main_window.Main_window_key_release_event
+
 
 
         self.main_window.Board_Label.wheelEvent        = self.board_layer_view.Wheel_Event
@@ -3428,9 +3736,11 @@ class Event_And_Singal_Distributor:
         self.main_window.Board_V_ScrollBar.valueChanged.connect(self.board_layer_view.On_Board_v_scrollbar_value_changed)
 
 
+
         self.main_window.Layer_Name_LineEdit.textChanged.    connect(self.board_layer_view.On_layer_name_lineedit_text_changed)
         self.main_window.Mix_Mod_ComboBox.currentTextChanged.connect(self.board_layer_view.On_mix_mod_combobox_text_changed)
         self.main_window.Opacity_Slider.value_change_single. connect(self.board_layer_view.On_opacity_slider_value_change)
+
 
 
         self.main_window.Pencil_Tool_Button.clicked.        connect(self.tool_view.On_pencil_tool_button_clicked)
@@ -3439,6 +3749,12 @@ class Event_And_Singal_Distributor:
         self.main_window.Fill_Tool_Button.clicked.          connect(self.tool_view.On_fill_tool_button_clicked)
 
         self.main_window.Square_Tool_Button.clicked.        connect(self.tool_view.On_square_tool_button_clicked)
+        self.main_window.Rect_Tool_Button.clicked.          connect(self.tool_view.On_rect_tool_button_clicked)
+        self.main_window.Circle_Tool_Button.clicked.        connect(self.tool_view.On_circle_tool_button_clicked)
+        self.main_window.Ellipse_Tool_Button.clicked.       connect(self.tool_view.On_ellipse_tool_button_clicked)
+        self.main_window.Line_Tool_Button.clicked.          connect(self.tool_view.On_line_tool_button_clicked)
+        self.main_window.Polygon_Tool_Button.clicked.       connect(self.tool_view.On_polygon_tool_button_clicked)
+        self.main_window.Polyline_Tool_Button.clicked.      connect(self.tool_view.On_polyline_tool_button_clicked)
         self.main_window.Path_Tool_Button.clicked.          connect(self.tool_view.On_path_tool_button_clicked)
 
         self.main_window.Color_Picker_Tool_Button.clicked.  connect(self.tool_view.On_color_picker_tool_button_clicked)
@@ -3458,17 +3774,58 @@ class Event_And_Singal_Distributor:
         self.main_window.Filling_Radio_Button.clicked.               connect(self.tool_view.On_filling_radio_button_clicked)
 
 
-        self.main_window.Square_Outline_Color_None_Radio_Button.clicked.          connect(self.tool_view.On_square_outline_color_none_radio_button_clicked)
-        self.main_window.Square_Outline_Color_Radio_Button.clicked.               connect(self.tool_view.On_square_outline_color_radio_button_clicked)
-        self.main_window.Square_Outline_Color_Indicator_Label.update_color_singal.connect(self.tool_view.On_square_outline_color_indicator_label_update_color)
-        self.main_window.Square_Outline_Width_Slider.value_change_single.         connect(self.tool_view.On_square_outline_width_slider_value_changed)
-        self.main_window.Square_Fill_Color_None_Radio_Button.clicked.             connect(self.tool_view.On_square_fill_color_none_radio_button_clicked)
-        self.main_window.Square_Fill_Color_Radio_Button.clicked.                  connect(self.tool_view.On_square_fill_color_radio_button_clicked)
-        self.main_window.Square_Fill_Color_Indicator_Label.update_color_singal.   connect(self.tool_view.On_square_fill_color_indicator_label_update_color)
-        self.main_window.Square_X_Radius_Slider_LineEdit.textChanged.             connect(self.tool_view.On_square_x_radius_slider_lineEdit_text_changed)
-        self.main_window.Square_Y_Radius_Slider_LineEdit.textChanged.             connect(self.tool_view.On_square_y_radius_slider_lineEdit_text_changed)
-        self.main_window.Square_X_Radius_Slider.value_change_single.              connect(self.tool_view.On_square_x_radius_slider_value_changed)
-        self.main_window.Square_Y_Radius_Slider.value_change_single.              connect(self.tool_view.On_square_y_radius_slider_value_changed)
+        self.main_window.Square_Outline_Color_None_Radio_Button.clicked.            connect(self.tool_view.On_square_outline_color_none_radio_button_clicked)
+        self.main_window.Square_Outline_Color_Radio_Button.clicked.                 connect(self.tool_view.On_square_outline_color_radio_button_clicked)
+        self.main_window.Square_Outline_Color_Indicator_Label.update_color_singal.  connect(self.tool_view.On_square_outline_color_indicator_label_update_color)
+        self.main_window.Square_Outline_Width_Slider.value_change_single.           connect(self.tool_view.On_square_outline_width_slider_value_changed)
+        self.main_window.Square_Fill_Color_None_Radio_Button.clicked.               connect(self.tool_view.On_square_fill_color_none_radio_button_clicked)
+        self.main_window.Square_Fill_Color_Radio_Button.clicked.                    connect(self.tool_view.On_square_fill_color_radio_button_clicked)
+        self.main_window.Square_Fill_Color_Indicator_Label.update_color_singal.     connect(self.tool_view.On_square_fill_color_indicator_label_update_color)
+        self.main_window.Square_X_Radius_Slider.value_change_single.                connect(self.tool_view.On_square_x_radius_slider_value_changed)
+        self.main_window.Square_Y_Radius_Slider.value_change_single.                connect(self.tool_view.On_square_y_radius_slider_value_changed)
+
+        self.main_window.Rect_Outline_Color_None_Radio_Button.clicked.              connect(self.tool_view.On_rect_outline_color_none_radio_button_clicked)
+        self.main_window.Rect_Outline_Color_Radio_Button.clicked.                   connect(self.tool_view.On_rect_outline_color_radio_button_clicked)
+        self.main_window.Rect_Outline_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_rect_outline_color_indicator_label_update_color)
+        self.main_window.Rect_Outline_Width_Slider.value_change_single.             connect(self.tool_view.On_rect_outline_width_slider_value_changed)
+        self.main_window.Rect_Fill_Color_None_Radio_Button.clicked.                 connect(self.tool_view.On_rect_fill_color_none_radio_button_clicked)
+        self.main_window.Rect_Fill_Color_Radio_Button.clicked.                      connect(self.tool_view.On_rect_fill_color_radio_button_clicked)
+        self.main_window.Rect_Fill_Color_Indicator_Label.update_color_singal.       connect(self.tool_view.On_rect_fill_color_indicator_label_update_color)
+        self.main_window.Rect_X_Radius_Slider.value_change_single.                  connect(self.tool_view.On_rect_x_radius_slider_value_changed)
+        self.main_window.Rect_Y_Radius_Slider.value_change_single.                  connect(self.tool_view.On_rect_y_radius_slider_value_changed)
+
+        self.main_window.Circle_Outline_Color_None_Radio_Button.clicked.            connect(self.tool_view.On_circle_outline_color_none_radio_button_clicked)
+        self.main_window.Circle_Outline_Color_Radio_Button.clicked.                 connect(self.tool_view.On_circle_outline_color_radio_button_clicked)
+        self.main_window.Circle_Outline_Color_Indicator_Label.update_color_singal.  connect(self.tool_view.On_circle_outline_color_indicator_label_update_color)
+        self.main_window.Circle_Outline_Width_Slider.value_change_single.           connect(self.tool_view.On_circle_outline_width_slider_value_changed)
+        self.main_window.Circle_Fill_Color_None_Radio_Button.clicked.               connect(self.tool_view.On_circle_fill_color_none_radio_button_clicked)
+        self.main_window.Circle_Fill_Color_Radio_Button.clicked.                    connect(self.tool_view.On_circle_fill_color_radio_button_clicked)
+        self.main_window.Circle_Fill_Color_Indicator_Label.update_color_singal.     connect(self.tool_view.On_circle_fill_color_indicator_label_update_color)
+
+        self.main_window.Ellipse_Outline_Color_None_Radio_Button.clicked.           connect(self.tool_view.On_ellipse_outline_color_none_radio_button_clicked)
+        self.main_window.Ellipse_Outline_Color_Radio_Button.clicked.                connect(self.tool_view.On_ellipse_outline_color_radio_button_clicked)
+        self.main_window.Ellipse_Outline_Color_Indicator_Label.update_color_singal. connect(self.tool_view.On_ellipse_outline_color_indicator_label_update_color)
+        self.main_window.Ellipse_Outline_Width_Slider.value_change_single.          connect(self.tool_view.On_ellipse_outline_width_slider_value_changed)
+        self.main_window.Ellipse_Fill_Color_None_Radio_Button.clicked.              connect(self.tool_view.On_ellipse_fill_color_none_radio_button_clicked)
+        self.main_window.Ellipse_Fill_Color_Radio_Button.clicked.                   connect(self.tool_view.On_ellipse_fill_color_radio_button_clicked)
+        self.main_window.Ellipse_Fill_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_ellipse_fill_color_indicator_label_update_color)
+
+        self.main_window.Line_Outline_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_line_outline_color_indicator_label_update_color)
+        self.main_window.Line_Outline_Width_Slider.value_change_single.             connect(self.tool_view.On_line_outline_width_slider_value_changed)
+
+        self.main_window.Polygon_Outline_Color_None_Radio_Button.clicked.           connect(self.tool_view.On_polygon_outline_color_none_radio_button_clicked)
+        self.main_window.Polygon_Outline_Color_Radio_Button.clicked.                connect(self.tool_view.On_polygon_outline_color_radio_button_clicked)
+        self.main_window.Polygon_Outline_Color_Indicator_Label.update_color_singal. connect(self.tool_view.On_polygon_outline_color_indicator_label_update_color)
+        self.main_window.Polygon_Outline_Width_Slider.value_change_single.          connect(self.tool_view.On_polygon_outline_width_slider_value_changed)
+        self.main_window.Polygon_Fill_Color_None_Radio_Button.clicked.              connect(self.tool_view.On_polygon_fill_color_none_radio_button_clicked)
+        self.main_window.Polygon_Fill_Color_Radio_Button.clicked.                   connect(self.tool_view.On_polygon_fill_color_radio_button_clicked)
+        self.main_window.Polygon_Fill_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_polygon_fill_color_indicator_label_update_color)
+
+        self.main_window.Polyline_Outline_Color_Indicator_Label.update_color_singal.connect(self.tool_view.On_polyline_outline_color_indicator_label_update_color)
+        self.main_window.Polyline_Outline_Width_Slider.value_change_single.        connect(self.tool_view.On_polyline_outline_width_slider_value_changed)
+
+        self.main_window.Path_Outline_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_path_outline_color_indicator_label_update_color)
+        self.main_window.Path_Outline_Width_Slider.value_change_single.             connect(self.tool_view.On_path_outline_width_slider_value_changed)
 
 
         self.main_window.Copy_Selection_Button.clicked.  connect(self.tool_view.On_copy_selection_button_clicked)
@@ -3477,37 +3834,37 @@ class Event_And_Singal_Distributor:
         self.main_window.Cancel_Selection_Button.clicked.connect(self.tool_view.On_cancel_selection_button_clicked)
 
 
-        self.main_window.New_Action.triggered.             connect(self.menu_tab_distributor.On_new_action_triggered)
-        self.main_window.Open_Action.triggered.            connect(self.menu_tab_distributor.On_open_action_triggered)
-        self.main_window.Save_As_Action.triggered.         connect(self.menu_tab_distributor.On_save_as_action_triggered)
-        self.main_window.Export_Action.triggered.          connect(self.menu_tab_distributor.On_export_action_triggered)
+        # self.main_window.New_Action.triggered.             connect(lambda : )
+        self.main_window.Open_Action.triggered.            connect(lambda : self.file_project_controller.Open_project())
+        self.main_window.Save_As_Action.triggered.         connect(lambda : self.file_project_controller.Save_as_project(path = None))
+        self.main_window.Export_Action.triggered.          connect(lambda : self.file_project_controller.Export_project())
 
-        self.main_window.Revoke_Action.triggered.          connect(self.menu_tab_distributor.On_revoke_action_triggered)
-        self.main_window.Redo_Action.triggered.            connect(self.menu_tab_distributor.On_redo_action_triggered)
+        self.main_window.Revoke_Action.triggered.          connect(lambda : self.backup_controller.Revoke_backup())
+        self.main_window.Redo_Action.triggered.            connect(lambda : self.backup_controller.Redo_backup())
 
-        self.main_window.New_Bit_Layer_Action.triggered.   connect(self.menu_tab_distributor.On_new_bit_layer_action_triggered)
-        self.main_window.New_Vector_Layer_Action.triggered.connect(self.menu_tab_distributor.On_new_vector_layer_action_triggered)
+        self.main_window.New_Bit_Layer_Action.triggered.   connect(lambda : self.board_layer_controller.Add_bit_layer())
+        self.main_window.New_Vector_Layer_Action.triggered.connect(lambda : self.board_layer_controller.Add_vector_layer())
 
-        self.main_window.Cancel_Selection_Action.triggered.connect(self.menu_tab_distributor.On_cancel_selection_action_triggered)
-        self.main_window.Copy_Selection_Action.triggered.  connect(self.menu_tab_distributor.On_copy_selection_action_triggered)
-        self.main_window.Cut_Selection_Action.triggered.   connect(self.menu_tab_distributor.On_cut_selection_action_triggered)
-        self.main_window.Clear_Selection_Action.triggered. connect(self.menu_tab_distributor.On_clear_selection_action_triggered)
+        self.main_window.Cancel_Selection_Action.triggered.connect(lambda : self.board_layer_controller.Cancel_selection())
+        self.main_window.Copy_Selection_Action.triggered.  connect(lambda : self.board_layer_controller.Copy_selection())
+        self.main_window.Cut_Selection_Action.triggered.   connect(lambda : self.board_layer_controller.Cut_selection())
+        self.main_window.Clear_Selection_Action.triggered. connect(lambda : self.board_layer_controller.Clear_selection())
 
-        self.main_window.New_Frame_Action.triggered.       connect(self.menu_tab_distributor.On_new_frame_action_triggered)
-        self.main_window.Copy_Frame_Action.triggered.      connect(self.menu_tab_distributor.On_copy_frame_action_triggered)
-        self.main_window.Next_Frame_Action.triggered.      connect(self.menu_tab_distributor.On_next_frame_action_triggered)
-        self.main_window.Previous_Frame_Action.triggered.  connect(self.menu_tab_distributor.On_previous_frame_action_triggered)
+        self.main_window.New_Frame_Action.triggered.       connect(lambda : self.frame_controller.New_frame())
+        self.main_window.Copy_Frame_Action.triggered.      connect(lambda : self.frame_controller.Copy_frame())
+        self.main_window.Next_Frame_Action.triggered.      connect(lambda : self.frame_controller.Next_frame())
+        self.main_window.Previous_Frame_Action.triggered.  connect(lambda : self.frame_controller.Previous_frame())
 
-        self.main_window.Normal_Color_Action.triggered.    connect(self.menu_tab_distributor.On_normal_color_action_triggered)
-        self.main_window.Miku_Color_Action.triggered.      connect(self.menu_tab_distributor.On_miku_color_action_triggered)
-        self.main_window.Bili_Color_Action.triggered.      connect(self.menu_tab_distributor.On_bili_color_action_triggered)
-        self.main_window.Red_Color_Action.triggered.       connect(self.menu_tab_distributor.On_red_color_action_triggered)
-        self.main_window.Yellow_Color_Action.triggered.    connect(self.menu_tab_distributor.On_yellow_color_action_triggered)
-        self.main_window.Green_Color_Action.triggered.     connect(self.menu_tab_distributor.On_green_color_action_triggered)
-        self.main_window.Blue_Color_Action.triggered.      connect(self.menu_tab_distributor.On_blue_color_action_triggered)
-        self.main_window.Purple_Color_Action.triggered.    connect(self.menu_tab_distributor.On_purple_color_action_triggered)
-        self.main_window.White_Color_Action.triggered.     connect(self.menu_tab_distributor.On_white_color_action_triggered)
-        self.main_window.Black_Color_Action.triggered.     connect(self.menu_tab_distributor.On_black_color_action_triggered)
+        self.main_window.Normal_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(240, 240, 240)))
+        self.main_window.Miku_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(57,  197, 187)))
+        self.main_window.Bili_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(249, 131, 151)))
+        self.main_window.Red_Color_Action.triggered.       connect(lambda : self.style_manage_controller.Set_base_color(QColor(243, 67,  52)))
+        self.main_window.Yellow_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(253, 192, 5)))
+        self.main_window.Green_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(138, 193, 74)))
+        self.main_window.Blue_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(31,  148, 243)))
+        self.main_window.Purple_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(154, 38,  175)))
+        self.main_window.White_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(255, 255, 255)))
+        self.main_window.Black_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(0,   0,   0)))
 
 
 class Main_Window(QMainWindow, Ui_Main_Window_UI):
@@ -3532,7 +3889,6 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.backup_controller            = Backup_Controller(self.main_window)
         self.style_manage_controller      = Style_Manage_Controller(self.main_window)
         self.file_project_controller      = File_Project_Controller(self.main_window)
-        self.menu_tab_distributor         = Menu_Tab_Distributor(self.main_window)
         self.event_and_singal_distributor = Event_And_Singal_Distributor(self.main_window)
 
         self.setupUi(self)
@@ -3550,7 +3906,6 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
                             self.backup_controller,
                             self.style_manage_controller,
                             self.file_project_controller,
-                            self.menu_tab_distributor,
                             self.event_and_singal_distributor]
 
         for module in self.module_list:
@@ -3565,13 +3920,12 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
             module.backup_controller            = self.backup_controller
             module.style_manage_controller      = self.style_manage_controller
             module.file_project_controller      = self.file_project_controller
-            module.menu_tab_distributor         = self.menu_tab_distributor
             module.event_and_singal_distributor = self.event_and_singal_distributor
 
         for module in self.module_list:
             module.init()
 
-        self.file_project_controller.New_project((400, 200))
+        self.file_project_controller.New_project((500, 500))
 
     def init(self):
         self.main_window.Board_Label.setFocus()
@@ -3603,20 +3957,45 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
             slider.Set_left_text(left_text)
             slider.Set_right_text(right_text)
 
-        Set_text_in_slider(self.main_window.Opacity_Slider,              0, 100, 100, '',    '100%')
+        Set_text_in_slider(self.main_window.Opacity_Slider,               0, 100, 100, '',    '100%')
 
-        Set_text_in_slider(self.main_window.Pencil_Size_Slider,          1, 100, 10,  '×1', '10')
-        Set_text_in_slider(self.main_window.Eraser_Size_Slider,          1, 100, 10,  '×1', '10')
-        Set_text_in_slider(self.main_window.Paintbrush_Size_Slider,      1, 100, 10,  '×1', '10')
-        Set_text_in_slider(self.main_window.Fill_Tolerance_Slider,       0, 255, 0,   '',    '0')
+        Set_text_in_slider(self.main_window.Pencil_Size_Slider,           1, 100, 10,  '×1', '10')
+        Set_text_in_slider(self.main_window.Eraser_Size_Slider,           1, 100, 10,  '×1', '10')
+        Set_text_in_slider(self.main_window.Paintbrush_Size_Slider,       1, 100, 10,  '×1', '10')
+        Set_text_in_slider(self.main_window.Fill_Tolerance_Slider,        0, 255, 0,   '',    '0')
 
-        Set_text_in_slider(self.main_window.Square_Outline_Width_Slider, 0, 100, 2,   '',    '2')
-        self.main_window.Square_Outline_Color_Indicator_Label.Set_color(QColor(0, 0, 0))
-        self.main_window.Square_Fill_Color_Indicator_Label.   Set_color(QColor(255, 255, 255))
-        self.main_window.Square_X_Radius_Slider_LineEdit.     setText('0')
-        self.main_window.Square_Y_Radius_Slider_LineEdit.     setText('0')
-        Set_text_in_slider(self.main_window.Square_X_Radius_Slider, 0, 100, 0, '', '0')
-        Set_text_in_slider(self.main_window.Square_Y_Radius_Slider, 0, 100, 0, '', '0')
+        Set_text_in_slider(self.main_window.Square_Outline_Width_Slider,  0, 100, 2,   '',    '2')
+        Set_text_in_slider(self.main_window.Square_X_Radius_Slider,       0, 100, 0,   '',    '0%')
+        Set_text_in_slider(self.main_window.Square_Y_Radius_Slider,       0, 100, 0,   '',    '0%')
+        self.main_window.Square_Outline_Color_Indicator_Label.  Set_color(QColor(0, 0, 0))
+        self.main_window.Square_Fill_Color_Indicator_Label.     Set_color(QColor(255, 255, 255))
+
+        Set_text_in_slider(self.main_window.Rect_Outline_Width_Slider,    0, 100, 2,   '',    '2')
+        Set_text_in_slider(self.main_window.Rect_X_Radius_Slider,         0, 100, 0,   '',    '0%')
+        Set_text_in_slider(self.main_window.Rect_Y_Radius_Slider,         0, 100, 0,   '',    '0%')
+        self.main_window.Rect_Outline_Color_Indicator_Label.    Set_color(QColor(0, 0, 0))
+        self.main_window.Rect_Fill_Color_Indicator_Label.       Set_color(QColor(255, 255, 255))
+
+        Set_text_in_slider(self.main_window.Circle_Outline_Width_Slider,   0, 100, 2,   '',    '2')
+        self.main_window.Circle_Outline_Color_Indicator_Label.  Set_color(QColor(0, 0, 0))
+        self.main_window.Circle_Fill_Color_Indicator_Label.     Set_color(QColor(255, 255, 255))
+
+        Set_text_in_slider(self.main_window.Ellipse_Outline_Width_Slider,  0, 100, 2,   '',    '2')
+        self.main_window.Ellipse_Outline_Color_Indicator_Label. Set_color(QColor(0, 0, 0))
+        self.main_window.Ellipse_Fill_Color_Indicator_Label.    Set_color(QColor(255, 255, 255))
+
+        Set_text_in_slider(self.main_window.Line_Outline_Width_Slider,     0, 100, 2,   '',    '2')
+        self.main_window.Line_Outline_Color_Indicator_Label.    Set_color(QColor(0,   0,   0))
+
+        Set_text_in_slider(self.main_window.Polygon_Outline_Width_Slider,  0, 100, 2,   '',    '2')
+        self.main_window.Polygon_Outline_Color_Indicator_Label. Set_color(QColor(0,   0,   0))
+        self.main_window.Polygon_Fill_Color_Indicator_Label.    Set_color(QColor(255, 255, 255))
+
+        Set_text_in_slider(self.main_window.Polyline_Outline_Width_Slider, 0, 100, 2,   '',    '2')
+        self.main_window.Polyline_Outline_Color_Indicator_Label.Set_color(QColor(0,   0,   0))
+
+        Set_text_in_slider(self.main_window.Path_Outline_Width_Slider,     0, 100, 2,   '',    '2')
+        self.main_window.Path_Outline_Color_Indicator_Label.    Set_color(QColor(0,   0,   0))
 
 
         icon_base_image = Image.new('RGB', (42, 42), (0, 0, 0))

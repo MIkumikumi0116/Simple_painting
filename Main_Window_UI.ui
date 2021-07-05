@@ -695,8 +695,8 @@
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <layout class="QGridLayout" name="gridLayout">
-                  <item row="0" column="1">
-                   <widget class="QPushButton" name="Rect_Tool_Button">
+                  <item row="1" column="4">
+                   <widget class="QPushButton" name="Path_Tool_Button">
                     <property name="minimumSize">
                      <size>
                       <width>1</width>
@@ -704,7 +704,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>矩形</string>
+                     <string>路径</string>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -727,7 +727,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="2">
+                  <item row="0" column="3">
                    <widget class="QPushButton" name="Circle_Tool_Button">
                     <property name="minimumSize">
                      <size>
@@ -743,7 +743,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="3">
+                  <item row="0" column="4">
                    <widget class="QPushButton" name="Ellipse_Tool_Button">
                     <property name="minimumSize">
                      <size>
@@ -759,39 +759,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QPushButton" name="Polygon_Tool_Button">
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>多边形</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QPushButton" name="Line_Tool_Button">
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>直线</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
+                  <item row="1" column="3">
                    <widget class="QPushButton" name="Polyline_Tool_Button">
                     <property name="minimumSize">
                      <size>
@@ -807,8 +775,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="3">
-                   <widget class="QPushButton" name="Path_Tool_Button">
+                  <item row="1" column="2">
+                   <widget class="QPushButton" name="Polygon_Tool_Button">
                     <property name="minimumSize">
                      <size>
                       <width>1</width>
@@ -816,7 +784,39 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>路径</string>
+                     <string>多边形</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QPushButton" name="Line_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>直线</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="Rect_Tool_Button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>1</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>矩形</string>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -926,6 +926,19 @@
                   </item>
                  </layout>
                 </item>
+                <item>
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
               <widget class="QWidget" name="Eraser_Tool_Option_Page">
@@ -1011,6 +1024,19 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -1119,6 +1145,19 @@
                   </item>
                  </layout>
                 </item>
+                <item>
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
               <widget class="QWidget" name="Fill_Tool_Option_Page">
@@ -1170,7 +1209,7 @@
                  </layout>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <layout class="QHBoxLayout" name="Fill_Type_Layout">
                   <item>
                    <widget class="QRadioButton" name="Cutout_Radio_Button">
                     <property name="text">
@@ -1189,6 +1228,19 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -1341,7 +1393,7 @@
                  </widget>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="Square_X_Radius_Layout" stretch="1,0,0,0">
+                 <layout class="QHBoxLayout" name="Square_X_Radius_Layout" stretch="1,0,0">
                   <item>
                    <widget class="QLabel" name="Square_X_Radius_Label">
                     <property name="text">
@@ -1361,22 +1413,6 @@
                      </size>
                     </property>
                    </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="Square_X_Radius_Slider_LineEdit">
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>40</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
                   </item>
                   <item>
                    <widget class="Text_In_Slider" name="Square_X_Radius_Slider" native="true">
@@ -1403,7 +1439,7 @@
                  </layout>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="Square_Y_Radius_Layout" stretch="1,0,0,0">
+                 <layout class="QHBoxLayout" name="Square_Y_Radius_Layout" stretch="1,0,0">
                   <item>
                    <widget class="QLabel" name="Square_Y_Radius_Label">
                     <property name="text">
@@ -1423,22 +1459,6 @@
                      </size>
                     </property>
                    </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="Square_Y_Radius_Slider_LineEdit">
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>40</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
                   </item>
                   <item>
                    <widget class="Text_In_Slider" name="Square_Y_Radius_Slider" native="true">
@@ -1464,22 +1484,35 @@
                   </item>
                  </layout>
                 </item>
+                <item>
+                 <spacer name="verticalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="Path_Tool_Option_Page">
-               <layout class="QVBoxLayout" name="verticalLayout_16">
+              <widget class="QWidget" name="Rect_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_10">
                 <item>
-                 <widget class="QWidget" name="Square_Outline_Color_Indicator_Layout_2" native="true">
-                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_3">
+                 <widget class="QWidget" name="Rect_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_2">
                    <item>
-                    <widget class="QLabel" name="Square_Outline_Color_Label_3">
+                    <widget class="QLabel" name="Rect_Outline_Color_Label">
                      <property name="text">
                       <string>描边颜色</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <spacer name="horizontalSpacer_21">
+                    <spacer name="horizontalSpacer_13">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -1492,14 +1525,14 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QRadioButton" name="Square_Outline_Color_None_Radio_Button_3">
+                    <widget class="QRadioButton" name="Rect_Outline_Color_None_Radio_Button">
                      <property name="text">
                       <string>无</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QRadioButton" name="Square_Outline_Color_Radio_Button_3">
+                    <widget class="QRadioButton" name="Rect_Outline_Color_Radio_Button">
                      <property name="text">
                       <string/>
                      </property>
@@ -1509,7 +1542,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="Color_Indicator_Label" name="Square_Outline_Color_Indicator_Label_3">
+                    <widget class="Color_Indicator_Label" name="Rect_Outline_Color_Indicator_Label">
                      <property name="text">
                       <string/>
                      </property>
@@ -1519,16 +1552,16 @@
                  </widget>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="Square_Outline_Width_Layout_3" stretch="1,0,0">
+                 <layout class="QHBoxLayout" name="Rect_Outline_Width_Layout" stretch="1,0,0">
                   <item>
-                   <widget class="QLabel" name="Square_Outline_Width_Label_3">
+                   <widget class="QLabel" name="Rect_Outline_Width_Label">
                     <property name="text">
                      <string>描边宽度</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer_22">
+                   <spacer name="horizontalSpacer_14">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -1541,7 +1574,7 @@
                    </spacer>
                   </item>
                   <item>
-                   <widget class="Text_In_Slider" name="Square_Outline_Width_Slider_3" native="true">
+                   <widget class="Text_In_Slider" name="Rect_Outline_Width_Slider" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>1</horstretch>
@@ -1563,6 +1596,938 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <widget class="QWidget" name="Rect_Fill_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Fill_Color_Layout_2">
+                   <item>
+                    <widget class="QLabel" name="Rect_Fill_Color_Label">
+                     <property name="text">
+                      <string>填充颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_15">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Rect_Fill_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Rect_Fill_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Rect_Fill_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Rect_X_Radius_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Rect_X_Radius_Label">
+                    <property name="text">
+                     <string>水平圆角</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Rect_X_Radius_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Rect_Y_Radius_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Rect_Y_Radius_Label">
+                    <property name="text">
+                     <string>竖直圆角</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_20">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Rect_Y_Radius_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Circle_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_11">
+                <item>
+                 <widget class="QWidget" name="Circle_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_4">
+                   <item>
+                    <widget class="QLabel" name="Circle_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_17">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Circle_Outline_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Circle_Outline_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Circle_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Circle_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Circle_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_16">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Circle_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QWidget" name="Circle_Fill_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Fill_Color_Layout_3">
+                   <item>
+                    <widget class="QLabel" name="Circle_Fill_Color_Label">
+                     <property name="text">
+                      <string>填充颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_18">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Circle_Fill_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Circle_Fill_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Circle_Fill_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Ellipse_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QWidget" name="Ellipse_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_5">
+                   <item>
+                    <widget class="QLabel" name="Ellipse_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_24">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Ellipse_Outline_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Ellipse_Outline_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Ellipse_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Ellipse_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Ellipse_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_25">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Ellipse_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QWidget" name="Ellipse_Fill_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Fill_Color_Layout_4">
+                   <item>
+                    <widget class="QLabel" name="Ellipse_Fill_Color_Label">
+                     <property name="text">
+                      <string>填充颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_23">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Ellipse_Fill_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Ellipse_Fill_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Ellipse_Fill_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_11">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Line_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_13">
+                <item>
+                 <widget class="QWidget" name="Line_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_6">
+                   <item>
+                    <widget class="QLabel" name="Line_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_26">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Line_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Line_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Line_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_27">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Line_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_12">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Polygon_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <widget class="QWidget" name="Polygon_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_7">
+                   <item>
+                    <widget class="QLabel" name="Polygon_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_29">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Polygon_Outline_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Polygon_Outline_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Polygon_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Polygon_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Polygon_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_30">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Polygon_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QWidget" name="Polygon_Fill_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Fill_Color_Layout_5">
+                   <item>
+                    <widget class="QLabel" name="Polygon_Fill_Color_Label">
+                     <property name="text">
+                      <string>填充颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_28">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Polygon_Fill_Color_None_Radio_Button">
+                     <property name="text">
+                      <string>无</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="Polygon_Fill_Color_Radio_Button">
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Polygon_Fill_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_13">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Polyline_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_14">
+                <item>
+                 <widget class="QWidget" name="Polyline_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_8">
+                   <item>
+                    <widget class="QLabel" name="Polyline_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_32">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Polyline_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Polyline_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Polyline_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_33">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Polyline_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_14">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="Path_Tool_Option_Page">
+               <layout class="QVBoxLayout" name="verticalLayout_16">
+                <item>
+                 <widget class="QWidget" name="Path_Outline_Color_Indicator_Layout" native="true">
+                  <layout class="QHBoxLayout" name="Square_Outline_Color_Layout_3">
+                   <item>
+                    <widget class="QLabel" name="Path_Outline_Color_Label">
+                     <property name="text">
+                      <string>描边颜色</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_21">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>228</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="Color_Indicator_Label" name="Path_Outline_Color_Indicator_Label">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="Path_Outline_Width_Layout" stretch="1,0,0">
+                  <item>
+                   <widget class="QLabel" name="Path_Outline_Width_Label">
+                    <property name="text">
+                     <string>描边宽度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_22">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="Text_In_Slider" name="Path_Outline_Width_Slider" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -1599,6 +2564,19 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>

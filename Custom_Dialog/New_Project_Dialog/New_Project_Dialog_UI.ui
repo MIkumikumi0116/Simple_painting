@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>New_Project_Dialog_UI</class>
+ <widget class="QDialog" name="New_Project_Dialog_UI">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>322</width>
-    <height>217</height>
+    <width>290</width>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,16 +45,16 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="Preset_Size_Layout">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="Preset_Size_Label">
            <property name="text">
             <string>预设尺寸</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox">
+          <widget class="QComboBox" name="Preset_Size_ComboBox">
            <property name="minimumSize">
             <size>
              <width>110</width>
@@ -96,16 +96,16 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <layout class="QHBoxLayout" name="Width_Layout">
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="Width_Label">
            <property name="text">
             <string>宽度</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="Width_LineEdit">
            <property name="minimumSize">
             <size>
              <width>60</width>
@@ -123,16 +123,16 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QHBoxLayout" name="Height_Layout">
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="Height_Label">
            <property name="text">
             <string>高度</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2">
+          <widget class="QLineEdit" name="Height_LineEdit">
            <property name="minimumSize">
             <size>
              <width>60</width>
@@ -195,16 +195,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="Confirm_Button">
        <property name="text">
-        <string>PushButton</string>
+        <string>确定</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="Cancel_Button">
        <property name="text">
-        <string>PushButton</string>
+        <string>取消</string>
        </property>
       </widget>
      </item>
