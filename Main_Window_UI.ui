@@ -2693,6 +2693,8 @@
     <addaction name="CCW_Rotate_Layer_Action"/>
     <addaction name="separator"/>
     <addaction name="Layer_Setting_Action"/>
+    <addaction name="separator"/>
+    <addaction name="Rasterize_Vector_Layer_Action"/>
    </widget>
    <widget class="QMenu" name="View_Menu_Tab">
     <property name="title">
@@ -3138,6 +3140,11 @@
     <string>夜间黑</string>
    </property>
   </action>
+  <action name="Rasterize_Vector_Layer_Action">
+   <property name="text">
+    <string>栅格化矢量图层</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -3169,8 +3176,5 @@
    <header>Custom_Widgets/Color_Indicator_Label.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="All_Res.qrc"/>
- </resources>
  <connections/>
 </ui>

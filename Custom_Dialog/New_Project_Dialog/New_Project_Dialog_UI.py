@@ -86,7 +86,7 @@ class Ui_New_Project_Dialog_UI(object):
 
     def retranslateUi(self, New_Project_Dialog_UI):
         _translate = QtCore.QCoreApplication.translate
-        New_Project_Dialog_UI.setWindowTitle(_translate("New_Project_Dialog_UI", "Dialog"))
+        New_Project_Dialog_UI.setWindowTitle(_translate("New_Project_Dialog_UI", "新建工程"))
         self.Preset_Size_Label.setText(_translate("New_Project_Dialog_UI", "预设尺寸"))
         self.Preset_Size_ComboBox.setItemText(0, _translate("New_Project_Dialog_UI", "1920×1080"))
         self.Preset_Size_ComboBox.setItemText(1, _translate("New_Project_Dialog_UI", "1024×1024"))
@@ -95,6 +95,8 @@ class Ui_New_Project_Dialog_UI(object):
         self.Preset_Size_ComboBox.setItemText(4, _translate("New_Project_Dialog_UI", "256×256"))
         self.Preset_Size_ComboBox.setItemText(5, _translate("New_Project_Dialog_UI", "64×64"))
         self.Width_Label.setText(_translate("New_Project_Dialog_UI", "宽度"))
+        self.Width_LineEdit.setText(_translate("New_Project_Dialog_UI", "256"))
         self.Height_Label.setText(_translate("New_Project_Dialog_UI", "高度"))
+        self.Height_LineEdit.setText(_translate("New_Project_Dialog_UI", "256"))
         self.Confirm_Button.setText(_translate("New_Project_Dialog_UI", "确定"))
         self.Cancel_Button.setText(_translate("New_Project_Dialog_UI", "取消"))

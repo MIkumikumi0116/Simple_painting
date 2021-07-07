@@ -18,6 +18,7 @@ from PyQt5 import sip
 from Main_Window_UI import Ui_Main_Window_UI
 from Custom_Widgets.Layer_Widget.Layer_Widget import Layer_Widget
 from Custom_Widgets.Color_Indicator_Widget import Color_Indicator_Widget
+from Custom_Dialog.New_Project_Dialog.New_Project_Dialog import New_Project_Dialog
 
 #TODO 图层拖动排序
 
@@ -69,6 +70,9 @@ class Frame_Controller:
             if layer not in self.selected_layer:
                 self.selected_layer.append(layer)
 
+
+        def Get_layer_index(self, layer):
+            return self.layer_list.index(layer)
 
         def Get_layer_list(self):
             return self.layer_list
@@ -1128,6 +1132,15 @@ class Board_Layer_Controller:
             pass
 
 
+        def Genrate_rasterize(self):
+            return Board_Layer_Controller.Bit_Layer(self.controller,
+                                                    self.controller._Yield_layer_widget(),
+                                                    self.image.copy(), self.offset,
+                                                    self.name if re.match('矢量图层\d+', self.name) is None else '栅格化' + self.name,
+                                                    self.mod_enum, self.opacity)
+
+
+
         def Get_layer_size(self):
             return self.layer_size
 
@@ -1570,14 +1583,37 @@ class Board_Layer_Controller:
         self.backup_controller.Add_backup()
 
 
+    def Rasterize_Vector_Layer(self):
+        layer = self.Get_strong_selected_layer()
+        if layer == False:
+            self.notify_controller.Send_label_notify('未选中图层')
+            return
+        if layer.Get_layer_type_enum() != 'vector_layer':
+            self.notify_controller.Send_label_notify('未选中矢量图层')
+            return
+        if layer.Get_lock_flag():
+            self.notify_controller.Send_label_notify('该图层已锁定')
+            return
+
+        self.main_window.Set_project_unsaved_flag(True)
+
+        new_layer = layer.Genrate_rasterize()
+        self.Insert_layer(new_layer, self.Get_layer_index(layer))
+
+
     def Insert_layer(self, layer, index = None):
         self.current_frame.Insert_layer(layer) if index is None else self.current_frame.Insert_layer(layer, index)
+        self.board_layer_view.Update_layer_widget_list()
+        self.Draw_painting()
 
     def Insert_layer_and_select(self, layer, index = None):
         self.current_frame.Insert_layer_and_select(layer) if index is None else self.current_frame.Insert_layer_and_select(layer, index)
 
     def Delete_layer(self, layer):
         self.current_frame.Delete_layer(layer)
+
+    def Get_layer_index(self, layer):
+        return self.current_frame.Get_layer_index(layer)
 
     def Get_layer_list(self):
         return self.current_frame.Get_layer_list()
@@ -1622,6 +1658,9 @@ class Board_Layer_Controller:
 
     def _Get_highlight_back_color(self):
         return self.style_manage_controller.Get_highlight_back_color()
+
+    def _Yield_layer_widget(self):
+        return self.board_layer_view.Yield_layer_widget()
 
 
 class Tool_View:
@@ -2073,7 +2112,7 @@ class Tool_Controller:
                 self.controller._Send_label_notify('该图层已锁定')
                 return
 
-            self.controller._Set_image_edited()
+            self.controller._Set_project_unsaved()
 
             board_size   = self.controller._Get_board_size()
             layer_size   = layer.Get_layer_size()
@@ -2295,7 +2334,7 @@ class Tool_Controller:
                 self.controller._Send_label_notify('该图层已锁定')
                 return
 
-            self.controller._Set_image_edited()
+            self.controller._Set_project_unsaved()
 
             board_size   = self.controller._Get_board_size()
             layer_size   = layer.Get_layer_size()
@@ -2407,7 +2446,7 @@ class Tool_Controller:
         def Draw_prompt(self):
             layer = self.controller._Get_strong_selected_layer()
 
-            self.controller._Set_image_edited()
+            self.controller._Set_project_unsaved()
 
             command = Board_Layer_Controller.Vector_Layer_Command_Struct()
             command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
@@ -2589,7 +2628,7 @@ class Tool_Controller:
         def Genrate_command(self, key_enter_flag):
             layer = self.controller._Get_strong_selected_layer()
 
-            self.controller._Set_image_edited()
+            self.controller._Set_project_unsaved()
 
             command = Board_Layer_Controller.Vector_Layer_Command_Struct()
             command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
@@ -3136,8 +3175,8 @@ class Tool_Controller:
     def _Add_backup(self):
         self.backup_controller.Add_backup()
 
-    def _Set_image_edited(self):
-        self.main_window.Set_image_edited_flag(True)
+    def _Set_project_unsaved(self):
+        self.main_window.Set_project_unsaved_flag(True)
 
     def _Get_board_image(self):
         return self.board_layer_controller.Get_board_image()
@@ -3481,6 +3520,7 @@ class File_Project_Controller:
     def init(self):
         pass
 
+
     def New_project(self, board_size):
         self.board_layer_controller.Set_board_size(board_size)
 
@@ -3496,125 +3536,138 @@ class File_Project_Controller:
         open_path = QFileDialog.getOpenFileName(self.main_window)[0]
         if len(open_path) == 0:
             return
-        try:
-            with open(open_path, encoding = 'utf-8') as file:
-                save = json.loads(file.read())
-                self.board_layer_controller.Set_board_size(tuple(save['board_size']))
+        elif open_path.endswith('.easypaint'):
+            try:
+                with open(open_path, encoding = 'utf-8') as file:
+                    save = json.loads(file.read())
+                    self.board_layer_controller.Set_board_size(tuple(save['board_size']))
 
-                frame_list = []
-                for frame_save in save['frame_save_list']:
-                    frame = Frame_Controller.Frame(self.frame_controller)
+                    frame_list = []
+                    for frame_save in save['frame_save_list']:
+                        frame = Frame_Controller.Frame(self.frame_controller)
 
-                    for layer_save in frame_save:
-                        if layer_save['layer_type_enum'] == 'bit_layer':
-                            layer                 = Board_Layer_Controller.Bit_Layer.__new__(Board_Layer_Controller.Bit_Layer)
-                            layer.layer_type_enum = layer_save['layer_type_enum']
+                        for layer_save in frame_save:
+                            if layer_save['layer_type_enum'] == 'bit_layer':
+                                layer                 = Board_Layer_Controller.Bit_Layer.__new__(Board_Layer_Controller.Bit_Layer)
+                                layer.layer_type_enum = layer_save['layer_type_enum']
 
-                            base64_data  = bytes(layer_save['image'], encoding = "utf-8")
-                            image_buffer = BytesIO(base64.b64decode(base64_data))
-                            image        = Image.open(image_buffer)
+                                base64_data  = bytes(layer_save['image'], encoding = "utf-8")
+                                image_buffer = BytesIO(base64.b64decode(base64_data))
+                                image        = Image.open(image_buffer)
 
-                            layer.image  = image
-                        elif layer_save['layer_type_enum'] == 'vector_layer':
-                            layer = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
-                            layer.layer_type_enum = layer_save['layer_type_enum']
-                            layer.rotate          = layer_save['rotate']
-                            layer.zoom            = tuple(layer_save['zoom'])
-                            layer.layer_size      = tuple(layer_save['layer_size'])
-                            layer.prompt_command  = None
+                                layer.image  = image
+                            elif layer_save['layer_type_enum'] == 'vector_layer':
+                                layer = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
+                                layer.layer_type_enum = layer_save['layer_type_enum']
+                                layer.rotate          = layer_save['rotate']
+                                layer.zoom            = tuple(layer_save['zoom'])
+                                layer.layer_size      = tuple(layer_save['layer_size'])
+                                layer.prompt_command  = None
 
-                            command_list = []
-                            for command_save in layer_save['command_list']:
-                                command                = Board_Layer_Controller.Vector_Layer_Command_Struct()
-                                command.command_enum   = command_save['command_enum']
-                                command.outline_color  = QColor(command_save['outline_color'][0], command_save['outline_color'][1], command_save['outline_color'][1]) if command_save['outline_color'] is not None else None
-                                command.outline_width  = command_save['outline_width']
-                                command.fill_color     = QColor(command_save['fill_color'][0],    command_save['fill_color'][1],    command_save['fill_color'][1])    if command_save['fill_color']    is not None else None
+                                command_list = []
+                                for command_save in layer_save['command_list']:
+                                    command                = Board_Layer_Controller.Vector_Layer_Command_Struct()
+                                    command.command_enum   = command_save['command_enum']
+                                    command.outline_color  = QColor(command_save['outline_color'][0], command_save['outline_color'][1], command_save['outline_color'][1]) if command_save['outline_color'] is not None else None
+                                    command.outline_width  = command_save['outline_width']
+                                    command.fill_color     = QColor(command_save['fill_color'][0],    command_save['fill_color'][1],    command_save['fill_color'][1])    if command_save['fill_color']    is not None else None
 
-                                if command.command_enum   == 'rect':
-                                    command.x          = command_save['x']
-                                    command.y          = command_save['y']
-                                    command.width      = command_save['width']
-                                    command.height     = command_save['height']
-                                    command.x_radius   = command_save['x_radius']
-                                    command.y_radius   = command_save['y_radius']
+                                    if command.command_enum   == 'rect':
+                                        command.x          = command_save['x']
+                                        command.y          = command_save['y']
+                                        command.width      = command_save['width']
+                                        command.height     = command_save['height']
+                                        command.x_radius   = command_save['x_radius']
+                                        command.y_radius   = command_save['y_radius']
 
-                                elif command.command_enum == 'circle':
-                                    command.x          = command_save['x']
-                                    command.y          = command_save['y']
-                                    command.radius     = command_save['radius']
+                                    elif command.command_enum == 'circle':
+                                        command.x          = command_save['x']
+                                        command.y          = command_save['y']
+                                        command.radius     = command_save['radius']
 
-                                elif command.command_enum == 'ellipse':
-                                    command.x          = command_save['x']
-                                    command.y          = command_save['y']
-                                    command.x_radius   = command_save['x_radius']
-                                    command.y_radius   = command_save['y_radius']
+                                    elif command.command_enum == 'ellipse':
+                                        command.x          = command_save['x']
+                                        command.y          = command_save['y']
+                                        command.x_radius   = command_save['x_radius']
+                                        command.y_radius   = command_save['y_radius']
 
-                                elif command.command_enum == 'line':
-                                    command.first_pos  = tuple(command_save['first_pos'])
-                                    command.second_pos = tuple(command_save['second_pos'])
+                                    elif command.command_enum == 'line':
+                                        command.first_pos  = tuple(command_save['first_pos'])
+                                        command.second_pos = tuple(command_save['second_pos'])
 
-                                elif command.command_enum == 'polygon':
-                                    command.point_list = list(map(lambda pos_list : tuple(pos_list), command_save['point_list']))
+                                    elif command.command_enum == 'polygon':
+                                        command.point_list = list(map(lambda pos_list : tuple(pos_list), command_save['point_list']))
 
-                                elif command.command_enum == 'polyline':
-                                    command.point_list = list(map(lambda pos_list : tuple(pos_list), command_save['point_list']))
+                                    elif command.command_enum == 'polyline':
+                                        command.point_list = list(map(lambda pos_list : tuple(pos_list), command_save['point_list']))
 
-                                elif command.command_enum == 'path':
-                                    path_command_list  = []
-                                    class Path_Command_Struct:
-                                        pass
+                                    elif command.command_enum == 'path':
+                                        path_command_list  = []
+                                        class Path_Command_Struct:
+                                            pass
 
-                                    for path_command_save in command_save['path_command_list']:
-                                        path_command = Path_Command_Struct()
-                                        path_command.command_enum = path_command_save['command_enum']
+                                        for path_command_save in command_save['path_command_list']:
+                                            path_command = Path_Command_Struct()
+                                            path_command.command_enum = path_command_save['command_enum']
 
-                                        if path_command.command_enum == 'M':
-                                            path_command.pos = tuple(path_command_save['pos'])
-                                        elif path_command.command_enum == 'C':
-                                            path_command.pos = list(map(lambda pos_list : tuple(pos_list), path_command_save['pos']))
+                                            if path_command.command_enum == 'M':
+                                                path_command.pos = tuple(path_command_save['pos'])
+                                            elif path_command.command_enum == 'C':
+                                                path_command.pos = list(map(lambda pos_list : tuple(pos_list), path_command_save['pos']))
 
-                                        path_command_list.append(path_command)
+                                            path_command_list.append(path_command)
 
-                                    command.path_command_list = path_command_list
+                                        command.path_command_list = path_command_list
 
-                                command_list.append(command)
+                                    command_list.append(command)
 
-                            layer.command_list = command_list
+                                layer.command_list = command_list
 
-                        layer.selected_state_enum = 'unselected'
-                        layer.controller          = self.board_layer_controller
+                            layer.selected_state_enum = 'unselected'
+                            layer.controller          = self.board_layer_controller
 
-                        layer.offset              = tuple(layer_save['offset'])
-                        layer.hide_flag           = False
-                        layer.lock_flag           = False
-                        layer.name                = layer_save['name']
-                        layer.mod_enum            = layer_save['mod_enum']
-                        layer.opacity             = layer_save['opacity']
+                            layer.offset              = tuple(layer_save['offset'])
+                            layer.hide_flag           = False
+                            layer.lock_flag           = False
+                            layer.name                = layer_save['name']
+                            layer.mod_enum            = layer_save['mod_enum']
+                            layer.opacity             = layer_save['opacity']
 
-                        layer.widget              = self.board_layer_view.Yield_layer_widget()
-                        layer.widget.                         init(layer, self.style_manage_controller)
-                        layer.widget.Hide_Button.clicked.     connect(layer.On_hide_button_clicked)
-                        layer.widget.Lock_Button.clicked.     connect(layer.On_lock_button_clicked)
-                        layer.widget.Move_Up_Button.clicked.  connect(layer.On_move_up_button_clicked)
-                        layer.widget.Move_Down_Button.clicked.connect(layer.On_move_down_button_clicked)
-                        layer.widget.mouse_press_singal.      connect(layer.On_mouse_press_singal_emit)
+                            layer.widget              = self.board_layer_view.Yield_layer_widget()
+                            layer.widget.                         init(layer, self.style_manage_controller)
+                            layer.widget.Hide_Button.clicked.     connect(layer.On_hide_button_clicked)
+                            layer.widget.Lock_Button.clicked.     connect(layer.On_lock_button_clicked)
+                            layer.widget.Move_Up_Button.clicked.  connect(layer.On_move_up_button_clicked)
+                            layer.widget.Move_Down_Button.clicked.connect(layer.On_move_down_button_clicked)
+                            layer.widget.mouse_press_singal.      connect(layer.On_mouse_press_singal_emit)
 
-                        layer.Set_preview_label()
-                        layer.Set_widget_info()
+                            layer.Set_preview_label()
+                            layer.Set_widget_info()
 
-                        frame.Insert_layer(layer)
-                    frame.Set_selected_layer([])
-                    frame_list.append(frame)
+                            frame.Insert_layer(layer)
+                        frame.Set_selected_layer([])
+                        frame_list.append(frame)
 
-                self.frame_controller.Set_frame_list(frame_list)
-                self.frame_controller.Set_current_frame(0)
+                    self.frame_controller.Set_frame_list(frame_list)
+                    self.frame_controller.Set_current_frame(0)
 
-                self.board_layer_controller.Draw_painting_frame_change()
+                    self.board_layer_controller.Draw_painting_frame_change()
 
-        except BaseException as e:
-            self.notify_controller.Send_label_notify('文件已损坏，无法读取')
-            return
+            except BaseException as e:
+                self.notify_controller.Send_label_notify('文件已损坏，无法读取')
+                return
+
+        elif open_path.lower().endswith('.png') or open_path.lower().endswith('.jpg') or open_path.lower().endswith('.jpeg') or open_path.lower().endswith('.webp') or open_path.lower().endswith('.ico') or open_path.lower().endswith('.bmp') or open_path.lower().endswith('.tif'):
+            try:
+                image = Image.open(open_path).convert('RGBA')
+                self.New_project(image.size)
+
+                self.board_layer_controller.Get_layer_list()[0].Set_image(image)
+                self.board_layer_controller.Draw_painting()
+
+            except BaseException as e:
+                self.notify_controller.Send_label_notify('读取图片失败')
+                return
 
     def Save_as_project(self, path):
         if path == None:
@@ -3822,7 +3875,7 @@ class Event_And_Singal_Distributor:
         self.main_window.Polygon_Fill_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_polygon_fill_color_indicator_label_update_color)
 
         self.main_window.Polyline_Outline_Color_Indicator_Label.update_color_singal.connect(self.tool_view.On_polyline_outline_color_indicator_label_update_color)
-        self.main_window.Polyline_Outline_Width_Slider.value_change_single.        connect(self.tool_view.On_polyline_outline_width_slider_value_changed)
+        self.main_window.Polyline_Outline_Width_Slider.value_change_single.         connect(self.tool_view.On_polyline_outline_width_slider_value_changed)
 
         self.main_window.Path_Outline_Color_Indicator_Label.update_color_singal.    connect(self.tool_view.On_path_outline_color_indicator_label_update_color)
         self.main_window.Path_Outline_Width_Slider.value_change_single.             connect(self.tool_view.On_path_outline_width_slider_value_changed)
@@ -3834,37 +3887,38 @@ class Event_And_Singal_Distributor:
         self.main_window.Cancel_Selection_Button.clicked.connect(self.tool_view.On_cancel_selection_button_clicked)
 
 
-        # self.main_window.New_Action.triggered.             connect(lambda : )
-        self.main_window.Open_Action.triggered.            connect(lambda : self.file_project_controller.Open_project())
-        self.main_window.Save_As_Action.triggered.         connect(lambda : self.file_project_controller.Save_as_project(path = None))
-        self.main_window.Export_Action.triggered.          connect(lambda : self.file_project_controller.Export_project())
+        self.main_window.New_Action.triggered.                   connect(lambda : New_Project_Dialog(self.main_window, self.file_project_controller.New_project))
+        self.main_window.Open_Action.triggered.                  connect(lambda : self.file_project_controller.Open_project())
+        self.main_window.Save_As_Action.triggered.               connect(lambda : self.file_project_controller.Save_as_project(path = None))
+        self.main_window.Export_Action.triggered.                connect(lambda : self.file_project_controller.Export_project())
 
-        self.main_window.Revoke_Action.triggered.          connect(lambda : self.backup_controller.Revoke_backup())
-        self.main_window.Redo_Action.triggered.            connect(lambda : self.backup_controller.Redo_backup())
+        self.main_window.Revoke_Action.triggered.                connect(lambda : self.backup_controller.Revoke_backup())
+        self.main_window.Redo_Action.triggered.                  connect(lambda : self.backup_controller.Redo_backup())
 
-        self.main_window.New_Bit_Layer_Action.triggered.   connect(lambda : self.board_layer_controller.Add_bit_layer())
-        self.main_window.New_Vector_Layer_Action.triggered.connect(lambda : self.board_layer_controller.Add_vector_layer())
+        self.main_window.New_Bit_Layer_Action.triggered.         connect(lambda : self.board_layer_controller.Add_bit_layer())
+        self.main_window.New_Vector_Layer_Action.triggered.      connect(lambda : self.board_layer_controller.Add_vector_layer())
+        self.main_window.Rasterize_Vector_Layer_Action.triggered.connect(lambda : self.board_layer_controller.Rasterize_Vector_Layer())
 
-        self.main_window.Cancel_Selection_Action.triggered.connect(lambda : self.board_layer_controller.Cancel_selection())
-        self.main_window.Copy_Selection_Action.triggered.  connect(lambda : self.board_layer_controller.Copy_selection())
-        self.main_window.Cut_Selection_Action.triggered.   connect(lambda : self.board_layer_controller.Cut_selection())
-        self.main_window.Clear_Selection_Action.triggered. connect(lambda : self.board_layer_controller.Clear_selection())
+        self.main_window.Cancel_Selection_Action.triggered.      connect(lambda : self.board_layer_controller.Cancel_selection())
+        self.main_window.Copy_Selection_Action.triggered.        connect(lambda : self.board_layer_controller.Copy_selection())
+        self.main_window.Cut_Selection_Action.triggered.         connect(lambda : self.board_layer_controller.Cut_selection())
+        self.main_window.Clear_Selection_Action.triggered.       connect(lambda : self.board_layer_controller.Clear_selection())
 
-        self.main_window.New_Frame_Action.triggered.       connect(lambda : self.frame_controller.New_frame())
-        self.main_window.Copy_Frame_Action.triggered.      connect(lambda : self.frame_controller.Copy_frame())
-        self.main_window.Next_Frame_Action.triggered.      connect(lambda : self.frame_controller.Next_frame())
-        self.main_window.Previous_Frame_Action.triggered.  connect(lambda : self.frame_controller.Previous_frame())
+        self.main_window.New_Frame_Action.triggered.             connect(lambda : self.frame_controller.New_frame())
+        self.main_window.Copy_Frame_Action.triggered.            connect(lambda : self.frame_controller.Copy_frame())
+        self.main_window.Next_Frame_Action.triggered.            connect(lambda : self.frame_controller.Next_frame())
+        self.main_window.Previous_Frame_Action.triggered.        connect(lambda : self.frame_controller.Previous_frame())
 
-        self.main_window.Normal_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(240, 240, 240)))
-        self.main_window.Miku_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(57,  197, 187)))
-        self.main_window.Bili_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(249, 131, 151)))
-        self.main_window.Red_Color_Action.triggered.       connect(lambda : self.style_manage_controller.Set_base_color(QColor(243, 67,  52)))
-        self.main_window.Yellow_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(253, 192, 5)))
-        self.main_window.Green_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(138, 193, 74)))
-        self.main_window.Blue_Color_Action.triggered.      connect(lambda : self.style_manage_controller.Set_base_color(QColor(31,  148, 243)))
-        self.main_window.Purple_Color_Action.triggered.    connect(lambda : self.style_manage_controller.Set_base_color(QColor(154, 38,  175)))
-        self.main_window.White_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(255, 255, 255)))
-        self.main_window.Black_Color_Action.triggered.     connect(lambda : self.style_manage_controller.Set_base_color(QColor(0,   0,   0)))
+        self.main_window.Normal_Color_Action.triggered.          connect(lambda : self.style_manage_controller.Set_base_color(QColor(240, 240, 240)))
+        self.main_window.Miku_Color_Action.triggered.            connect(lambda : self.style_manage_controller.Set_base_color(QColor(57,  197, 187)))
+        self.main_window.Bili_Color_Action.triggered.            connect(lambda : self.style_manage_controller.Set_base_color(QColor(249, 131, 151)))
+        self.main_window.Red_Color_Action.triggered.             connect(lambda : self.style_manage_controller.Set_base_color(QColor(243, 67,  52)))
+        self.main_window.Yellow_Color_Action.triggered.          connect(lambda : self.style_manage_controller.Set_base_color(QColor(253, 192, 5)))
+        self.main_window.Green_Color_Action.triggered.           connect(lambda : self.style_manage_controller.Set_base_color(QColor(138, 193, 74)))
+        self.main_window.Blue_Color_Action.triggered.            connect(lambda : self.style_manage_controller.Set_base_color(QColor(31,  148, 243)))
+        self.main_window.Purple_Color_Action.triggered.          connect(lambda : self.style_manage_controller.Set_base_color(QColor(154, 38,  175)))
+        self.main_window.White_Color_Action.triggered.           connect(lambda : self.style_manage_controller.Set_base_color(QColor(255, 255, 255)))
+        self.main_window.Black_Color_Action.triggered.           connect(lambda : self.style_manage_controller.Set_base_color(QColor(0,   0,   0)))
 
 
 class Main_Window(QMainWindow, Ui_Main_Window_UI):
@@ -3874,7 +3928,7 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
 
         self.main_window = self
 
-        self.image_edited_flag      = False
+        self.project_unsaved_flag     = True
         self.key_space_pressed_flag = False
         self.key_ctrl_pressed_flag  = False
 
@@ -3925,7 +3979,7 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         for module in self.module_list:
             module.init()
 
-        self.file_project_controller.New_project((500, 500))
+        self.file_project_controller.New_project((256, 256))
 
     def init(self):
         self.main_window.Board_Label.setFocus()
@@ -4025,11 +4079,11 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         return self.style_manage_controller
 
 
-    def Get_image_edited_flag(self):
-        return self.image_edited_flag
+    def Get_project_unsaved_flag(self):
+        return self.project_unsaved_flag
 
-    def Set_image_edited_flag(self, flag):
-        self.image_edited_flag = flag
+    def Set_project_unsaved_flag(self, flag):
+        self.project_unsaved_flag = flag
 
     def Get_key_space_pressed_flag(self):
         return self.key_space_pressed_flag

@@ -1271,6 +1271,8 @@ class Ui_Main_Window_UI(object):
         self.White_Color_Action.setObjectName("White_Color_Action")
         self.Black_Color_Action = QtWidgets.QAction(Main_Window_UI)
         self.Black_Color_Action.setObjectName("Black_Color_Action")
+        self.Rasterize_Vector_Layer_Action = QtWidgets.QAction(Main_Window_UI)
+        self.Rasterize_Vector_Layer_Action.setObjectName("Rasterize_Vector_Layer_Action")
         self.File_Menu_Tab.addAction(self.New_Action)
         self.File_Menu_Tab.addAction(self.Open_Action)
         self.File_Menu_Tab.addSeparator()
@@ -1320,6 +1322,8 @@ class Ui_Main_Window_UI(object):
         self.Layer_Menu_Tab.addAction(self.CCW_Rotate_Layer_Action)
         self.Layer_Menu_Tab.addSeparator()
         self.Layer_Menu_Tab.addAction(self.Layer_Setting_Action)
+        self.Layer_Menu_Tab.addSeparator()
+        self.Layer_Menu_Tab.addAction(self.Rasterize_Vector_Layer_Action)
         self.View_Menu_Tab.addAction(self.Enlarge_View_Action)
         self.View_Menu_Tab.addAction(self.Narrow_View_Action)
         self.View_Menu_Tab.addAction(self.CW_Rotate_View_Action)
@@ -1559,9 +1563,9 @@ class Ui_Main_Window_UI(object):
         self.Miku_Color_Action.setText(_translate("Main_Window_UI", "初音绿"))
         self.White_Color_Action.setText(_translate("Main_Window_UI", "简洁白"))
         self.Black_Color_Action.setText(_translate("Main_Window_UI", "夜间黑"))
+        self.Rasterize_Vector_Layer_Action.setText(_translate("Main_Window_UI", "栅格化矢量图层"))
 from Custom_Widgets.Board_Label import Board_Label
 from Custom_Widgets.Color_Indicator_Label import Color_Indicator_Label
 from Custom_Widgets.Color_Indicator_Widget import Color_Indicator_Widget
 from Custom_Widgets.Color_Picker.Color_Picker_Widget import Color_Picker_Widget
 from Custom_Widgets.Text_In_Slider import Text_In_Slider
-import All_Res_rc
