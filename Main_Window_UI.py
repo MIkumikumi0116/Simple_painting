@@ -15,6 +15,7 @@ class Ui_Main_Window_UI(object):
     def setupUi(self, Main_Window_UI):
         Main_Window_UI.setObjectName("Main_Window_UI")
         Main_Window_UI.resize(1400, 750)
+        Main_Window_UI.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.Centra_Layout = QtWidgets.QWidget(Main_Window_UI)
         self.Centra_Layout.setObjectName("Centra_Layout")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.Centra_Layout)
@@ -1273,6 +1274,8 @@ class Ui_Main_Window_UI(object):
         self.Black_Color_Action.setObjectName("Black_Color_Action")
         self.Rasterize_Vector_Layer_Action = QtWidgets.QAction(Main_Window_UI)
         self.Rasterize_Vector_Layer_Action.setObjectName("Rasterize_Vector_Layer_Action")
+        self.Stop_Anime_Action = QtWidgets.QAction(Main_Window_UI)
+        self.Stop_Anime_Action.setObjectName("Stop_Anime_Action")
         self.File_Menu_Tab.addAction(self.New_Action)
         self.File_Menu_Tab.addAction(self.Open_Action)
         self.File_Menu_Tab.addSeparator()
@@ -1342,6 +1345,7 @@ class Ui_Main_Window_UI(object):
         self.Anime_Menu_Tab.addAction(self.Previous_Frame_Action)
         self.Anime_Menu_Tab.addSeparator()
         self.Anime_Menu_Tab.addAction(self.Play_Anime_Action)
+        self.Anime_Menu_Tab.addAction(self.Stop_Anime_Action)
         self.Anime_Menu_Tab.addSeparator()
         self.Anime_Menu_Tab.addAction(self.Anime_Setting_Action)
         self.Skin_Menu.addAction(self.Normal_Color_Action)
@@ -1379,7 +1383,7 @@ class Ui_Main_Window_UI(object):
 
     def retranslateUi(self, Main_Window_UI):
         _translate = QtCore.QCoreApplication.translate
-        Main_Window_UI.setWindowTitle(_translate("Main_Window_UI", "MainWindow"))
+        Main_Window_UI.setWindowTitle(_translate("Main_Window_UI", "Easy Paint"))
         self.Layer_Name_Label.setText(_translate("Main_Window_UI", "图层名称"))
         self.Mix_Mod_Label.setText(_translate("Main_Window_UI", "混合模式"))
         self.Mix_Mod_ComboBox.setItemText(0, _translate("Main_Window_UI", "正常"))
@@ -1564,6 +1568,7 @@ class Ui_Main_Window_UI(object):
         self.White_Color_Action.setText(_translate("Main_Window_UI", "简洁白"))
         self.Black_Color_Action.setText(_translate("Main_Window_UI", "夜间黑"))
         self.Rasterize_Vector_Layer_Action.setText(_translate("Main_Window_UI", "栅格化矢量图层"))
+        self.Stop_Anime_Action.setText(_translate("Main_Window_UI", "停止"))
 from Custom_Widgets.Board_Label import Board_Label
 from Custom_Widgets.Color_Indicator_Label import Color_Indicator_Label
 from Custom_Widgets.Color_Indicator_Widget import Color_Indicator_Widget

@@ -116,6 +116,9 @@ class Frame_Controller:
         self.frame_list = []
         self.current_frame = None
 
+        self.stop_anime_flag = False
+        self.play_anime_thread = None
+
     def init(self):
         self.frame_list = []
         self.current_frame = None
@@ -188,6 +191,27 @@ class Frame_Controller:
             self.board_layer_controller.Draw_painting_frame_change()
         else:
             self.notify_controller.Send_label_notify('已经是第一帧了')
+
+
+    def Play_anime(self):
+        def Play_anime_thread_func():
+            self.stop_anime_flag = False
+
+            while True:
+                for index in range(len(self.frame_list)):
+                    if self.stop_anime_flag == True:
+                        return
+                    self.Set_current_frame(index)
+                    self.board_layer_controller.Draw_painting_frame_change()
+
+                    time.sleep(0.015)
+
+        self.play_anime_thread = Thread(target = Play_anime_thread_func, args = ())
+        self.play_anime_thread.start()
+
+    def Stop_anime(self):
+        self.stop_anime_flag = True
+
 
 
     def Get_frame_list(self):
@@ -597,11 +621,11 @@ class Board_Layer_View:
             delta_angle = np.arccos(angle_cos)
             delta_angle = delta_angle * 360 / 2 / np.pi
 
-            if abs(delta_angle) > 10:
+            if abs(delta_angle) > 3:
                 if np.cross(first_pos_vector, second_pos_vector) > 0:
-                    self.Rotate_board( delta_angle // 10 * 10)
+                    self.Rotate_board( delta_angle // 3 * 3)
                 else:
-                    self.Rotate_board(-delta_angle // 10 * 10)
+                    self.Rotate_board(-delta_angle // 3 * 3)
 
                 self.rotate_first_pos = self.rotate_second_pos
 
@@ -1020,12 +1044,15 @@ class Board_Layer_Controller:
             self.Set_widget_info()
 
         def Draw_layer(self):
+            # 根据画布大小新建临时画布
             board_size = self.controller.Get_board_size()
             image      = QImage(board_size[0], board_size[1], QImage.Format_ARGB32)
             image.fill(QColor(0, 0, 0, 0))
             painter    = QPainter(image)
             painter.setRenderHint(QPainter.Antialiasing)
 
+            # 根据图层的偏移、旋转、缩放设置绘图命令的偏移、旋转、缩放
+            # 位图图层无法无损地旋转或缩放，因此不存储旋转与缩放信息，旋转与缩放由用变换后的图层图片替换原有图片实现
             transform = QTransform()
             transform.translate(-board_size[0] // 2, -board_size[1] // 2)
             transform.rotate(self.rotate)
@@ -1033,7 +1060,10 @@ class Board_Layer_Controller:
             transform.scale(self.zoom[0], self.zoom[1])
             painter.setTransform(transform)
 
+            # 从命令列表依次取出作画命令，依据作画命令设置颜色，进行绘制
+            # self.prompt_command是正在绘制过程中的命令，如绘制矩形时鼠标按下，在画布上拖动，还未松开时。
             for command in (self.command_list + [self.prompt_command]) if self.prompt_command != None else self.command_list:
+                # 设置描边与填充颜色
                 if command.outline_color != None:
                     pen = QPen(QColor(command.outline_color))
                     pen.setWidth(command.outline_width)
@@ -1047,7 +1077,8 @@ class Board_Layer_Controller:
                 else:
                     painter.setBrush(Qt.NoBrush)
 
-                if command.command_enum == 'rect':
+                # 根据命令类型进行绘制
+                if command.command_enum == 'rect'：
                     painter.drawRoundedRect(command.x, command.y, command.width, command.height, command.x_radius, command.y_radius)
 
                 elif command.command_enum == 'circle':
@@ -1070,7 +1101,9 @@ class Board_Layer_Controller:
                     painter.drawPolyline(* point_list)
 
                 elif command.command_enum == 'path':
+                    # 绘制路径命令本身也是一组命令序列，指示曲线从何处开始，以怎样的曲率绘制到下一个控制点
                     path = QPainterPath()
+
                     for path_command in command.path_command_list:
                         if path_command.command_enum == 'M':
                             path.moveTo(* path_command.pos)
@@ -1180,25 +1213,33 @@ class Board_Layer_Controller:
 
 
     def Genrate_painting(self):
+        # 生成空白画布
         painting_array = np.array(self.base_layer.copy(), dtype = 'int32')
 
-        for layer in self.Get_layer_list()[::-1]:
+        for layer in self.Get_layer_list()[::-1]:   #从底层图层开始依次叠加各图层
             if not layer.Get_hide_flag():
+                # 获取图层图像、偏移、透明度
                 layer_image   = layer.Draw_layer()
                 layer_offset  = layer.Get_offset()
                 layer_opacity = layer.Get_opacity()
 
+                # 图层的尺寸不一定与画布尺寸相等，图层图像可位于画布任意位置，甚至画布外
+                # 叠加图层前先生成与画布等大的临时画布，将图层图像根据偏移粘贴到临时画布，再叠加各图层
                 temp_image    = Image.new('RGBA', self.board_size, (0, 0, 0, 0))
                 temp_image.paste(layer_image, layer_offset, mask = layer_image)
+
+                # 图片的rgb通道存储颜色，alpha通道存储该点是否有像素，
+                # alpha通道的值只能为0（无像素）或255（有像素）
+                # 将图片转为numpy_array对象以利用矩阵操作
                 layer_image_array   = np.array(temp_image,  dtype = 'int32')
                 layer_rgb           = layer_image_array[:, :, :3]
                 painting_array_copy = painting_array.copy()
                 painting_rgb        = painting_array_copy[:, :, :3]
-
                 alpha_array         = painting_array[:, :, 3] + layer_image_array[:, :, 3]
                 alpha_array[alpha_array > 0] = 255
                 opaque_array        = np.zeros((self.board_size[0], self.board_size[1] ,3))
 
+                # 根据混合公式，按完全不透明绘制图层叠加效果
                 if layer.mod_enum == '正常':
                     mask_array = layer_image_array[:, :, 3] == 255
                     painting_rgb[mask_array] = layer_rgb[mask_array]
@@ -1305,8 +1346,9 @@ class Board_Layer_Controller:
                 elif layer.mod_enum == '实色混合':
                     pass
 
-
+                # 将rgb、alpha值限制在0~255
                 opaque_array = np.clip(opaque_array[:, :, :3], 0, 255)
+                # 根据图层透明度将完全不透明下的效果按不透明比例叠加到已有画作上，得到新画作
                 painting_array[:, :, :3] = (layer_opacity * opaque_array + (100 - layer_opacity) * painting_array[:, :, :3]) / 100
                 painting_array[:, :,  3] = alpha_array
 
@@ -1661,6 +1703,17 @@ class Board_Layer_Controller:
 
     def _Yield_layer_widget(self):
         return self.board_layer_view.Yield_layer_widget()
+
+    def On_delete_layer_action_trigged(self):
+        layer = self.Get_strong_selected_layer()
+        if layer == None:
+            return
+        if layer.Get_lock_flag() == True:
+            self.notify_controller.Send_label_notify('该图层已锁定')
+            return
+
+        self.Delete_layer(layer)
+        self.board_layer_view.Update_layer_widget_list()
 
 
 class Tool_View:
@@ -2114,6 +2167,7 @@ class Tool_Controller:
 
             self.controller._Set_project_unsaved()
 
+            # 根据图层图像尺寸与偏移计算临时画布的尺寸
             board_size   = self.controller._Get_board_size()
             layer_size   = layer.Get_layer_size()
             layer_offset = layer.Get_offset()
@@ -2126,6 +2180,9 @@ class Tool_Controller:
             painting_layer_size = (right - left, button - top)
             layer_pos           = (board_pos[0] - left, board_pos[1] - top)
 
+            # 将图层图片粘贴到临时画布上
+            # 生成作画区域蒙版
+            # 处理作画区域
             layer_image_array   = self.Yield_layer_image_array(layer.Draw_layer(), painting_layer_size, layer_offset)
             painting_mask_array = self.Yield_painting_mask_array(layer_pos, painting_layer_size)
             layer_image_array   = self.Process_painting(layer_image_array, painting_mask_array)
@@ -2626,22 +2683,23 @@ class Tool_Controller:
             self.painting_layer = None
 
         def Genrate_command(self, key_enter_flag):
-            layer = self.controller._Get_strong_selected_layer()
+            if len(self.pos_list) > 0:
+                layer = self.controller._Get_strong_selected_layer()
 
-            self.controller._Set_project_unsaved()
+                self.controller._Set_project_unsaved()
 
-            command = Board_Layer_Controller.Vector_Layer_Command_Struct()
-            command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
-            command.outline_width = self.outline_width
-            command.fill_color    = QColor(self.fill_color)    if self.fill_color    is not None else None
+                command = Board_Layer_Controller.Vector_Layer_Command_Struct()
+                command.outline_color = QColor(self.outline_color) if self.outline_color is not None else None
+                command.outline_width = self.outline_width
+                command.fill_color    = QColor(self.fill_color)    if self.fill_color    is not None else None
 
-            command = self.Fill_command_date(command, key_enter_flag)
+                command = self.Fill_command_date(command, key_enter_flag)
 
-            layer.Set_prompt_command(command)
-            if key_enter_flag:
-                layer.Formaliz_prompt_command()
-                self.controller._Add_backup()
-            self.controller._Draw_painting()
+                layer.Set_prompt_command(command)
+                if key_enter_flag:
+                    layer.Formaliz_prompt_command()
+                    self.controller._Add_backup()
+                self.controller._Draw_painting()
 
         def Fill_command_date(self, command):
             #victual function
@@ -3372,6 +3430,7 @@ class Backup_Controller:
                     layer                 = Board_Layer_Controller.Vector_Layer.__new__(Board_Layer_Controller.Vector_Layer)
                     layer.layer_type_enum = layer_backup.layer_type_enum
                     layer.command_list    = copy.deepcopy(layer_backup.command_list)
+                    layer.prompt_command  = None
                     layer.rotate          = layer_backup.rotate
                     layer.zoom            = layer_backup.zoom
                     layer.layer_size      = layer_backup.layer_size
@@ -3537,7 +3596,7 @@ class File_Project_Controller:
         if len(open_path) == 0:
             return
         elif open_path.endswith('.easypaint'):
-            try:
+            # try:
                 with open(open_path, encoding = 'utf-8') as file:
                     save = json.loads(file.read())
                     self.board_layer_controller.Set_board_size(tuple(save['board_size']))
@@ -3612,6 +3671,8 @@ class File_Project_Controller:
 
                                             if path_command.command_enum == 'M':
                                                 path_command.pos = tuple(path_command_save['pos'])
+                                            elif path_command.command_enum == 'L':
+                                                path_command.pos = tuple(path_command_save['pos'])
                                             elif path_command.command_enum == 'C':
                                                 path_command.pos = list(map(lambda pos_list : tuple(pos_list), path_command_save['pos']))
 
@@ -3653,9 +3714,9 @@ class File_Project_Controller:
 
                     self.board_layer_controller.Draw_painting_frame_change()
 
-            except BaseException as e:
-                self.notify_controller.Send_label_notify('文件已损坏，无法读取')
-                return
+            # except BaseException as e:
+            #     self.notify_controller.Send_label_notify('文件已损坏，无法读取')
+            #     return
 
         elif open_path.lower().endswith('.png') or open_path.lower().endswith('.jpg') or open_path.lower().endswith('.jpeg') or open_path.lower().endswith('.webp') or open_path.lower().endswith('.ico') or open_path.lower().endswith('.bmp') or open_path.lower().endswith('.tif'):
             try:
@@ -3778,7 +3839,6 @@ class Event_And_Singal_Distributor:
         self.main_window.keyReleaseEvent               = self.main_window.Main_window_key_release_event
 
 
-
         self.main_window.Board_Label.wheelEvent        = self.board_layer_view.Wheel_Event
         self.main_window.Board_Label.mousePressEvent   = self.board_layer_view.Mouse_press_event
         self.main_window.Board_Label.mouseMoveEvent    = self.board_layer_view.Mouse_move_event
@@ -3897,6 +3957,7 @@ class Event_And_Singal_Distributor:
 
         self.main_window.New_Bit_Layer_Action.triggered.         connect(lambda : self.board_layer_controller.Add_bit_layer())
         self.main_window.New_Vector_Layer_Action.triggered.      connect(lambda : self.board_layer_controller.Add_vector_layer())
+        self.main_window.Del_Layer_Action.triggered.             connect(lambda : self.board_layer_controller.On_delete_layer_action_trigged())
         self.main_window.Rasterize_Vector_Layer_Action.triggered.connect(lambda : self.board_layer_controller.Rasterize_Vector_Layer())
 
         self.main_window.Cancel_Selection_Action.triggered.      connect(lambda : self.board_layer_controller.Cancel_selection())
@@ -3908,6 +3969,9 @@ class Event_And_Singal_Distributor:
         self.main_window.Copy_Frame_Action.triggered.            connect(lambda : self.frame_controller.Copy_frame())
         self.main_window.Next_Frame_Action.triggered.            connect(lambda : self.frame_controller.Next_frame())
         self.main_window.Previous_Frame_Action.triggered.        connect(lambda : self.frame_controller.Previous_frame())
+
+        self.main_window.Play_Anime_Action.triggered.            connect(lambda : self.frame_controller.Play_anime())
+        self.main_window.Stop_Anime_Action.triggered.            connect(lambda : self.frame_controller.Stop_anime())
 
         self.main_window.Normal_Color_Action.triggered.          connect(lambda : self.style_manage_controller.Set_base_color(QColor(240, 240, 240)))
         self.main_window.Miku_Color_Action.triggered.            connect(lambda : self.style_manage_controller.Set_base_color(QColor(57,  197, 187)))
@@ -3926,12 +3990,13 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
     def __init__(self):
         super().__init__()
 
-        self.main_window = self
-
-        self.project_unsaved_flag     = True
+        self.project_unsaved_flag   = True
         self.key_space_pressed_flag = False
         self.key_ctrl_pressed_flag  = False
 
+        self.main_window = self
+
+        # 实例化各模块
         self.frame_view                   = Frame_View(self.main_window)
         self.frame_controller             = Frame_Controller(self.main_window)
         self.board_layer_view             = Board_Layer_View(self.main_window)
@@ -3945,10 +4010,12 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
         self.file_project_controller      = File_Project_Controller(self.main_window)
         self.event_and_singal_distributor = Event_And_Singal_Distributor(self.main_window)
 
+        # 绘制用户界面
         self.setupUi(self)
         self.main_window.show()
         self.init()
 
+        #连接各模块
         self.module_list = [self.frame_view,
                             self.frame_controller,
                             self.board_layer_view,
@@ -3976,13 +4043,14 @@ class Main_Window(QMainWindow, Ui_Main_Window_UI):
             module.file_project_controller      = self.file_project_controller
             module.event_and_singal_distributor = self.event_and_singal_distributor
 
+        # 初始化各模块
         for module in self.module_list:
             module.init()
 
         self.file_project_controller.New_project((256, 256))
 
     def init(self):
-        self.main_window.Board_Label.setFocus()
+        self.main_window.grabKeyboard()
 
         self.main_window.Board_Label_Widget.setStyleSheet('''#Board_Label_Widget{
                                                                 border:1px solid red

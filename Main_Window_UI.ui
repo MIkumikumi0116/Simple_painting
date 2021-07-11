@@ -10,8 +10,11 @@
     <height>750</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Easy Paint</string>
   </property>
   <widget class="QWidget" name="Centra_Layout">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -2723,6 +2726,7 @@
     <addaction name="Previous_Frame_Action"/>
     <addaction name="separator"/>
     <addaction name="Play_Anime_Action"/>
+    <addaction name="Stop_Anime_Action"/>
     <addaction name="separator"/>
     <addaction name="Anime_Setting_Action"/>
    </widget>
@@ -3145,6 +3149,11 @@
     <string>栅格化矢量图层</string>
    </property>
   </action>
+  <action name="Stop_Anime_Action">
+   <property name="text">
+    <string>停止</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -3176,5 +3185,6 @@
    <header>Custom_Widgets/Color_Indicator_Label.h</header>
   </customwidget>
  </customwidgets>
+ <resources/>
  <connections/>
 </ui>
